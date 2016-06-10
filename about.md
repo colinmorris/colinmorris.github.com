@@ -1,14 +1,12 @@
 ---
 layout: page
-title: "About Me"
-description: ""
+title: About
+permalink: /about/
 ---
-{% include JB/setup %}
 
-My name is Colin Morris. I just finished my Master's in computer science at the University of Toronto. My [thesis](http://ftp.cs.toronto.edu/pub/gh/Morris,Colin-MSc-thesis-2013.pdf) was on detecting online sexual predators using machine learning techniques with linguistic features. I love Python and Linux and pop music (wanna be my friend on [last.fm](http://www.last.fm/user/UnicornTurds)?).
+I'm an unemployed programmer and deep learning enthusiast. Currently working on some kooky personal projects involving machine learning and data visualization, which I plan to share here (and on my Github: {% include icon-github.html username="colinmorris" %}).
 
-Thanks for stopping by. If you'd like to contact me, my e-mail is:
+I graduated from the University of Toronto in 2013 with a Master's in CS. From 2013-2016, I worked at Apple on the "Proactive Siri" team.
 
-{% highlight python %} 
-    '.'.join(['colin', 'morris2@gmail', 'com'])
-{% endhighlight %}
+You can contact me at \[firstname\].\[lastname\]2@gmail.com
+

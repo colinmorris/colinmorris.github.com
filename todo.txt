@@ -1,4 +1,0 @@
-- Add 'about me' section
-- Some kind of default title?
-- Headings at the top are kind of dumb (and I have no desire to use categories)
-- Make stuff look nice. (I like the design of this jekyll site: http://tatey.com/)
