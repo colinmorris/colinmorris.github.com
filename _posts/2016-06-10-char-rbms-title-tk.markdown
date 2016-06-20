@@ -32,16 +32,6 @@ I used three datasets for most of my experiments:
 
 [This README](TODO) has instructions for downloading each of them, if you want to reproduce my results.
 
-Some other domains that could be fun to play with:
-
-- book titles
-- movies
-- songs
-- bands
-- prescription drugs
-
-I was able to find large public datasets for some of these domains (e.g. [the Project Gutenberg catalog](http://www.gutenberg.org/wiki/Gutenberg:Offline_Catalogs) for books), but a common problem was that they would often contain names from many different languages mixed together. Which makes for a harder problem, but more significantly, makes it harder for me to assess the quality of outputs. (And as I'll describe later, qualitative assessment turned out to be important.)
-
 ### Representing Inputs
 
 The first thing we need to consider is what the input layer ("visible" layer in RBM parlance) is going to look like. How do we represent these strings we're trying to model?
@@ -52,7 +42,7 @@ We'll represent names as a sequence of [one-hot](https://en.wikipedia.org/wiki/O
 
 Because we're not using a recurrent architecture, we'll need to fix some maximum string length M ahead of time. Names shorter than M will need to be padded with some special character.
 
-For example, let's take our alphabet to be just {a,b,c,d,e,$}, where '$' is our padding character, and set M to 4. We can encode the name 'deb' using the following 4x6 matrix:
+For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is our padding character, and set M to 4. We can encode the name '*deb*' using the following 4x6 matrix:
 
 |index  |a      |b      |c      |d      |e      |$      |
 |-------|-------|-------|-------|-------|-------|-------|
@@ -70,7 +60,7 @@ For example, let's take our alphabet to be just {a,b,c,d,e,$}, where '$' is our 
 
 #### How do they work?
 
-A restricted Boltzmann machine (or RBM) is a neural network consisting of two layers of binary units, one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names, encoded as concatenations of one-hot character vectors.
+A restricted Boltzmann machine (or RBM) is a neural network consisting of two layers of binary units[\*](TODO: footnote on variations), one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names, encoded as concatenations of one-hot character vectors.
 
 <div class="imgcap">
     <img src="/img/rbm.svg">
@@ -82,6 +72,7 @@ As a generative model, RBMs try to learn the distribution of the data they're gi
 
 ```python
 class RBM(object):
+    # TODO: Should probably describe the shape/semantics of self.W and biases?
     # ...
     def energy(self, visible, hidden):
         # TODO: Is this actually accurate?
@@ -92,7 +83,7 @@ class RBM(object):
     def energy(self, visible):
         """Equivalent to 
             sum(self.energy(visible, h) for h in all_possible_hidden_vectors)
-        But not exponential in h!"""
+        But not exponential in h"""
         return -1*(np.dot(visible, self.visible_bias)
             + np.logaddexp(0, np.dot(visible, self.W.T) + self.hidden_bias))
 ```
@@ -125,7 +116,7 @@ One of the fundamental operations we can perform on an RBM is called Gibbs sampl
         return np.random.rand(visible_probs.shape) < visible_probs
 ```
 
-Gibbs sampling essentially bounces back and forth between the visible and hidden units, continually asking "What hidden states go well with these visible states?", then "What visible states go well with these hidden states?".
+Gibbs sampling starts from some configuration of one of the layers, and essentially bounces back and forth between the visible and hidden layers, continually asking "What hidden states go well with these visible states?", then "What visible states go well with these hidden states?".
 
 Here's an example of how the state of the visible layer evolves during repeated Gibbs sampling. This example uses a model trained on the geo names dataset:
 
@@ -155,9 +146,9 @@ Remember how we said that RBMs are trying to learn the distribution of our data?
 
 #### Training RBMs (1)
 
-There are a few methods for training RBMs. The one I'll be using is called "Persistent Contrastive Divergence". Here's a sketch:
+[TODO: Which of these training sections is better? Leaning to 2.]()
 
-[TODO: just do pseudocode?]()
+There are a few methods for training RBMs. The one I'll be using is called "Persistent Contrastive Divergence". Here's a sketch:
 
 ```python
 def train(self, training_data, epochs):
@@ -188,7 +179,7 @@ Probably the most commonly used training procedure is (non-persistent) contrasti
 
 #### Training RBMs (2)
 
-There are a few methods for training RBMs. The one I'll be using is called "Persistent Contrastive Divergence". Here's a sketch:
+There are a few methods for training RBMs. The one I'll be using is called "Persistent Contrastive Divergence". Here's a pseudocode sketch:
 
 ```
 initialize $batch_size random visible configurations - call these "fantasy particles"
@@ -207,7 +198,7 @@ As we noted above, if we do Gibbs sampling long enough, we eventually get exactl
 
 #### Softmax units
 
-One thing to notice is that, for every block of N visible units representing a character, there will always be exactly one unit turned on - the probability we assign to any vector failing this criterion should be 0. We should help the network out by giving it this information for free. We'll do that by treating each of those blocks as a single 'softmax' unit. Rather than sampling each binary unit independently, and turning it on with some probability according to the sum of the incoming weights from the hidden layer, we'll sample using the [softmax function](https://en.wikipedia.org/wiki/Softmax_function). 
+One thing to notice is that, for every block of N visible units representing a character, there will always be exactly one unit turned on - the probability we assign to any vector failing this criterion should be 0. We should help the network out by giving it this information for free. We'll do that by treating each of those blocks as a single 'softmax' unit. Rather than sampling each visible binary unit independently, and turning it on with some probability according to the sum of the incoming weights from the hidden layer, we'll sample using the [softmax function](https://en.wikipedia.org/wiki/Softmax_function). 
 
 (Doing this is not strictly necessary. But, empirically, I observed that it helped training a lot.)
 
@@ -219,105 +210,164 @@ If you're interested in reading more about RBMs, I highly recommend Geoff Hinton
 
 [What is there to say here? Should this go toward the end](TODO)
 
-### Evaluating RBMs
+### Evaluating Results
 
-RBMs have a reputation for being a bit finnicky to train, and my experience working on this project is consistent with that. And there are a lot of hyperparameters to tweak. The most significant one is probably learning rate, but some others include:
-
-- Weight cost (add a cost to the magnitude of weights to prevent overfitting, and encourage a good mixing rate)
-- Batch size
-- Number of fantasy particles
-- Number of hidden units
-- Epochs (number of times to cycle through the training data)
-- Number of rounds of Gibbs sampling on fantasy particles per update (usually 1, but could be more)
-
-There are also some knobs to turn that are specific to this problem, like:
-
-- Whether to do softmax sampling of visible units
-- Maximum string length
-- Padding character (using spaces reduces the complexity of the model by reducing the size of the visible layer, but a special padding character gives a clearer signal.)
-
-It makes sense to try lots of variations on these parameters, and see what sticks. But, having trained a bunch of models, how do we rank them?
-
-This turns out to be a surprisingly hairy problem. If we were classifying spam, the answer would be obvious - we want the model with the highest accuracy. (Or F\_Beta score for some Beta). 
-
-The most obvious way to assess a generative model is to look at the probability it assigns to some data from the target distribution - ideally, heldout test data that it didn't see during training. If `P_A(test_set) > P_B(test_set)` then we can say that model A is better than B. 
-
-But here's a bombshell I've been holding on to until now. **Likelihood is intranctable for RBMs**. The probability of a visible vector v and hidden vector h is...
-
-    P(v, h) = 1/Z * exp(-E(v,h))
-
-`E(v,h)` is our familiar energy function from earlier, but `Z` is new. It's called the *partition function*, and it's defined as
-
-    sum(exp(-E(v,h)) for (v,h) in all_possible_v_and_h)
-
-If we want to train a model on GitHub repository names of up to length 18, the number of possible visible vectors will be 66^18. That's a for loop we probably don't want to wait on.
-
-Let's talk about some evaluation metrics that are tractable.
-
-#### Pseudolikelihood
-
-[Pseudolikelihood](https://en.wikipedia.org/wiki/Pseudolikelihood) approximates the likelihood of a vector X by the product of the probabilities of each individual X\_i conditioned on the other values. e.g.
-
-    P(X='Bort') = P(X[0] = 'B' | '_ort')
-                * P(X[1] = 'o' | 'B_rt')
-                * P(X[2] = 'r' | 'Bo_t')
-                * P(X[3] = 't' | 'Bor_')
-
-To understand why this isn't a perfect approximation, let's consider a name like 'Barbara'.
-
-I'll use [ghits](http://itre.cis.upenn.edu/~myl/languagelog/archives/000954.html) as a rough proxy for name popularity. "Barbara" has around 500 Mghits. There are no single-character substitutions that have anywhere near that popularity. The only reasonably popular variants I could find were "Darbara" (300k), and "Barbora" (15m). So, if our conditional probabilities follow these counts, our pseudolikelihood product looks something like:
-
-P(X='Barbara') = .995 * .999 * .999 * .999 * .95 * .999 * .999 ~= .90
-
-I do not live in a universe where 90% of people are named 'Barabara'. Though I kind of wish I did.
-
-#### Noise discrimination 
-
-
-We can't directly calculate the probability of a string, but because E(X) is directly proportional to P(X), we can easily tell whether one string is more or less likely than another, by comparing their energies.
-
-A good model should assign high likelihood to data from the target distribution. Which is another way of saying it should assign higher likelihood to data from the target distribution than it does to some data from not-the-target-distribution.
-
-If we have some mutagen function f that introduces some noise to an instance, we can propose a binary classification problem where the classifier wins if `E(x) < E(f(x))`. 
-
-One simple function we can use just ignores x and returns some uniform noise (either in the space of binary vectors, or one-hot character vectors). This is maybe a bit too easy because most mutants can be tossed out immediately for reasons of form rather than content. For example, the geo-names training corpus will never contain:
-
-- a padding character preceding a non-padding character
-- two or more consecutive spaces
-- a string with no padding characters or spaces (i.e. a single-word name 20 characters long)
-
-This is not a great differentiator, since even the worst models get error rates around 0.1%.
-
-A more subtle noising function is the one that just alters a single randomly-chosen character (while obeying the constraints above - e.g. never replacing a padding character past the first one). This is a better differentiator than pure noise. Error rates range from 5.5% to 10.6%. 
-
-[Scatter plots of PL vs. err rate](TODO)
-
-Yet another noising function returns a 'sillhouetted' version of x, preserving the spaces and padding characters, but replacing all the other characters with ones chosen uniformly at random. In terms of differentiation, this one seems strongest, with error rates ranging from 0.4% to 12.1%. 
-
-#### Qualitative Evaluation
-
-Blah blah.
-
-#### Other methods.
-
-Annealed importance sampling, reconstruction error, blah blah.
+[This is complicated enough that I wrote a second blog post about it](TODO)
 
 ### Sampling
 
-How to sample.
+[TODO: Separate this one out into a separate post too?]()
+
+Once we've trained a model, we want to see what kinds of hilarious garbage it dreams up. How do we do that? Well, we know that if we start anywhere and do Gibbs sampling long enough, we'll get the model distribution. There's even a proof of it in a drawer somewhere! Problem solved, right?
+
+In practice, "long enough" might be a long, long time for some models. An RBM (or, more generally, any Markov chain) that takes a long time to converge is said to have a low [mixing rate](https://en.wikipedia.org/wiki/Markov_chain_mixing_time). Such models may wallow in valleys of (locally) low energy for a long time, and be very sensitive to initial conditions.
+
+[Here's](/assets/tablesamples_usgeo_goodmix.html) what a well-behaved model looks like. Each row represents a different starting point for the sampling, and each line is a separate "fantasy particle", sampled in parallel. The samples in the final column of each row (representing 10k iterations of sampling) are fairly similar, and there's no evidence of any particles getting stuck. After 10k iterations, the training examples are substantially transformed.
+
+[Here's](/assets/tablesamples_usgeo_badmix.html) what a bad mixing rate looks like. Even after 10k iterations, there are dramatic differences in samples depending on how the chains were started. chunks/silhouettes/train look pretty reasonable, but the chains started from zeroed-out vectors look like noise. Many of the chains started from training examples still look a lot like their starting configuration - e.g. "carleton pond dam" -> "greslocd ponn dam", "southwestern college" -> "southordoure college").
+
+[TODO: Add a legend to HTML files explaining meaning of different initialization methods]()
+
+One way to avoid the second scenario is to introduce a **weight cost** to discourage large weights, which are associated with poor mixing rates. 
+
+#### goon remetery
+
+Let's consider a sample from our well-behaved model: "goon remetery". Ouch, so close. But remember that our procedure for sampling the visible units is stochastic. It may be that we had P("r") = 0.1, P("c")=0.8 for index 5, and that we just got unlucky. To maximize the quality of our samples, we could sample determnistically at the very last round of sampling, always taking the character with the highest probability.
+
+This is actually a (trivial) special case of [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing). To take it further, we'll need to introduce the concept of "temperature" to the sampling process:
+
+```python
+    def sample_hidden(self, visible, temperature):
+        """Sample from P(h|v)"""
+        hidden_probs = logistic(np.dot(visible, self.W.T/temperature) + self.visible_bias/temperature)
+        return np.random.rand(hidden_probs.shape) < hidden_probs
+```
+
+When temperature=1.0, we have our normal sampling procedure. Other values will scale our weights and biases up or down. A high temperature has the effect of flattening out the probability distribution. In the limit, when T is infinite, we'll ignore the weights and biases, setting the hidden units with a coin flip (and setting the visible units with the flip of a ~26-sided coin).
+
+A low temperature has the effect of "sharpening" the probability distribution, with the rich getting richer and the poor getting poorer. T=0 leads to exactly the procedure we described earlier where we always take the character with the highest score.
+
+#### Simulated Annealing
+
+We can draw our samples with simulated annealing by starting our chain at a high temperature and gradually lowering it. This is appealing for a few reasons:
+
+Firstly, it defeats models with low mixing rates. Recall that our problem was fantasy particles stubbornly lying in local valleys. Turning up the heat will bounce them out and encourage them to explore other regions. 
+
+It also lets us draw samples with much lower energy than what we would get from repeated Gibbs sampling at T=1 - even after many iterations. And low energy samples tend to be qualitatively superior. We can no longer pretend that we're trying to draw from exactly the model distribution - we may be drawing from a sharpened version of that distribution that favours especially probable points. In practice, we're totally cool with this, as long as we still get some reasonable variety.
+
+[Diagrams go here](TODO)
+
+### Results
+
+Note: With the exception of the GitHub dataset, models were trained on lowercased names (to do otherwise would double the size of the visible layer for little benefit). I've uppercased the first character of each token in the below samples for aesthetic reasons. I've preserved the case of the strings generated by the GitHub model.
+
+[TODO: Link to demo app and some larger raw files - including examples from bad models]()
+
+## Human names
+
+[TODO: Get some good examples here. Maybe try to find a better dataset?]()
+
+## Geographic names
+
+Here's a random selection of samples from a model with 180 hidden units trained for around 50 epochs on 680k
+
+    Little Granch Canyon
+    Little Trough Winery
+    Will Apring Marina
+    Lace Crossing
+    Cammath Square
+    Bill Creek Rapids
+    Fort Cemetery
+    City Of Man Bridge
+    Love View Church
+    Rucker Mountain
+    Ton Ellvator
+    City Of Sideteries
+    Afford Mountain
+    Roder Brown Spring
+    Adge Stream
+    Wittherof Thusgules
+    Arke Grange
+    West Point Acres
+    Anevany Hospital
+    Bell Mine
+    Raveriver Spring
+    Lly Creek Meadow
+    Alley Spring
+    Beg Street School
+    Lake Townhall
+    Loke High School
+    Aster Mountain
+    Manter Millpond
+    Big Ridge School
+    Taw Creek Gap
+    Wister Spring
+    Villey School
+
+A few of my favourites:
+
+    Mount Mountain
+    Crackspork
+    Flart
+    City of Pork
+    Mayo Creek
+    Mockian Mind Camp
+    Licklers Corners
+    Gibber Springs Trail
+    Days Inn Oil Field
+    Rucky Rock Summit
+    Hilford Hills
+    Lame Pond
+    Well Dam
+    City of Inglandibble
+
+## GitHub repository names
+
+Here are some random samples from a model with 350 hidden units trained for 20 epochs on 3.7m repository names:
+
+    testing_project
+    css-qlation-server
+    Learning_Gitertion
+    Spee-Sample-Server
+    Learning_Generator
+    MS-Service-Manager
+    my_pert_stsi
+    CSC-1201-Semplate
+    san
+    node-book-mite
+    datasian.github.io
+    node-ation-minder
+    CS_Codes_Project
+    sliding.js
+    Google-Application
+
+Some favourites I encountered:
+
+    instaCloud
+    python-licker
+    mobile-masher
+    JustQuery
+    hello-bool
+    dataserverclient
+    2048-ing-master
+
+I was actually surprised by the quality of these samples, and became suspicious that it might be memorizing examples from the training set. It turns out there are some samples that appear in the training data (including the first name above, "testing\_project"), but it's fairly rare. Of the 38 names in my running list of favourites (of which the second list above is an excerpt), only 2 occurred in the training dataset. Given the size and entropy of the dataset, these co-occurences aren't too alarming.
+
+## Bonus: Board games
+
+I spent a bit of time trying to learn board game names, but wasn't particularly successful. I suspect my dataset, at about 50k games, was just too small.
+
+[TODO: Actual examples. But maybe retry training first just in case given what you've learned re learning rate, annealing etc.?]()
+
+#### Comparing to the Unreasonable Effectiveness of RNNs
+
+Blah blah comparison.
 
 ### Understanding what's going on
 
 - hidden activations
 - receptive fields
 
-### Results
-
-Blah blah results.
-
-#### Comparing to the Unreasonable Effectiveness of RNNs
-
-Blah blah comparison.
 
 ### Next steps
 
