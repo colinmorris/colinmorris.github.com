@@ -8,7 +8,7 @@ categories: machine-learning
 
 ### Named entity generation
 
-A classic problem in NLP is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem? What if we ask a model to dream up new names of people, places and things? It turns out it comes up with some funny stuff! Here's a random sampling of algorithmically generated geographic place names:
+A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem? What if we ask a model to dream up new names of people, places and things? It turns out it comes up with some funny stuff! Here's a random sampling of algorithmically generated geographic place names:
 
     campterton reservoir
     south landing canyon
@@ -53,6 +53,8 @@ For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is ou
 
 [TODO: These tables look like crap]()
 
+[TODO: totally unnecessary]()
+
 (It's easier to think of these as 2-d matrices, but in the code, we'll actually be representing them as a 1-d concatenation of the rows.)
 
 
@@ -96,7 +98,13 @@ In the diagram above, the energy of the RBM will be equal to the negative sum of
 
 There are weights connecting every visible unit to every hidden unit, but no intra-layer (visible-visible, or hidden-hidden) weights. During training, the RBM will adjust these weights, and a vector of biases for the visible and hidden units, in such a way as to bring down the energy of good examples, and raise the energy of bad ones. 
 
+[TODO: wording. Without bringing down the energy of everything else? Can't just lower the energy of training examples because...]()
+
 #### Gibbs sampling
+
+[TODO: motivation]()
+
+[TODO: give some background on how RBM is modeling some probability distribution. Starting from something that doesn't look like a name, and keep resampling as it looks more and more like what the RBM is encoding.]()
 
 One of the fundamental operations we can perform on an RBM is called Gibbs sampling.
 
@@ -206,13 +214,9 @@ One thing to notice is that, for every block of N visible units representing a c
 
 If you're interested in reading more about RBMs, I highly recommend Geoff Hinton's [A Practical Guide to Training Restricted Boltzmann Machines](http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf), which was my bible during this project. The [Wikipedia article](https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine) has a good overview if you prefer LaTeX formulas to code.
 
-### The Code
-
-[What is there to say here? Should this go toward the end](TODO)
-
 ### Evaluating Results
 
-[This is complicated enough that I wrote a second blog post about it](TODO)
+[This is complicated enough that I wrote a second blog post about it](/machine-learning/2015/06/10/char-rbms-evaluation.html)
 
 ### Sampling
 
@@ -269,7 +273,7 @@ Note: With the exception of the GitHub dataset, models were trained on lowercase
 
 ## Geographic names
 
-Here's a random selection of samples from a model with 180 hidden units trained for around 50 epochs on 680k
+Here's a random selection of samples from a model with 180 hidden units trained for around 50 epochs on 680k US place names:
 
     Little Granch Canyon
     Little Trough Winery
@@ -353,7 +357,7 @@ Some favourites I encountered:
 
 I was actually surprised by the quality of these samples, and became suspicious that it might be memorizing examples from the training set. It turns out there are some samples that appear in the training data (including the first name above, "testing\_project"), but it's fairly rare. Of the 38 names in my running list of favourites (of which the second list above is an excerpt), only 2 occurred in the training dataset. Given the size and entropy of the dataset, these co-occurences aren't too alarming.
 
-## Bonus: Board games
+#### Bonus: Board games
 
 I spent a bit of time trying to learn board game names, but wasn't particularly successful. I suspect my dataset, at about 50k games, was just too small.
 
@@ -361,14 +365,47 @@ I spent a bit of time trying to learn board game names, but wasn't particularly 
 
 #### Comparing to the Unreasonable Effectiveness of RNNs
 
-Blah blah comparison.
+Andrej Karpathy's excellent blog post on [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) was the first thing I read that got me really excited about deep learning and noodling around with neural networks, and it was also the inspiration for this little project. I loved the RNN-generated [names](http://cs.stanford.edu/people/karpathy/namesGenUnique.txt), and also found it interesting that they were probably the most difficult to distinguish from the training data.
+
+At the local level, the source code, the Shakespeare, and the Wikipedia all look great. But zooming out, there's a lack of long-term coherence. What are Pandarus, Second Senator, Duke Vincentio, Second Lord, Viola, and a clown all doing in a room together? But the names didn't have this problem, because they're nice little atomic units - they don't need to flow together smoothly to tell a story. And because of their atomicity, we don't even need a recurrent architecture. We can treat each name individually as an input to a feed-forward network. (Or, in this case, feed-forward-and-backward.)
+
+Usually when we give something up (like the ability to generate arbitrary-length sequences), we gain something in return. So let's compare our results to char-rnn to see whether we actually gained anything. 
+
+[TODO: Examples go here. Still need to train a decent model.]()
 
 ### Understanding what's going on
 
 - hidden activations
 - receptive fields
 
+[TODO: Is there a nice way to transclude some of the HTML visualizations? So I don't have to copy-paste a huge autogenerated HTML table in here?]()
 
-### Next steps
+[Anyways, here's a recep field example](/assets/recep.html)
 
-Blah blah.
+### The Code
+
+[TODO: rbms not mentioned yet]()
+
+I've made all the code I wrote for this project [available on my GitHub](https://github.com/colinmorris/char-rbm). The core RBM code is cannibalized from scikit-learn's [BernoulliRBM](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.BernoulliRBM.html#sklearn.neural_network.BernoulliRBM) implementation. I tacked on some additional features (many cribbed from Hinton's "Practical Guide"), including:
+
+- L2 weight cost
+- flag to gradually reduce learning rate
+- sampling with temperature (for simulated annealing)
+- softmax sampling
+- initializing visible biases to the training set means
+
+If I wanted to promote this from a toy project, I'd probably start by reimplementing it using a library with GPU support like TensorFlow or Theano. A few other obvious next steps:
+
+#### Going Deeper
+
+RBMs can be (almost trivially) stacked on one another to form a [deep belief network](https://en.wikipedia.org/wiki/Deep_belief_network). It seems plausible that additional layers would be able to learn higher layers of abstraction and generate even better samples.
+
+### Translation Invariance
+
+Under the current architecture, for a model to learn the word "Pond" (a very useful word to learn), it needs to memorize a separate version for each place it can appear: `___ Pond`, `____ Pond`, `_____ Pond`, etc.
+
+We'd like our model to learn robust, position-invariant patterns and understand that "Hays Pond" and "Darby Pond" are quite similar (even though their vector representations are completely disjoint). 
+
+One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. This is just like CNNs for vision tasks, where we have many collections of units - 'filters' - that each see small patches of the image, and share weights. These can detect features both low-level (lines), or high (faces), no matter where they appear in the image.
+
+We can do the same thing with text, except that our filters would be 1-d rather than 2-d. And if we stacked them, we could presumably also get low-level features at the bottom layer (e.g. common character bigrams and trigrams like "th", "ch", "ing") and more complex features at the top (words, or patterns of words, like `$foo pond` or `$foo pond dam`).
