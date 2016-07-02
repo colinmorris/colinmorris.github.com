@@ -2,45 +2,53 @@
 layout: post
 title: "Title TK char rbms"
 categories: machine-learning
+custom_css: recep
 ---
+
+<!-- title candidates...
+Dreaming of GitHub repositories with RBMs
+Generating named entities with RBMs: Journey to Hilford Hills
+-->
 
 <!-- Graphic goes here? -->
 
 ### Named entity generation
 
-A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem? What if we ask a model to dream up new names of people, places and things? It turns out it comes up with some funny stuff! Here's a random sampling of algorithmically generated geographic place names:
+A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem? What if we ask a model to dream up new names of people, places and things? 
 
-    campterton reservoir
-    south landing canyon
-    camors meadow
-    mount memarill park
-    harritin millpond
-    upper couse trail
-    north milnow branch
-    lake landingh creek
-    lake cove city hall
+I wrote some toy code to do this using Restricted Boltzmann Machines, a nifty (if slightly passe) variety of generative neural network. It turns out they come up with some funny stuff! For example, if we train it on GitHub repository names, it can come up with new ones like...
 
-If you're interested in learning about how the model that generated these works, read on. If you just want to see some more examples from different domains, feel free to [skip ahead]().
+    fuzzyTools
+    Slick-Android-App
+    sublime-app
+    Backbone-Switcher
+    thenchon
 
-### Datasets
+If you want to flip through more examples, I wrote a little [web app](/rbm/repos/) for that (and analogous ones for generating [US place names](/rbm/geo/) and [actor names](/rbm/actors/)). If you want to learn about how I got there, read on. 
 
-I used three datasets for most of my experiments:
+In this post, I'll give a brief overview of Restricted Boltzmann Machines and how I applied them to this problem, and try to give some intuition about what's going on in the brain of one of these models.
 
-- US geographical names
-- GitHub repository names
-- personal names
+My code is available [here](https://github.com/colinmorris/char-rbm) on GitHub. Feel free to play with it (with the caveat that it's more of a research notebook than a polished library). 
 
-[This README](TODO) has instructions for downloading each of them, if you want to reproduce my results.
+### Restricted Boltzmann Machines
 
-### Representing Inputs
+#### Background - generative models
 
-The first thing we need to consider is what the input layer ("visible" layer in RBM parlance) is going to look like. How do we represent these strings we're trying to model?
+Our goal is to build a model that spits out funny names, but our path there will be a bit indirect. The problem that RBMs - and generative models in general - are trying to solve is **learning a probability distribution**. We want to learn a function `P` that assigns every string a probability according to its plausibility as a particular kind of name. e.g. in the case of personal names, we probably want...
 
-Most NLP models stop at the word level, representing texts by counts of words (or by word vectors). But we don't want to limit ourselves to regurgitating words we've seen in the training data - we want whole new words (like "memarill" or "campterton"). For that, we need to go deeper, down to the character level.
+    P("John Smith") > P("Dweezil Zappa") >> P("mCN xGl  JeY")
 
-We'll represent names as a sequence of [one-hot](https://en.wikipedia.org/wiki/One-hot) vectors of length N, where N is the size of our alphabet. 
+If we can sample from this distribution, the effect should be like thumbing through a phone book. We'll see lots of "John Smith"s, but not very many "Dweezil Zappa"s. And we could probably spend our whole life looking for a "mCN xGL  JeY" and never find one.
 
-Because we're not using a recurrent architecture, we'll need to fix some maximum string length M ahead of time. Names shorter than M will need to be padded with some special character.
+#### Representing Inputs
+
+We've said we want to learn a function over strings, but anything we're going to feed into a neural network needs to be transformed into a vector of numbers first. How should we do that in this case?
+
+Most NLP models stop at the word level, representing texts by counts of words (or by word embeddings, such as those produced by word2vec). But breaking up GitHub repository names (like `tool_dbg`, `burgvan.github.io`, or `refcounting`) into words isn't trivial. And more to the point, we don't want to limit ourselves to regurgitating words we've seen in the training data. We want whole new words (like `Brinesville`[TODO:link to line #]()). For that, we need to go deeper, down to the character level.
+
+We'll represent names as sequences of [one-hot](https://en.wikipedia.org/wiki/One-hot) vectors of length `N`, where `N` is the size of our alphabet. 
+
+Because we're not using a recurrent architecture, we'll need to fix some maximum string length `M` ahead of time. Names shorter than `M` will need to be padded with some special character.
 
 For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is our padding character, and set M to 4. We can encode the name '*deb*' using the following 4x6 matrix:
 
@@ -53,16 +61,9 @@ For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is ou
 
 [TODO: These tables look like crap]()
 
-[TODO: totally unnecessary]()
+#### RBMs
 
-(It's easier to think of these as 2-d matrices, but in the code, we'll actually be representing them as a 1-d concatenation of the rows.)
-
-
-### Restricted Boltzmann Machines
-
-#### How do they work?
-
-A restricted Boltzmann machine (or RBM) is a neural network consisting of two layers of binary units[\*](TODO: footnote on variations), one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names, encoded as concatenations of one-hot character vectors.
+A restricted Boltzmann machine (henceforth RBM) is a neural network consisting of two layers of binary units[\*](TODO: footnote on variations), one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names. 
 
 <div class="imgcap">
     <img src="/img/rbm.svg">
@@ -70,22 +71,19 @@ A restricted Boltzmann machine (or RBM) is a neural network consisting of two la
 </div>
 <br/>
 
-As a generative model, RBMs try to learn the distribution of the data they're given. They do this by learning to assign relatively low 'energy' to samples from the data distribution.
+Again, RBMs try to learn a probability distribution from the data they're given. They do this by learning to assign relatively low 'energy' to samples from the data distribution. That energy will be proportional to the learned probability.
 
 ```python
 class RBM(object):
-    # TODO: Should probably describe the shape/semantics of self.W and biases?
-    # ...
     def energy(self, visible, hidden):
-        # TODO: Is this actually accurate?
         return -1*(np.dot(visible, self.visible_bias)
             + np.dot(hidden, self.hidden_bias)
             + np.dot( np.dot(hidden, self.W), visible))
 
     def energy(self, visible):
-        """Equivalent to 
-            sum(self.energy(visible, h) for h in all_possible_hidden_vectors)
-        But not exponential in h"""
+        """Equivalent to summing the energy of this visible layer over all 
+        possible hidden layers (but not exponential). This is why we can talk 
+        about the energy of a particular string in isolation."""
         return -1*(np.dot(visible, self.visible_bias)
             + np.logaddexp(0, np.dot(visible, self.W.T) + self.hidden_bias))
 ```
@@ -96,180 +94,78 @@ In the diagram above, the energy of the RBM will be equal to the negative sum of
 - the biases on the active (blue) visible units
 - the weights connecting the red and blue units (i.e. the bold lines)
 
-There are weights connecting every visible unit to every hidden unit, but no intra-layer (visible-visible, or hidden-hidden) weights. During training, the RBM will adjust these weights, and a vector of biases for the visible and hidden units, in such a way as to bring down the energy of good examples, and raise the energy of bad ones. 
+There are weights connecting every visible unit to every hidden unit, but no intra-layer (visible-visible, or hidden-hidden) weights. During training, the RBM will adjust these weights, and a vector of biases for the visible and hidden units, in such a way as to bring down the energy of training examples, without bringing down the energy of everything else along with it.
 
-[TODO: wording. Without bringing down the energy of everything else? Can't just lower the energy of training examples because...]()
-
-#### Gibbs sampling
-
-[TODO: motivation]()
-
-[TODO: give some background on how RBM is modeling some probability distribution. Starting from something that doesn't look like a name, and keep resampling as it looks more and more like what the RBM is encoding.]()
-
-One of the fundamental operations we can perform on an RBM is called Gibbs sampling.
-
-```python
-    def gibbs_sample(self, visible):
-        hidden = self.sample_hidden(visible)
-        return self.sample_visible(hidden)
-
-    def sample_hidden(self, visible):
-        """Sample from P(h|v)"""
-        hidden_probs = logistic(np.dot(visible, self.W.T) + self.visible_bias)
-        return np.random.rand(hidden_probs.shape) < hidden_probs
-
-    def sample_visible(self, hidden):
-        """Sample from P(v|h)"""
-        visible_probs = logistic(np.dot(hidden, self.W.T) + self.hidden_bias)
-        return np.random.rand(visible_probs.shape) < visible_probs
-```
-
-Gibbs sampling starts from some configuration of one of the layers, and essentially bounces back and forth between the visible and hidden layers, continually asking "What hidden states go well with these visible states?", then "What visible states go well with these hidden states?".
-
-Here's an example of how the state of the visible layer evolves during repeated Gibbs sampling. This example uses a model trained on the geo names dataset:
-
-|i      |visible        | energy(visible)|
-|-------|---------------|----------------|
-1|      tyxeavonam adhbufwij|    35.4
-2|      tenrimilty in dlenic|    -19.2
-3|      gedromoold in foerna|    -21.0
-4|      eo  wiogh in fulrsa|     -21.7
-5|      cl biigs in fusrta|      -24.2
-6|      lhgwiogs in filrma|      -20.8
-7|      sogwiitt on fueeso|      -29.2
-8|      mockiotd on lueera|      -34.9
-9|      commaosy an luvera |     -30.1
-10|     seroont on lemert   |    -35.8
-11|     g an sun lerort| -42.8
-12|     toon yan ferert |-55.6
-13|     doin ron forest |-61.0
-
-It's not a coincidence that the energy is going down over time, or that the sample with the lowest energy is the one that looks most like a real name. There's a connection between how we do sampling and our energy function above. The probability of turning on a particular hidden unit h\_j, given a visible vector v is:
-
-    1 / 1 + exp(-1 * (hidden_bias[j] + W[j]*v))
-
-If the model doesn't care about h\_j and gives it a bias of 0, and all its weights 0, then the exponent goes to 0, and the probability of turning on becomes 1/2. As we decrease the bias, or give it negative weights at indices where v is turned on, then the energy associated with that unit being on increases, and the probability goes toward 0. If we do the opposite, the effect on energy becomes negative, and the probability goes to 1. So, the probability of turning on a hidden unit is proportional to the negative energy difference associated with turning it on. The same argument applies to visible units conditioned on hidden vectors.
-
-Remember how we said that RBMs are trying to learn the distribution of our data? An important property of RBMs is that **if we do repeated Gibbs sampling for long enough, our samples will eventually start coming from exactly the model's estimation of that distribution.**
-
-#### Training RBMs (1)
-
-[TODO: Which of these training sections is better? Leaning to 2.]()
-
-There are a few methods for training RBMs. The one I'll be using is called "Persistent Contrastive Divergence". Here's a sketch:
-
-```python
-def train(self, training_data, epochs):
-    fantasy_particles = np.zeros(self.batch_size, self.visible_shape)
-    for _ in epochs:
-        random.shuffle(training_data)
-        for train_examples in training_data.minibatches(self.batch_size):
-            fantasy_hidden_probs = self.hidden_probs(fantasy_particles)
-            fantasy_hiddens = np.random.rand(fantasy_hidden_probs.shape) < fantasy_hidden_probs
-
-            positive_hidden_probs = self.hidden_probs(fantasy_particles)
-            positive_hiddens = self.sample_hidden_units(train_examples)
-            
-            # Adjust model parameters away from the fantasy particles, and
-            # toward the positive examples in this batch of train data
-            self.visible_bias += self.learning_rate * (train_examples - fantasy_particles)
-            self.hidden_bias += self.learning_rate * (positive_hidden_probs - fantasy_hidden_probs)
-            self.W += np.dot(positive_hidden_probs, train_examples.T)
-            self.W -= np.dot(fantasy_hidden_probs, fantasy_particles.T)
-            fantasy_particles = self.sample_visible_units(fantasy_hiddens)
-```
-
-The key intuition here is that we're adjusting the parameters to decrease the energy of the training examples in our minibatch, and to increase the energy of our "fantasy particles". These fantasy particles are the result of n rounds of Gibbs sampling (where n is the number of minibatch updates performed so far), starting from some arbitrary noise. In our case, they'll be strings like "gingley pass" or "sled ditch". We usually keep the same number as our batch size. The idea is that these approximate the current model distribution.
-
-Because we effectively increase the energy of our fantasy particles with each update, we encourage them to jump around and explore other regions. 
-
-Probably the most commonly used training procedure is (non-persistent) contrastive divergence. This is the same as the procedure above, except that instead of fantasy particles, our proxy for the model distribution is a set of "reconstructions" - training examples that have undergone just one round of Gibbs sampling. I use PCD here because, according to Geoff Hinton, it "is the recommended method if the aim is to build the best density model of the data" (rather than pretraining). 
-
-#### Training RBMs (2)
-
-There are a few methods for training RBMs. The one I'll be using is called "Persistent Contrastive Divergence". Here's a pseudocode sketch:
-
-```
-initialize $batch_size random visible configurations - call these "fantasy particles"
-for each epoch:
-    shuffle the training data
-    for each minibatch of training data:
-        lower the energy of this minibatch (by adjusting weights and biases)
-        raise the energy of the fantasy particles
-        perform a round of Gibbs sampling on the fantasy particles
-```
-
-We're trying to do something like nudging the model distribution toward the target distribution. As is typical for stochastic gradient descent, a small batch of training examples stands in for the target distribution. The more interesting part is how to represent the model distribution. PCD uses a chain of "fantasy particles", resampled at every step. 
-
-As we noted above, if we do Gibbs sampling long enough, we eventually get exactly the model distribution. But in this case, we're never stepping foot in the same river twice - we're changing the model's parameters between each round of Gibbs sampling, so we have no theoretical guarantees. Like vanilla contrastive divergence (where the model distribution is represented by the result of one round of Gibbs sampling on a training example), it's a hack that turns out to work well in practice, even though it's not obvious why it should.
+<!-- TODO: is this necessary?
+(That last part is important. The probability assigned to a vector `X` is equal to `E(x)` *divided by the sum of the energy assigned to all strings* - the [partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics\).)
+-->
 
 
 #### Softmax units
+
+[TODO: With the section on Gibbs sampling gone, this no longer really makes sense.]()
 
 One thing to notice is that, for every block of N visible units representing a character, there will always be exactly one unit turned on - the probability we assign to any vector failing this criterion should be 0. We should help the network out by giving it this information for free. We'll do that by treating each of those blocks as a single 'softmax' unit. Rather than sampling each visible binary unit independently, and turning it on with some probability according to the sum of the incoming weights from the hidden layer, we'll sample using the [softmax function](https://en.wikipedia.org/wiki/Softmax_function). 
 
 (Doing this is not strictly necessary. But, empirically, I observed that it helped training a lot.)
 
-### More reading
+#### More reading
 
 If you're interested in reading more about RBMs, I highly recommend Geoff Hinton's [A Practical Guide to Training Restricted Boltzmann Machines](http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf), which was my bible during this project. The [Wikipedia article](https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine) has a good overview if you prefer LaTeX formulas to code.
 
-### Evaluating Results
-
-[This is complicated enough that I wrote a second blog post about it](/machine-learning/2015/06/10/char-rbms-evaluation.html)
-
-### Sampling
-
-[TODO: Separate this one out into a separate post too?]()
-
-Once we've trained a model, we want to see what kinds of hilarious garbage it dreams up. How do we do that? Well, we know that if we start anywhere and do Gibbs sampling long enough, we'll get the model distribution. There's even a proof of it in a drawer somewhere! Problem solved, right?
-
-In practice, "long enough" might be a long, long time for some models. An RBM (or, more generally, any Markov chain) that takes a long time to converge is said to have a low [mixing rate](https://en.wikipedia.org/wiki/Markov_chain_mixing_time). Such models may wallow in valleys of (locally) low energy for a long time, and be very sensitive to initial conditions.
-
-[Here's](/assets/tablesamples_usgeo_goodmix.html) what a well-behaved model looks like. Each row represents a different starting point for the sampling, and each line is a separate "fantasy particle", sampled in parallel. The samples in the final column of each row (representing 10k iterations of sampling) are fairly similar, and there's no evidence of any particles getting stuck. After 10k iterations, the training examples are substantially transformed.
-
-[Here's](/assets/tablesamples_usgeo_badmix.html) what a bad mixing rate looks like. Even after 10k iterations, there are dramatic differences in samples depending on how the chains were started. chunks/silhouettes/train look pretty reasonable, but the chains started from zeroed-out vectors look like noise. Many of the chains started from training examples still look a lot like their starting configuration - e.g. "carleton pond dam" -> "greslocd ponn dam", "southwestern college" -> "southordoure college").
-
-[TODO: Add a legend to HTML files explaining meaning of different initialization methods]()
-
-One way to avoid the second scenario is to introduce a **weight cost** to discourage large weights, which are associated with poor mixing rates. 
-
-#### goon remetery
-
-Let's consider a sample from our well-behaved model: "goon remetery". Ouch, so close. But remember that our procedure for sampling the visible units is stochastic. It may be that we had P("r") = 0.1, P("c")=0.8 for index 5, and that we just got unlucky. To maximize the quality of our samples, we could sample determnistically at the very last round of sampling, always taking the character with the highest probability.
-
-This is actually a (trivial) special case of [simulated annealing](https://en.wikipedia.org/wiki/Simulated_annealing). To take it further, we'll need to introduce the concept of "temperature" to the sampling process:
-
-```python
-    def sample_hidden(self, visible, temperature):
-        """Sample from P(h|v)"""
-        hidden_probs = logistic(np.dot(visible, self.W.T/temperature) + self.visible_bias/temperature)
-        return np.random.rand(hidden_probs.shape) < hidden_probs
-```
-
-When temperature=1.0, we have our normal sampling procedure. Other values will scale our weights and biases up or down. A high temperature has the effect of flattening out the probability distribution. In the limit, when T is infinite, we'll ignore the weights and biases, setting the hidden units with a coin flip (and setting the visible units with the flip of a ~26-sided coin).
-
-A low temperature has the effect of "sharpening" the probability distribution, with the rich getting richer and the poor getting poorer. T=0 leads to exactly the procedure we described earlier where we always take the character with the highest score.
-
-#### Simulated Annealing
-
-We can draw our samples with simulated annealing by starting our chain at a high temperature and gradually lowering it. This is appealing for a few reasons:
-
-Firstly, it defeats models with low mixing rates. Recall that our problem was fantasy particles stubbornly lying in local valleys. Turning up the heat will bounce them out and encourage them to explore other regions. 
-
-It also lets us draw samples with much lower energy than what we would get from repeated Gibbs sampling at T=1 - even after many iterations. And low energy samples tend to be qualitatively superior. We can no longer pretend that we're trying to draw from exactly the model distribution - we may be drawing from a sharpened version of that distribution that favours especially probable points. In practice, we're totally cool with this, as long as we still get some reasonable variety.
-
-[Diagrams go here](TODO)
-
 ### Results
+
+Evaluating generative models is hard! As [A note on the evaluation of generative models] describes, the commonly used quantitative metrics for this task can disagree with each other, and with qualitative human assessments. To make matters worse, the gold standard metric for generative models (likelihood of heldout data) is actually intractable for RBMs! 
+
+But you didn't come here to see graphs anyways, right? So let's just look at some samples.
+
+(In fact, when tuning hyperparameters, I relied a lot on visual assesment of samples. I did find some metrics that correlated well with my assessments - a form of [pseudolikelihood](https://en.wikipedia.org/wiki/Pseudolikelihood) and denoising - but they weren't perfect. In the words of Geoff Hinton, "use them, but don't trust them".)
+
 
 Note: With the exception of the GitHub dataset, models were trained on lowercased names (to do otherwise would double the size of the visible layer for little benefit). I've uppercased the first character of each token in the below samples for aesthetic reasons. I've preserved the case of the strings generated by the GitHub model.
 
-[TODO: Link to demo app and some larger raw files - including examples from bad models]()
-
 ## Human names
 
-[TODO: Get some good examples here. Maybe try to find a better dataset?]()
+One of the first things I tried was generating first names (as Andrej Karpathy did in his [Unreasonable effectiveness of recurrent neural networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/#generating-baby-names)). They turned out pretty well! e.g.
+
+    Aluna
+    Lamadona
+    Ellin
+    Dovin
+    Filker
+
+But I suspect this is actually not a very hard problem. I noticed that merely sampling according to the biases of the visible units (completely ignoring our weights/hidden units), produced kind of reasonable names already:
+
+    Borme
+    Yareeh
+    Vestey
+    Sexte
+    Barise
+    Patya
+    Maegae
+
+A more difficult problem is generating *full* names. Here are some samples drawn from a model trained on the full names of 1.5m actors from the [IMDB dataset](http://www.imdb.com/interfaces) (more [here](
+
+(Note: [this README](TODO) has instructions for downloading all of the datasets I used in this project.)
+
+    daniel e. dubinge
+    gabriel dugard
+    oliver mano
+    jason cona
+    ken mey
+    anton mane
+    wolfgang stron
+
+The dataset included naming traditions from around the world which created several distinct modes that the model captured pretty well. For example, it generates names like...
+
+    hiroshi tajamara
+    hing-hying li
+    vladimir tjomanovic
+    giuseppe rariali
+
+But is unlikely to generate a name like "hiroshi tjomanovic".
+
+(Incidentally, Google tells me that none of "Tajamara", "Hing-hying", "Tjomanovic" and "Rariali" are actual extant names - though based on my limited exposure to Japanese/Chinese/Slavic/Italian names, I could have believed they were all real. We want to generate novel examples not copied from the training set, so this is good news.)
 
 ## Geographic names
 
@@ -363,6 +259,52 @@ I spent a bit of time trying to learn board game names, but wasn't particularly 
 
 [TODO: Actual examples. But maybe retry training first just in case given what you've learned re learning rate, annealing etc.?]()
 
+### "Did they really need a neural network for that?"
+
+This is a question that probably doesn't get asked often enough. Our results here are pretty neat, but before we chalk this up as another victory for the deep learning revolution, we should ask whether the problem we solved was actually difficult. I'll follow the example of [Yoav Goldberg](http://nbviewer.jupyter.org/gist/yoavg/d76121dfde2618422139) and use unsmoothed maximum-likelihood character level language models as my dumb baseline to compare against. In short, we'll just predict the next letter by looking at the last n, and looking at what letters came after that prefix in the training set.
+
+Some examples from an order-4 model: 
+
+    Bonny Maringer City of Lake
+    Sour Motoruk Mountain
+    Mount Branchorage Lakes
+    Duck Kill Bar Rock
+    Goatyard Point
+    Noblit Hollow
+    Spenceton
+    Jay Canal Cemetery
+    Oriflamming Beach
+    Duncaster Reservoir
+    The Gravel Creek
+    Tunnel
+    Old Park
+
+Huh. Those are, uh, actually pretty excellent. And with 4-grams it's not at the point where it's just copying the training data. Around 25% of generated names exist in the training set (compared to 1% for a typical RBM sample), but I filtered those out of the list above. Several of the individual tokens above don't exist in the training set either, including the excellent "Goatyard".
+
+Let's see if we can salvage our dignity by comparing performance on the GitHub dataset. The order-4 output is pretty goofy, so let's give it 5 characters of context:
+
+    littlePython-hall-effectv-frontAngles2
+    media
+    EasyCanvas
+    shutupmrnotific
+    MinkGhost-deployShpaste_ember
+    terrain-Exercise3
+    gaben
+    bot-repots-interestingGithub.io
+    CredStatus
+    wall-as
+    BB-FlappyBao
+    py_shopping-sample
+
+Our baseline's not looking so hot now. It's interesting to note some mistakes here that the RBM model never makes. For example, it never flubs the formatting of a URL. It's also very good at picking a consistent scheme for case and separators for each name, e.g.:
+
+    SAPAPP
+    ruby-fale-project
+    DataTownSample
+    java-mails-rails
+
+This is where being able to see the whole string at once really comes in handy. When our Markov model has generated as far as "mails", it doesn't have enough context to know whether it should make `java-mails-rails` or `java-mailsRails` or `java-mails_Rails` (great repo name, btw). We can always feed it even *more* context, but a window of 5 already leads to a lot of copy-pasting from the training set. For example, `shutupmrnotific` is funny, but it's just a truncation of a repo from the training set, `shutupmrnotification`.
+
 #### Comparing to the Unreasonable Effectiveness of RNNs
 
 Andrej Karpathy's excellent blog post on [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) was the first thing I read that got me really excited about deep learning and noodling around with neural networks, and it was also the inspiration for this little project. I loved the RNN-generated [names](http://cs.stanford.edu/people/karpathy/namesGenUnique.txt), and also found it interesting that they were probably the most difficult to distinguish from the training data.
@@ -375,30 +317,71 @@ Usually when we give something up (like the ability to generate arbitrary-length
 
 ### Understanding what's going on
 
-- hidden activations
-- receptive fields
+A common trick when working with neural nets in the image domain is to visualize what a neuron in the first hidden layer is "seeing" by treating the weights between that neuron and each input pixel as pixel intensities. [TODO: link to example]()
 
-[TODO: Is there a nice way to transclude some of the HTML visualizations? So I don't have to copy-paste a huge autogenerated HTML table in here?]()
+We can do something similar here. The columns in the tables below represent positions in a 20-character geographic name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
 
-[Anyways, here's a recep field example](/assets/recep.html)
+These are just a couple examples taken from a model with 250 hidden units. [This page](/assets/recep.html) has visualizations of all those units.
 
-### The Code
+{% include recep149.html %}
 
-[TODO: rbms not mentioned yet]()
+`vndubnr`? Actually, this word search is hiding several useful words. How many can you spot?
 
-I've made all the code I wrote for this project [available on my GitHub](https://github.com/colinmorris/char-rbm). The core RBM code is cannibalized from scikit-learn's [BernoulliRBM](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.BernoulliRBM.html#sklearn.neural_network.BernoulliRBM) implementation. I tacked on some additional features (many cribbed from Hinton's "Practical Guide"), including:
+- vagrant (and Vagrant)
+- android
+- arduino
+- angular
+- ansible
 
-- L2 weight cost
-- flag to gradually reduce learning rate
-- sampling with temperature (for simulated annealing)
-- softmax sampling
-- initializing visible biases to the training set means
+<!-- It's interesting to note that these are all of a particular type. -->
 
-If I wanted to promote this from a toy project, I'd probably start by reimplementing it using a library with GPU support like TensorFlow or Theano. A few other obvious next steps:
+This kind of multitasking is a common theme. And maybe it shouldn't be surprising. A good model of place names or GitHub repositories needs to remember more than 200-350 words (in addition to the [phonotactic](https://en.wikipedia.org/wiki/Phonotactics) rules for inventing new words), so most of the time, it can't afford to waste a hidden unit on a single word.
+
+Of course, this hidden unit alone is perfectly happy to see hybrid prefixes like `vadroid`, or `andulant` or even `aaDmaae`. To avoid those, it needs a little help from its friends. For example...
+
+{% include recep122.html %}
+
+With this and the previous unit turned on, we're now happy to see 'ang**ul**ar' and 'ans**ib**le', but not 'vag**ra**nt', 'and**ro**id', or 'ard**ui**no'.
+
+Whereas the last unit was focused on a few domain-specific words, this unit seems very generic. It mostly just wants to see a vowel in the fourth position followed immediately by a consonant (note that the chars it *least* wants to see there are `[a, u, o, e, i]`). Of course, our model has no explicit knowledge of what a "vowel" is, so it's neat to see it picked up naturally as a useful feature.
+
+Another emergent behaviour is the strong spatial locality. Most hidden units have their strong weights tightly clustered on a particular neighbourhood of contiguous character positions. This is neat because, again, we never told our model that certain visible units are "next to" each other - it knows nothing about the input geometry.
+
+
+{% include recep9.html %}
+<br/> 
+
+Most hidden units exhibit strong spatial locality - that is, their weights are focused on a particular region within the string. This is cool because we never told the model that certain visible units are 'next to' each other - it has no prior notion of the input geometry.
+
+The model also seems to have learned the distinction between vowels and consonants. This hidden unit really wants to see a vowel at the 15th position (`[i, a, e, o, u]`), and a consonant at the position immediately before (with `[o, e, a, i, u]` being the characters it *least* wants to see). 
+
+{% include recep72.html %}
+<br/>
+
+One of the most surprising things is how little evidence there is of overt 'memorization' of words. This unit almost seems to have memorized the word 'ranch', except that 'k' has a slightly higher weight than 'h'. But there's a lot of green spread across many letters - in addition to "ranch" (and therefore "branch"), this unit is happy with "range" (and "grange"), "marsh", "basin", and "entrance". And that's just counting exact matches on the top-5 characters.
+
+This kind of multitasking is a common theme. And perhaps it shouldn't be surprising. Most of these RBMs have around 150-250 hidden units. A good model of place names or GitHub repositories needs to remember more than 250 important words (in addition to the [phonotactic](https://en.wikipedia.org/wiki/Phonotactics) rules for inventing new words), so a dense representation is called for.
+
+This also accounts for some of the most common clunkers generated by otherwise strong models, e.g.:
+
+    Little Malding Ponk
+    Millard Landing Pork
+    Nouth Bay Village
+    Sorth River Lakes
+    PHP-Remort-Server
+
+(For the longest time, I also thought that my geo models' predilections for generating "Millponds" and "Tanks" were also symptoms of this. Turns out those are real things. If anyone knows what they are, I'd love to know.)
+
+
+### Making it better
+
+If I wanted to promote this from a toy project, the first thing I'd do would be to reimplement it using a library with GPU support like TensorFlow or Theano. A few more interesting improvements that suggest themselves...
 
 #### Going Deeper
 
 RBMs can be (almost trivially) stacked on one another to form a [deep belief network](https://en.wikipedia.org/wiki/Deep_belief_network). It seems plausible that additional layers would be able to learn higher layers of abstraction and generate even better samples.
+
+In particular, I think this would help avoid solecisms like "Lake Lake". [TODO: becauase? Sort of relates to next point. Units already look at small neighbourhoods. Need to coordinate them for bigger picture.]() Okay, names like "Days Inn Oil Field" are pretty funny tho.
 
 ### Translation Invariance
 
@@ -409,3 +392,5 @@ We'd like our model to learn robust, position-invariant patterns and understand 
 One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. This is just like CNNs for vision tasks, where we have many collections of units - 'filters' - that each see small patches of the image, and share weights. These can detect features both low-level (lines), or high (faces), no matter where they appear in the image.
 
 We can do the same thing with text, except that our filters would be 1-d rather than 2-d. And if we stacked them, we could presumably also get low-level features at the bottom layer (e.g. common character bigrams and trigrams like "th", "ch", "ing") and more complex features at the top (words, or patterns of words, like `$foo pond` or `$foo pond dam`).
+
+### Acknowledgements
