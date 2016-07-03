@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Title TK char rbms"
+title: "Dreaming of GitHub repositories with RBMs"
 categories: machine-learning
 custom_css: recep
 ---
@@ -16,7 +16,7 @@ Generating named entities with RBMs: Journey to Hilford Hills
 
 A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem? What if we ask a model to dream up new names of people, places and things? 
 
-I wrote some toy code to do this using Restricted Boltzmann Machines, a nifty (if slightly passe) variety of generative neural network. It turns out they come up with some funny stuff! For example, if we train it on GitHub repository names, it can come up with new ones like...
+I wrote some toy code to do this using restricted Boltzmann machines, a nifty (if slightly passe) variety of generative neural network. It turns out they come up with some funny stuff! For example, if we train an RBM on GitHub repository names, it can come up with new ones like...
 
     fuzzyTools
     Slick-Android-App
@@ -38,19 +38,19 @@ Our goal is to build a model that spits out funny names, but our path there will
 
     P("John Smith") > P("Dweezil Zappa") >> P("mCN xGl  JeY")
 
-If we can sample from this distribution, the effect should be like thumbing through a phone book. We'll see lots of "John Smith"s, but not very many "Dweezil Zappa"s. And we could probably spend our whole life looking for a "mCN xGL  JeY" and never find one.
+If we can sample from this distribution, the effect should be like thumbing through a phone book. We'll see lots of "John Smith"s, we might eventually see a "Dweezil Zappa", but we'll probably never find a "mCN xGL  JeY" no matter how long we look.
 
 #### Representing Inputs
 
 We've said we want to learn a function over strings, but anything we're going to feed into a neural network needs to be transformed into a vector of numbers first. How should we do that in this case?
 
-Most NLP models stop at the word level, representing texts by counts of words (or by word embeddings, such as those produced by word2vec). But breaking up GitHub repository names (like `tool_dbg`, `burgvan.github.io`, or `refcounting`) into words isn't trivial. And more to the point, we don't want to limit ourselves to regurgitating words we've seen in the training data. We want whole new words (like `Brinesville`[TODO:link to line #]()). For that, we need to go deeper, down to the character level.
+Most NLP models stop at the word level, representing texts by counts of words (or by word embeddings, such as those produced by word2vec). But breaking up GitHub repository names (like `tool_dbg`, `burgvan.github.io`, or `refcounting`) into words isn't trivial. And more to the point, we don't want to limit ourselves to regurgitating words we've seen in the training data. We want whole new words (like [Brinesville](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/usgeo_unique.txt#L191)). For that, we need to go deeper, down to the character level.
 
 We'll represent names as sequences of [one-hot](https://en.wikipedia.org/wiki/One-hot) vectors of length `N`, where `N` is the size of our alphabet. 
 
 Because we're not using a recurrent architecture, we'll need to fix some maximum string length `M` ahead of time. Names shorter than `M` will need to be padded with some special character.
 
-For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is our padding character, and set M to 4. We can encode the name '*deb*' using the following 4x6 matrix:
+For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is our padding character, and set `M` to 4. We can encode the name '*deb*' using the following 4x6 matrix:
 
 |index  |a      |b      |c      |d      |e      |$      |
 |-------|-------|-------|-------|-------|-------|-------|
@@ -59,7 +59,7 @@ For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is ou
 |2      |0      |1      |0      |0      |0      |0      |
 |3      |0      |0      |0      |0      |0      |1      |
 
-[TODO: These tables look like crap]()
+<!-- TODO: These tables look like crap -->
 
 #### RBMs
 
@@ -115,17 +115,17 @@ If you're interested in reading more about RBMs, I highly recommend Geoff Hinton
 
 ### Results
 
-Evaluating generative models is hard! As [A note on the evaluation of generative models] describes, the commonly used quantitative metrics for this task can disagree with each other, and with qualitative human assessments. To make matters worse, the gold standard metric for generative models (likelihood of heldout data) is actually intractable for RBMs! 
+Evaluating generative models is hard! As [A note on the evaluation of generative models](https://arxiv.org/abs/1511.01844) describes, the commonly used quantitative metrics for this task can disagree with each other, and with qualitative human assessments. To make matters worse, the gold standard metric for generative models (likelihood of heldout data) is actually intractable for RBMs! 
 
 But you didn't come here to see graphs anyways, right? So let's just look at some samples.
 
 (In fact, when tuning hyperparameters, I relied a lot on visual assesment of samples. I did find some metrics that correlated well with my assessments - a form of [pseudolikelihood](https://en.wikipedia.org/wiki/Pseudolikelihood) and denoising - but they weren't perfect. In the words of Geoff Hinton, "use them, but don't trust them".)
 
-If you're curious, [this README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training and sampling. After sampling, any strings that existed in the training data were filtered out (this was anywhere between .01% of samples to 10% depending on the model). [*This* README](TODO) has pointers to where each dataset was downloaded from and how it was preprocessed.
+If you're curious, [this README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training them and sampling from them. After sampling, repetitions were deduped and any strings that existed in the training data were filtered out (this was anywhere between .01% of samples to 10% depending on the model). [*This* README](TODO) has pointers to where each dataset was downloaded from and how it was preprocessed.
 
-## Human names
+#### Human names
 
-One of the first things I tried was generating first names (as Andrej Karpathy did in his [Unreasonable effectiveness of recurrent neural networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/#generating-baby-names)). They turned out pretty well! e.g.
+One of the first things I tried was generating first names (as Andrej Karpathy did in his [blog post on character-level RNNs](http://karpathy.github.io/2015/05/21/rnn-effectiveness/#generating-baby-names)). They turned out pretty well! e.g.
 
     aluna
     lamadona
@@ -135,7 +135,7 @@ One of the first things I tried was generating first names (as Andrej Karpathy d
 
 (For reasons of computational efficiency all but one model was trained on a lowercased version of the dataset. The exception is the GitHub repository dataset, where case is a very meaningful source of variation.)
 
-But I suspect this is actually not a very hard problem. I noticed that merely sampling according to the biases of the visible units (completely ignoring our weights/hidden units), produced kind of reasonable names already:
+But I suspect this is actually not a very hard problem. I noticed that just sampling according to the biases of the visible units (completely ignoring the weights/hidden units), produced kind of reasonable names already:
 
     borme
     yareeh
@@ -145,7 +145,7 @@ But I suspect this is actually not a very hard problem. I noticed that merely sa
     patya
     maegae
 
-A more difficult problem is generating *full* names. Here are some samples drawn from a model trained on the full names of 1.5m actors from the [IMDB dataset](http://www.imdb.com/interfaces) (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/actors_unique.txt)):
+A more difficult problem is generating *full* names. Here are some samples drawn from a model trained on the full names of 1.5m actors from IMDB (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/actors_unique.txt)): <!-- link to word lists or just the app? or both? -->
 
     omar vole
     r.j. pen
@@ -157,7 +157,7 @@ A more difficult problem is generating *full* names. Here are some samples drawn
 
 (It turns out they meant "actors" in the gendered sense of the word, which is why you won't see any female names.)
 
-The dataset included naming traditions from around the world which created several distinct modes that the model captured pretty well. For example, it generates names like...
+The dataset includes naming traditions from around the world which created several distinct modes that the model captured pretty well. For example, it generates names like...
 
     hiroshi tajamara
     hing-hying li
@@ -170,7 +170,7 @@ But is unlikely to generate a name like "hiroshi tjomanovic".
 
 The model's favourite name (that is, the sample it assigned the lowest energy) was `christian scheller` (who [exists](http://www.imdb.com/name/nm1013241/) in the training set - `christian schuller`, who doesn't exist, is a close second).
 
-## Geographic names
+#### Geographic names
 
 It's not much of a stretch of the imagination to go from training on names of people to names of places (examples from the dataset: "Gall Creek", "Grovertown", "Aneta", "Goodyear Heights"). Here are some examples from our RBM's dreamed atlas (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/usgeo_unique.txt)):
 
@@ -188,7 +188,7 @@ Not bad! Who wouldn't enjoy a picnic in Jicky Park?
 
 The model's favourite place name was `indian post office`, which exists in the training set. It's second favourite is `wester post office`, which doesn't. 
 
-## GitHub repository names
+#### GitHub repository names
 
 How about some GitHub repos? More [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/repos_unique.txt):
 <!-- These were better? :(
@@ -247,9 +247,9 @@ Favourite name: `the : the card game`. The most commonly sampled name was `the b
 
 ### "Did they really need a neural network for that?"
 
-This is a question that probably doesn't get asked often enough. Our results here are pretty neat, but before we chalk this up as another victory for the deep learning revolution, we should ask whether the problem we solved was actually difficult. I'll follow the example of [Yoav Goldberg](http://nbviewer.jupyter.org/gist/yoavg/d76121dfde2618422139) and use unsmoothed maximum-likelihood character level language models as my dumb baseline to compare against. In short, we'll just predict the next letter by looking at the last n, and looking at what letters came after that prefix in the training set.
+This is a question that probably doesn't get asked often enough. The results here are pretty neat, but before we claim another victory for the deep learning revolution, we should ask whether the problem we solved was actually difficult. I'll follow the example of [Yoav Goldberg](http://nbviewer.jupyter.org/gist/yoavg/d76121dfde2618422139) and use unsmoothed maximum-likelihood character level language models as my dumb baseline to compare against. In short, we'll generate strings one letter at a time, choosing the next letter by looking at the last n, and seeing which letters tended to follow that sequence in the training set.
 
-Some examples from an order-4 model: 
+Some examples from an order-4 model trained on the US place names dataset: 
 
     Bonny Maringer City of Lake
     Sour Motoruk Mountain
@@ -265,7 +265,7 @@ Some examples from an order-4 model:
     Tunnel
     Old Park
 
-Huh. Those are, uh, actually pretty excellent. And with 4-grams it's not at the point where it's just copying the training data. Around 25% of generated names exist in the training set (compared to 1% for a typical RBM sample), but I filtered those out of the list above. Several of the individual tokens above don't exist in the training set either, including the excellent "Goatyard".
+Huh. Those are, uh, actually pretty excellent. And with 4-grams it's not at the point where it's just copying the training data. Around 25% of generated names exist in the training set, but I filtered those out of the list above. Several of the individual tokens above don't exist in the training set either, including the excellent "Goatyard".
 
 Let's see if we can salvage our dignity by comparing performance on the GitHub dataset. The order-4 output is pretty goofy, so let's give it 5 characters of context:
 
@@ -297,12 +297,12 @@ This is where being able to see the whole string at once really comes in handy. 
 
 A common trick when working with neural nets in the image domain is to visualize what a neuron in the first hidden layer is "seeing" by treating the weights between that neuron and each input pixel as pixel intensities. 
 
-<img src="http://neuralnetworksanddeeplearning.com/images/net_full_layer_0.png"></img>
+<img src="http://neuralnetworksanddeeplearning.com/images/net_full_layer_0.png" style="width:400px">
 [TODO: Give credit and don't hotlink. You dick.]()
 
-We can do something similar here. The columns in the tables below represent positions in a 20-character geographic name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
+We can do something similar here. The columns in the tables below represent positions in a 17-character GitHub repo name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
 
-These are just a couple examples taken from a model with 350 hidden units trained on the dataset of GitHub repos. [This page](/assets/recep.html) has visualizations of all those units.
+These are just a couple examples taken from a model with 350 hidden units (the same model from which the above samples were taken). [This page](/assets/recep.html) has visualizations of all those units.
 
 {% include recep149.html %}
 
@@ -336,9 +336,9 @@ If I wanted to promote this from a toy project, the first thing I'd do would be 
 
 RBMs can be (almost trivially) stacked on one another to form a [deep belief network](https://en.wikipedia.org/wiki/Deep_belief_network). It seems plausible that additional layers would be able to learn higher layers of abstraction and generate even better samples.
 
-In particular, I think this would help avoid solecisms like "Lake Lake". [TODO: becauase? Sort of relates to next point. Units already look at small neighbourhoods. Need to coordinate them for bigger picture.]() Okay, names like "Days Inn Oil Field" are pretty funny tho.
+Remember how we saw above that most units learn patterns local to a particular region of the string? This may explain solecisms like `Lake Lake`, or `Church Swamp`. If, as seems to be the case, our initial layer of hidden units is mostly learning words, phonotactics, and low-level structural patterns (word lengths, spacing), another layer of hidden units on top of those could learn more semantic patterns. e.g. "Lake $foo", "$foo Lake", "$foo Swamp", but never "Lake Lake", "Lake Swamp", etc. I would be sad to see `Days Inn Oil Field` go though. That one was pretty good.
 
-### Translation Invariance
+#### Translation Invariance
 
 Under the current architecture, for a model to learn the word "Pond" (a very useful word to learn), it needs to memorize a separate version for each place it can appear: `___ Pond`, `____ Pond`, `_____ Pond`, etc.
 
@@ -346,14 +346,15 @@ We'd like our model to learn robust, position-invariant patterns and understand 
 
 One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. This is just like CNNs for vision tasks, where we have many collections of units - 'filters' - that each see small patches of the image, and share weights. These can detect features both low-level (lines), or high (faces), no matter where they appear in the image.
 
-We can do the same thing with text, except that our filters would be 1-d rather than 2-d. And if we stacked them, we could presumably also get low-level features at the bottom layer (e.g. common character bigrams and trigrams like "th", "ch", "ing") and more complex features at the top (words, or patterns of words, like `$foo pond` or `$foo pond dam`).
+We can do the same thing with text, except that our filters would be 1-d rather than 2-d. And if we stacked them, we could presumably also get low-level features at the bottom layer (e.g. common character bigrams and trigrams like "th", "ch", "ing") and more complex features at the top.
 
-The importance of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are already looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions. [TODO: link to github.io example hidden units]()
+Again, the promise of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are *already* looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions. With convolutional units, we could help the network do what it's already doing much more efficiently (in terms of the size of the model, and the amount of information learned per training instance).[TODO: link to github.io example hidden units]()
 
 ### Practical Applications
 
 None whatsoever.
 
+<!--
 ### Acknowledgements
 
 [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) by Andrej Karpathy inspired me to play with character-level representations (and was basically the first thing I read that got me excited about deep learning). If you haven't read it already, go do it now! [TODO: compare results to char-rnn?]()
@@ -361,3 +362,5 @@ None whatsoever.
 My RBM implementation was built on top of scikit-learn's [BernoulliRBM](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.BernoulliRBM.html#sklearn.neural_network.BernoulliRBM) class, which is cleanly written and well-commented, and easy to hack on out of the box.
 
 Thanks to Falsifian for reviewing a draft of this post and teaching me about simulated annealing.
+
+-->
