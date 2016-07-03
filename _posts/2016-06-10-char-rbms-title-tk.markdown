@@ -121,7 +121,7 @@ But you didn't come here to see graphs anyways, right? So let's just look at som
 
 (In fact, when tuning hyperparameters, I relied a lot on visual assesment of samples. I did find some metrics that correlated well with my assessments - a form of [pseudolikelihood](https://en.wikipedia.org/wiki/Pseudolikelihood) and denoising - but they weren't perfect. In the words of Geoff Hinton, "use them, but don't trust them".)
 
-If you're curious, [this README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training and sampling. And [*this* README](TODO) has pointers to where each dataset was downloaded from and how it was preprocessed.
+If you're curious, [this README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training and sampling. After sampling, any strings that existed in the training data were filtered out (this was anywhere between .01% of samples to 10% depending on the model). [*This* README](TODO) has pointers to where each dataset was downloaded from and how it was preprocessed.
 
 ## Human names
 
@@ -168,6 +168,8 @@ But is unlikely to generate a name like "hiroshi tjomanovic".
 
 (Incidentally, Google tells me that none of "Tajamara", "Hing-hying", "Tjomanovic" and "Rariali" are actual extant names - though based on my limited exposure to Japanese/Chinese/Slavic/Italian names, I could have believed they were all real. We want to generate novel examples not copied from the training set, so this is good news.)
 
+The model's favourite name (that is, the sample it assigned the lowest energy) was `christian scheller` (who [exists](http://www.imdb.com/name/nm1013241/) in the training set - `christian schuller`, who doesn't exist, is a close second).
+
 ## Geographic names
 
 It's not much of a stretch of the imagination to go from training on names of people to names of places (examples from the dataset: "Gall Creek", "Grovertown", "Aneta", "Goodyear Heights"). Here are some examples from our RBM's dreamed atlas (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/usgeo_unique.txt)):
@@ -184,10 +186,12 @@ It's not much of a stretch of the imagination to go from training on names of pe
 
 Not bad! Who wouldn't enjoy a picnic in Jicky Park?
 
+The model's favourite place name was `indian post office`, which exists in the training set. It's second favourite is `wester post office`, which doesn't. 
+
 ## GitHub repository names
 
-Here are some random samples from a model with 350 hidden units trained for 20 epochs on 3.7m repository names:
-
+How about some GitHub repos? More [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/repos_unique.txt):
+<!-- These were better? :(
     testing_project
     css-qlation-server
     Learning_Gitertion
@@ -203,24 +207,43 @@ Here are some random samples from a model with 350 hidden units trained for 20 e
     CS_Codes_Project
     sliding.js
     Google-Application
+-->
 
-Some favourites I encountered:
+    frost2
+    gruntus.js
+    simpleshefe
+    backbook.com
+    thetesters
+    mandolind
+    smart-cheling
+    ShreeCheck
+    redget-2014
+    tumber_server
 
-    instaCloud
-    python-licker
-    mobile-masher
-    JustQuery
-    hello-bool
-    dataserverclient
-    2048-ing-master
 
-I was actually surprised by the quality of these samples, and became suspicious that it might be memorizing examples from the training set. It turns out there are some samples that appear in the training data (including the first name above, "testing\_project"), but it's fairly rare. Of the 38 names in my running list of favourites (of which the second list above is an excerpt), only 2 occurred in the training dataset. Given the size and entropy of the dataset, these co-occurences aren't too alarming.
+Favourite name: `unity.guithub.io`, which doesn't exist in the training set.
 
 #### Bonus: Board games
 
-I spent a bit of time trying to learn board game names, but wasn't particularly successful. I suspect my dataset, at about 50k games, was just too small.
+I spent a bit of time trying to learn board game names, but wasn't particularly successful. I suspect my dataset, at about 50k games, was just too small. Some samples (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/games_unique.txt)):
 
-[TODO: Actual examples. But maybe retry training first just in case given what you've learned re learning rate, annealing etc.?]()
+    stopeest game
+    chef ths gome
+    the mitean game
+    eleppitt care game
+    chipling gome
+    the sidal game
+    elepes on the game
+    the hing board game
+
+Well, it's certainly figured out that the word "game" is important to unlocking the mystery of this distribution. Good job on that, RBM. It caught a few other types of game names, but again with a lot of jpeg compression:
+
+    hocket'& pace
+    spop the gime
+    brauk
+    pocket quizs
+
+Favourite name: `the : the card game`. The most commonly sampled name was `the bile game`, which appeared **700** times in 35k samples. Neither game exists in the training set. If you do own a copy of "the bile game", don't invite me over for board game night. 
 
 ### "Did they really need a neural network for that?"
 
@@ -259,7 +282,7 @@ Let's see if we can salvage our dignity by comparing performance on the GitHub d
     BB-FlappyBao
     py_shopping-sample
 
-Our baseline's not looking so hot now. It's interesting to note some mistakes here that the RBM model never makes. For example, it never flubs the formatting of a URL. It's also very good at picking a consistent scheme for case and separators for each name, e.g.:
+Our baseline's not looking so hot now. It's interesting to note some mistakes here that the RBM model almost never makes. For example, it never flubs the formatting of a URL. It's also very good at picking a consistent scheme for case and separators for each name, e.g.:
 
     SAPAPP
     ruby-fale-project
@@ -268,23 +291,18 @@ Our baseline's not looking so hot now. It's interesting to note some mistakes he
 
 This is where being able to see the whole string at once really comes in handy. When our Markov model has generated as far as "mails", it doesn't have enough context to know whether it should make `java-mails-rails` or `java-mailsRails` or `java-mails_Rails` (great repo name, btw). We can always feed it even *more* context, but a window of 5 already leads to a lot of copy-pasting from the training set. For example, `shutupmrnotific` is funny, but it's just a truncation of a repo from the training set, `shutupmrnotification`.
 
-#### Comparing to the Unreasonable Effectiveness of RNNs
-
-Andrej Karpathy's excellent blog post on [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) was the first thing I read that got me really excited about deep learning and noodling around with neural networks, and it was also the inspiration for this little project. I loved the RNN-generated [names](http://cs.stanford.edu/people/karpathy/namesGenUnique.txt), and also found it interesting that they were probably the most difficult to distinguish from the training data.
-
-At the local level, the source code, the Shakespeare, and the Wikipedia all look great. But zooming out, there's a lack of long-term coherence. What are Pandarus, Second Senator, Duke Vincentio, Second Lord, Viola, and a clown all doing in a room together? But the names didn't have this problem, because they're nice little atomic units - they don't need to flow together smoothly to tell a story. And because of their atomicity, we don't even need a recurrent architecture. We can treat each name individually as an input to a feed-forward network. (Or, in this case, feed-forward-and-backward.)
-
-Usually when we give something up (like the ability to generate arbitrary-length sequences), we gain something in return. So let's compare our results to char-rnn to see whether we actually gained anything. 
-
-[TODO: Examples go here. Still need to train a decent model.]()
+<!-- But there are also other less flammable strawmen? HMMs? -->
 
 ### Understanding what's going on
 
-A common trick when working with neural nets in the image domain is to visualize what a neuron in the first hidden layer is "seeing" by treating the weights between that neuron and each input pixel as pixel intensities. [TODO: link to example]()
+A common trick when working with neural nets in the image domain is to visualize what a neuron in the first hidden layer is "seeing" by treating the weights between that neuron and each input pixel as pixel intensities. 
+
+<img src="http://neuralnetworksanddeeplearning.com/images/net_full_layer_0.png"></img>
+[TODO: Give credit and don't hotlink. You dick.]()
 
 We can do something similar here. The columns in the tables below represent positions in a 20-character geographic name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
 
-These are just a couple examples taken from a model with 250 hidden units. [This page](/assets/recep.html) has visualizations of all those units.
+These are just a couple examples taken from a model with 350 hidden units trained on the dataset of GitHub repos. [This page](/assets/recep.html) has visualizations of all those units.
 
 {% include recep149.html %}
 
@@ -310,35 +328,9 @@ Whereas the last unit was focused on a few domain-specific words, this unit seem
 
 Another emergent behaviour is the strong spatial locality. Most hidden units have their strong weights tightly clustered on a particular neighbourhood of contiguous character positions. This is neat because, again, we never told our model that certain visible units are "next to" each other - it knows nothing about the input geometry.
 
-
-{% include recep9.html %}
-<br/> 
-
-Most hidden units exhibit strong spatial locality - that is, their weights are focused on a particular region within the string. This is cool because we never told the model that certain visible units are 'next to' each other - it has no prior notion of the input geometry.
-
-The model also seems to have learned the distinction between vowels and consonants. This hidden unit really wants to see a vowel at the 15th position (`[i, a, e, o, u]`), and a consonant at the position immediately before (with `[o, e, a, i, u]` being the characters it *least* wants to see). 
-
-{% include recep72.html %}
-<br/>
-
-One of the most surprising things is how little evidence there is of overt 'memorization' of words. This unit almost seems to have memorized the word 'ranch', except that 'k' has a slightly higher weight than 'h'. But there's a lot of green spread across many letters - in addition to "ranch" (and therefore "branch"), this unit is happy with "range" (and "grange"), "marsh", "basin", and "entrance". And that's just counting exact matches on the top-5 characters.
-
-This kind of multitasking is a common theme. And perhaps it shouldn't be surprising. Most of these RBMs have around 150-250 hidden units. A good model of place names or GitHub repositories needs to remember more than 250 important words (in addition to the [phonotactic](https://en.wikipedia.org/wiki/Phonotactics) rules for inventing new words), so a dense representation is called for.
-
-This also accounts for some of the most common clunkers generated by otherwise strong models, e.g.:
-
-    Little Malding Ponk
-    Millard Landing Pork
-    Nouth Bay Village
-    Sorth River Lakes
-    PHP-Remort-Server
-
-(For the longest time, I also thought that my geo models' predilections for generating "Millponds" and "Tanks" were also symptoms of this. Turns out those are real things. If anyone knows what they are, I'd love to know.)
-
-
 ### Making it better
 
-If I wanted to promote this from a toy project, the first thing I'd do would be to reimplement it using a library with GPU support like TensorFlow or Theano. A few more interesting improvements that suggest themselves...
+If I wanted to promote this from a toy project, the first thing I'd do would be to reimplement it using a library with GPU support like TensorFlow or Theano. There are also some technical RBM hacks I never got around to trying which probably would have helped (like a sparsity target on hidden units and fast weights for persistent contrastive divergence learning). A few more interesting improvements that suggest themselves...
 
 #### Going Deeper
 
@@ -355,6 +347,8 @@ We'd like our model to learn robust, position-invariant patterns and understand 
 One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. This is just like CNNs for vision tasks, where we have many collections of units - 'filters' - that each see small patches of the image, and share weights. These can detect features both low-level (lines), or high (faces), no matter where they appear in the image.
 
 We can do the same thing with text, except that our filters would be 1-d rather than 2-d. And if we stacked them, we could presumably also get low-level features at the bottom layer (e.g. common character bigrams and trigrams like "th", "ch", "ing") and more complex features at the top (words, or patterns of words, like `$foo pond` or `$foo pond dam`).
+
+The importance of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are already looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions. [TODO: link to github.io example hidden units]()
 
 ### Practical Applications
 
