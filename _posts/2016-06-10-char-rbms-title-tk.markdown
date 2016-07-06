@@ -44,7 +44,7 @@ If we can sample from this distribution, the effect should be like thumbing thro
 
 We've said we want to learn a function over strings, but anything we're going to feed into a neural network needs to be transformed into a vector of numbers first. How should we do that in this case?
 
-Most NLP models stop at the word level, representing texts by counts of words (or by word embeddings, such as those produced by word2vec). But breaking up GitHub repository names (like `tool_dbg`, `burgvan.github.io`, or `refcounting`) into words isn't trivial. And more to the point, we don't want to limit ourselves to regurgitating words we've seen in the training data. We want whole new words (like [Brinesville](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/usgeo_unique.txt#L191)). For that, we need to go deeper, down to the character level.
+Most NLP models stop at the word level, representing texts by counts of words (or by word embeddings, such as those produced by word2vec). But breaking up GitHub repository names (like `tool_dbg`, `burgvan.github.io`, or `refcounting`) into words isn't trivial. And more to the point, we don't want to limit ourselves to regurgitating words we've seen in the training data. We want to generate whole new words (like, say, [Brinesville](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/usgeo_unique.txt#L191)). For that, we need to go deeper, down to the character level.
 
 We'll represent names as sequences of [one-hot](https://en.wikipedia.org/wiki/One-hot) vectors of length `N`, where `N` is the size of our alphabet. 
 
@@ -63,7 +63,7 @@ For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is ou
 
 #### RBMs
 
-A restricted Boltzmann machine (henceforth RBM) is a neural network consisting of two layers of binary units[\*](TODO: footnote on variations), one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names. 
+A restricted Boltzmann machine (henceforth RBM) is a neural network consisting of two layers of binary units), one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names. 
 
 <div class="imgcap">
     <img src="/img/rbm.svg">
@@ -71,8 +71,9 @@ A restricted Boltzmann machine (henceforth RBM) is a neural network consisting o
 </div>
 <br/>
 
-Again, RBMs try to learn a probability distribution from the data they're given. They do this by learning to assign relatively low 'energy' to samples from the data distribution. That energy will be proportional to the learned probability.
+Again, RBMs try to learn a probability distribution from the data they're given. They do this by learning to assign relatively low 'energy' to samples from the data distribution. That energy will be proportional to the (log) learned probability.
 
+<!--
 ```python
 class RBM(object):
     def energy(self, visible, hidden):
@@ -87,6 +88,7 @@ class RBM(object):
         return -1*(np.dot(visible, self.visible_bias)
             + np.logaddexp(0, np.dot(visible, self.W.T) + self.hidden_bias))
 ```
+-->
 
 In the diagram above, the energy of the RBM will be equal to the negative sum of:
 
@@ -121,7 +123,7 @@ But you didn't come here to see graphs anyways, right? So let's just look at som
 
 (In fact, when tuning hyperparameters, I relied a lot on visual assesment of samples. I did find some metrics that correlated well with my assessments - a form of [pseudolikelihood](https://en.wikipedia.org/wiki/Pseudolikelihood) and denoising - but they weren't perfect. In the words of Geoff Hinton, "use them, but don't trust them".)
 
-If you're curious, [this README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training them and sampling from them. After sampling, repetitions were deduped and any strings that existed in the training data were filtered out (this was anywhere between .01% of samples to 10% depending on the model). [*This* README](TODO) has pointers to where each dataset was downloaded from and how it was preprocessed.
+If you're curious, [this README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training them and sampling from them. After sampling, repetitions were deduped and any strings that existed in the training data were filtered out (this was anywhere between .01% of samples to 10% depending on the model). [*This* README](https://github.com/colinmorris/char-rbm/blob/master/data/README.md) describes where each dataset was downloaded from and how it was preprocessed.
 
 #### Human names
 
@@ -221,7 +223,7 @@ How about some GitHub repos? More [here](https://github.com/colinmorris/char-rbm
     tumber_server
 
 
-Favourite name: `unity.guithub.io`, which doesn't exist in the training set.
+Favourite name: `unity.github.io`, which doesn't exist in the training set.
 
 #### Bonus: Board games
 
@@ -293,6 +295,28 @@ This is where being able to see the whole string at once really comes in handy. 
 
 <!-- But there are also other less flammable strawmen? HMMs? -->
 
+### Stupid RBM tricks
+
+The coolest thing we can do with our trained models is ask them to come up with new names, but that's not the only thing we can ask of them. We can also give them a name of our own choosing and ask them how good they think it is. Let's see if the model we trained on actor names has the hoped-for behaviour on the examples we described at the beginning:
+
+    >>> E('john smith')
+    -75.10
+    >>> E('dweezil zappa')
+    -38.14
+    >>> E('mcn zgl jey')
+    -34.25
+
+Remember that lower energy corresponds to higher probability, so this is great! Also, energy is proportional to the log of the probability, so the model thinks that Dweezil is about 4 orders of magnitude more likely than Mcn, and 37(!) orders of magnitude less likely than John. 
+
+That sounds like a lot, but in addition to "Smith" being a [more common surname](https://books.google.com/ngrams/graph?content=Zappa%2CSmith&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CZappa%3B%2Cc0%3B.t1%3B%2CSmith%3B%2Cc0) than "Zappa" (especially in our presumably American-centric dataset), the name "Dweezil" [simply didn't exist](https://books.google.com/ngrams/graph?content=Dweezil&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CDweezil%3B%2Cc0) until 1969. In a slightly different universe without Frank Zappa, human civilization might come to an end without a single Dweezil being born. What a sobering thought.
+
+It can be interesting to walk around the neighbours of a name to get a feel for the energy landscape of the model, and its robustness to small changes:
+
+[TODO: Ooh! Ooh! Put a scatterplot here with string labels!]()
+
+
+[TODO: -ve is good, logs, reference to denoising autoencoders, pseudolikelihood]()
+
 ### Understanding what's going on
 
 A common trick when working with neural nets in the image domain is to visualize what a neuron in the first hidden layer is "seeing" by treating the weights between that neuron and each input pixel as pixel intensities. 
@@ -300,13 +324,13 @@ A common trick when working with neural nets in the image domain is to visualize
 <img src="http://neuralnetworksanddeeplearning.com/images/net_full_layer_0.png" style="width:400px">
 [TODO: Give credit and don't hotlink. You dick.]()
 
-We can do something similar here. The columns in the tables below represent positions in a 17-character GitHub repo name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
+We can do something similar here. The tables below each represent the 'receptive field' of a particular hidden unit. The columns correspond to positions in a 17-character GitHub repo name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
 
 These are just a couple examples taken from a model with 350 hidden units (the same model from which the above samples were taken). [This page](/assets/recep.html) has visualizations of all those units.
 
 {% include recep149.html %}
 
-`vndubnr`? Actually, this word search is hiding several useful words. How many can you spot?
+This hidden unit wants to see... `vndubnr`? Actually, this word search is hiding several useful words. How many can you spot?
 
 - vagrant (and Vagrant)
 - android
@@ -316,15 +340,15 @@ These are just a couple examples taken from a model with 350 hidden units (the s
 
 <!-- It's interesting to note that these are all of a particular type. -->
 
-This kind of multitasking is a common theme. And maybe it shouldn't be surprising. A good model of place names or GitHub repositories needs to remember more than 200-350 words (in addition to the [phonotactic](https://en.wikipedia.org/wiki/Phonotactics) rules for inventing new words), so most of the time, it can't afford to waste a hidden unit on a single word.
+This kind of multitasking is a common theme. And maybe it shouldn't be surprising. This model only has 350 hidden units, but a good model of repository names needs to remember more words than that (not to mention formatting and the [phonotactic](https://en.wikipedia.org/wiki/Phonotactics) rules for inventing new words).
 
-Of course, this hidden unit alone is perfectly happy to see hybrid prefixes like `vadroid`, or `andulant` or even `aaDmaae`. To avoid those, it needs a little help from its friends. For example...
+Of course, this hidden unit alone is perfectly happy to see hybrid prefixes like `vadroid`, or `andulant` or even `aaDmaae`. It needs to work in concert with other hidden units that impose their own regularities, like...
 
 {% include recep122.html %}
 
-With this and the previous unit turned on, we're now happy to see 'ang**ul**ar' and 'ans**ib**le', but not 'vag**ra**nt', 'and**ro**id', or 'ard**ui**no'.
+Whereas the last unit was focused on a few domain-specific words, this unit is pretty generic. It mostly just wants to see a vowel in the fourth position followed immediately by a consonant (note that the chars it *least* wants to see there are `[a, u, o, e, i]`). With this and the previous unit turned on, we're now happy to see 'ang**ul**ar' and 'ans**ib**le', but not 'vag**ra**nt', 'and**ro**id', or 'ard**ui**no'.
 
-Whereas the last unit was focused on a few domain-specific words, this unit seems very generic. It mostly just wants to see a vowel in the fourth position followed immediately by a consonant (note that the chars it *least* wants to see there are `[a, u, o, e, i]`). Of course, our model has no explicit knowledge of what a "vowel" is, so it's neat to see it picked up naturally as a useful feature.
+Of course, our model has no explicit knowledge of what a "vowel" is, so it's neat to see it picked up naturally as a useful feature.
 
 Another emergent behaviour is the strong spatial locality. Most hidden units have their strong weights tightly clustered on a particular neighbourhood of contiguous character positions. This is neat because, again, we never told our model that certain visible units are "next to" each other - it knows nothing about the input geometry.
 
