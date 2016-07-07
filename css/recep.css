@@ -19,3 +19,28 @@ td {
     height: 20px;
 }
 
+.mostwanted {
+    font-family: mono;
+}
+
+#hidden-carousel {
+    height: 300px;
+}
+
+#hidden-carousel div.carousel-inner {
+    height: 300px;
+}
+
+div.carousel-caption {
+    color: black !important;
+    text-shadow: none !important;
+    position: relative !important;
+    left: auto;
+    right: auto;
+    /*bottom: 10px;*/
+}
+
+#hidden-carousel .carousel-inner .item .activations {
+    padding-left: 140px;
+    padding-top: 20px;
+}

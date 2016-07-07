@@ -12,6 +12,7 @@ description: >
     Splashing around in the shallow end of the deep learning pool.
 baseurl: ""
 url: "http://colinmorris.github.io"
+permalink: /blog/:title
 twitter_username: 
 github_username: colinmorris
 

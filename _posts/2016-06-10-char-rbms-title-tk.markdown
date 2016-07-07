@@ -295,7 +295,7 @@ This is where being able to see the whole string at once really comes in handy. 
 
 <!-- But there are also other less flammable strawmen? HMMs? -->
 
-### Stupid RBM tricks
+### More stupid RBM tricks
 
 The coolest thing we can do with our trained models is ask them to come up with new names, but that's not the only thing we can ask of them. We can also give them a name of our own choosing and ask them how good they think it is. Let's see if the model we trained on actor names has the hoped-for behaviour on the examples we described at the beginning:
 
@@ -306,16 +306,14 @@ The coolest thing we can do with our trained models is ask them to come up with 
     >>> E('mcn zgl jey')
     -34.25
 
-Remember that lower energy corresponds to higher probability, so this is great! Also, energy is proportional to the log of the probability, so the model thinks that Dweezil is about 4 orders of magnitude more likely than Mcn, and 37(!) orders of magnitude less likely than John. 
-
-That sounds like a lot, but in addition to "Smith" being a [more common surname](https://books.google.com/ngrams/graph?content=Zappa%2CSmith&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CZappa%3B%2Cc0%3B.t1%3B%2CSmith%3B%2Cc0) than "Zappa" (especially in our presumably American-centric dataset), the name "Dweezil" [simply didn't exist](https://books.google.com/ngrams/graph?content=Dweezil&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CDweezil%3B%2Cc0) until 1969. In a slightly different universe without Frank Zappa, human civilization might come to an end without a single Dweezil being born. What a sobering thought.
+Remember that lower energy corresponds to higher probability, so this is great! Also, energy is proportional to the log of the probability, so the model thinks that Dweezil is about 4 orders of magnitude more likely than Mcn, and 37(!) orders of magnitude less likely than John.  (That sounds like a lot, but the name "Dweezil" [is globally unique](https://books.google.com/ngrams/graph?content=Dweezil&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CDweezil%3B%2Cc0). There are probably lots of alternate universes very similar to our own where no Dweezil will ever be born.)
 
 It can be interesting to walk around the neighbours of a name to get a feel for the energy landscape of the model, and its robustness to small changes:
 
 [TODO: Ooh! Ooh! Put a scatterplot here with string labels!]()
 
+This is a nice intuitive way of evaluating our model's density function. We can't calculate the exact probability our model assigns to any instance, but we can compare probabilities. It seems clear that a good model should generally assign more energy to a sample from our dataset after we've randomly nudged it. In fact, we could have used something like this as a cost function to train our RBM, and if we had, we would have [wound up](http://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf) with a special case of a [denoising autoencoder](https://en.wikipedia.org/wiki/Autoencoder#Denoising_autoencoder), another powerful generative neural network.
 
-[TODO: -ve is good, logs, reference to denoising autoencoders, pseudolikelihood]()
 
 ### Understanding what's going on
 
@@ -351,6 +349,63 @@ Whereas the last unit was focused on a few domain-specific words, this unit is p
 Of course, our model has no explicit knowledge of what a "vowel" is, so it's neat to see it picked up naturally as a useful feature.
 
 Another emergent behaviour is the strong spatial locality. Most hidden units have their strong weights tightly clustered on a particular neighbourhood of contiguous character positions. This is neat because, again, we never told our model that certain visible units are "next to" each other - it knows nothing about the input geometry.
+
+<!-- WIP: carousel -->
+
+<div id="hidden-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
+
+<!-- slides -->
+<div class="carousel-inner" role="listbox">
+
+<div class="item active">
+{% include rbm/5.html %}
+<div class="carousel-caption">
+    Github URL recognizer
+</div>
+</div>
+
+<div class="item">
+{% include rbm/29.html %}
+<div class="carousel-caption">
+    Short names (e.g. <code>CS3001</code>, <code>Team11</code>)
+</div>
+</div>
+
+<div class="item">
+{% include rbm/40.html %}
+<div class="carousel-caption">
+    Word delimeter at position 8
+</div>
+</div>
+
+<div class="item">
+{% include rbm/114.html %}
+<div class="carousel-caption">
+    Cruise control for cool.
+</div>
+</div>
+
+<div class="item">
+{% include rbm/331.html %}
+<div class="carousel-caption">
+    Three letter acronym prefixes (e.g. <code>PHP-Server</code>)
+</div>
+</div
+>
+</div><!-- /carousel-inner -->
+
+<!-- Controls -->
+<a class="left carousel-control" href="#hidden-carousel" role="button" data-slide="prev">
+  <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+  <span class="sr-only">Previous</span>
+</a>
+<a class="right carousel-control" href="#hidden-carousel" role="button" data-slide="next">
+  <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+  <span class="sr-only">Next</span>
+</a>
+
+</div>
+
 
 ### Making it better
 
