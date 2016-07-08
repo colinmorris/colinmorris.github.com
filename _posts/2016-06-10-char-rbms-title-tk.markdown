@@ -326,7 +326,7 @@ We can do something similar here. The tables below each represent the 'receptive
 
 These are just a couple examples taken from a model with 350 hidden units (the same model from which the above samples were taken). [This page](/assets/recep.html) has visualizations of all those units.
 
-{% include recep149.html %}
+{% include rbm/149.html %}
 
 This hidden unit wants to see... `vndubnr`? Actually, this word search is hiding several useful words. How many can you spot?
 
@@ -342,7 +342,7 @@ This kind of multitasking is a common theme. And maybe it shouldn't be surprisin
 
 Of course, this hidden unit alone is perfectly happy to see hybrid prefixes like `vadroid`, or `andulant` or even `aaDmaae`. It needs to work in concert with other hidden units that impose their own regularities, like...
 
-{% include recep122.html %}
+{% include rbm/122.html %}
 
 Whereas the last unit was focused on a few domain-specific words, this unit is pretty generic. It mostly just wants to see a vowel in the fourth position followed immediately by a consonant (note that the chars it *least* wants to see there are `[a, u, o, e, i]`). With this and the previous unit turned on, we're now happy to see 'ang**ul**ar' and 'ans**ib**le', but not 'vag**ra**nt', 'and**ro**id', or 'ard**ui**no'.
 
