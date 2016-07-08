@@ -12,11 +12,11 @@ Generating named entities with RBMs: Journey to Hilford Hills
 
 <!-- Graphic goes here? -->
 
-### Named entity generation
+<!-- ### Named entity generation -->
 
-A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem? What if we ask a model to dream up new names of people, places and things? 
+A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem - i.e. **named entity generation**? What if we ask a model to dream up new names of people, places and things? 
 
-I wrote some toy code to do this using restricted Boltzmann machines, a nifty (if slightly passe) variety of generative neural network. It turns out they come up with some funny stuff! For example, if we train an RBM on GitHub repository names, it can come up with new ones like...
+I wrote some code to do this using restricted Boltzmann machines, a nifty (if slightly passé) variety of generative neural network. It turns out they come up with some funny stuff! For example, if we train an RBM on GitHub repository names, it can come up with new ones like...
 
     fuzzyTools
     Slick-Android-App
@@ -26,7 +26,7 @@ I wrote some toy code to do this using restricted Boltzmann machines, a nifty (i
 
 If you want to flip through more examples, I wrote a little [web app](/rbm/repos/) for that (and analogous ones for generating [US place names](/rbm/geo/) and [actor names](/rbm/actors/)). If you want to learn about how I got there, read on. 
 
-In this post, I'll give a brief overview of Restricted Boltzmann Machines and how I applied them to this problem, and try to give some intuition about what's going on in the brain of one of these models.
+In this post, I'll give a brief overview of restricted Boltzmann machines and how I applied them to this problem, and try to give some intuition about what's going on in the brain of one of these models.
 
 My code is available [here](https://github.com/colinmorris/char-rbm) on GitHub. Feel free to play with it (with the caveat that it's more of a research notebook than a polished library). 
 
@@ -38,7 +38,7 @@ Our goal is to build a model that spits out funny names, but our path there will
 
     P("John Smith") > P("Dweezil Zappa") >> P("mCN xGl  JeY")
 
-If we can sample from this distribution, the effect should be like thumbing through a phone book. We'll see lots of "John Smith"s, we might eventually see a "Dweezil Zappa", but we'll probably never find a "mCN xGL  JeY" no matter how long we look.
+If we can sample from this distribution, the effect should be like thumbing through a phone book. We'll see lots of "John Smith"s, we might eventually see a "Dweezil Zappa", but we'll probably never find a "mCN xGL  JeY".
 
 #### Representing Inputs
 
@@ -46,11 +46,11 @@ We've said we want to learn a function over strings, but anything we're going to
 
 Most NLP models stop at the word level, representing texts by counts of words (or by word embeddings, such as those produced by word2vec). But breaking up GitHub repository names (like `tool_dbg`, `burgvan.github.io`, or `refcounting`) into words isn't trivial. And more to the point, we don't want to limit ourselves to regurgitating words we've seen in the training data. We want to generate whole new words (like, say, [Brinesville](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/usgeo_unique.txt#L191)). For that, we need to go deeper, down to the character level.
 
-We'll represent names as sequences of [one-hot](https://en.wikipedia.org/wiki/One-hot) vectors of length `N`, where `N` is the size of our alphabet. 
+We'll represent names as sequences of [one-hot](https://en.wikipedia.org/wiki/One-hot) vectors of length **N**, where **N** is the size of our alphabet. 
 
-Because we're not using a recurrent architecture, we'll need to fix some maximum string length `M` ahead of time. Names shorter than `M` will need to be padded with some special character.
+Because we're not using a recurrent architecture, we'll need to fix some maximum string length **M** ahead of time. Names shorter than **M** will need to be padded with some special character.
 
-For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is our padding character, and set `M` to 4. We can encode the name '*deb*' using the following 4x6 matrix:
+For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is our padding character, and set **M** to 4. We can encode the name '*deb*' using the following 4x6 matrix:
 
 |index  |a      |b      |c      |d      |e      |$      |
 |-------|-------|-------|-------|-------|-------|-------|
@@ -59,7 +59,6 @@ For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is ou
 |2      |0      |1      |0      |0      |0      |0      |
 |3      |0      |0      |0      |0      |0      |1      |
 
-<!-- TODO: These tables look like crap -->
 
 #### RBMs
 
@@ -310,7 +309,14 @@ Remember that lower energy corresponds to higher probability, so this is great! 
 
 It can be interesting to walk around the neighbours of a name to get a feel for the energy landscape of the model, and its robustness to small changes:
 
-[TODO: Ooh! Ooh! Put a scatterplot here with string labels!]()
+<div class="imgcap">
+<img src="/assets/zohnsmith.png">
+<div class="thecap">
+    Energy assigned by our model to various single-character substitutions on <code>john smith</code>. Names are arranged into columns according to the affected index in the string. Note that the y-axis is reversed.
+</div>
+</div>
+
+The chart above is heartening. First of all, it's great that our model assigned lower energy to the 'real' name than to any of the corrupted versions. But the order assigned to the corrupted names also seems very reasonable. The ones with the lowest energy - Messrs. Smitt, Smitz, and Smich - are the most plausible. The three samples with the highest energy are not only weird - they're not even pronouncable in English.
 
 This is a nice intuitive way of evaluating our model's density function. We can't calculate the exact probability our model assigns to any instance, but we can compare probabilities. It seems clear that a good model should generally assign more energy to a sample from our dataset after we've randomly nudged it. In fact, we could have used something like this as a cost function to train our RBM, and if we had, we would have [wound up](http://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf) with a special case of a [denoising autoencoder](https://en.wikipedia.org/wiki/Autoencoder#Denoising_autoencoder), another powerful generative neural network.
 
