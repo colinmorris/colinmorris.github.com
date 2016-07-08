@@ -19,6 +19,16 @@ td {
     height: 20px;
 }
 
+figure {
+    background: #f5f5f5;
+    display: inline-block !important;
+    margin: 1em 40px !important;
+}
+
+figcaption {
+    font-size: small;
+}
+
 .mostwanted {
     font-family: mono;
 }

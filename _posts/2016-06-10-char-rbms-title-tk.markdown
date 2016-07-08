@@ -62,15 +62,14 @@ For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is ou
 
 #### RBMs
 
-A restricted Boltzmann machine (henceforth RBM) is a neural network consisting of two layers of binary units), one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names. 
+A restricted Boltzmann machine (henceforth RBM) is a neural network consisting of two layers of binary units, one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names. 
 
-<div class="imgcap">
+<figure>
     <img src="/img/rbm.svg">
-    <div class="thecap">A tiny RBM with 3 hidden units and 24 visible units (not all shown) representing the name "deb". Two hidden units and 2 visible units (that we can see) are turned on - the rest are off.</div>
-</div>
-<br/>
+    <figcaption>A tiny RBM with 3 hidden units and 24 visible units (not all shown) representing the name "deb". Two hidden units and 2 visible units (that we can see) are turned on - the rest are off.</figcaption>
+</figure>
 
-Again, RBMs try to learn a probability distribution from the data they're given. They do this by learning to assign relatively low 'energy' to samples from the data distribution. That energy will be proportional to the (log) learned probability.
+Again, RBMs try to learn a probability distribution from the data they're given. They do this by learning to assign relatively low **energy** to samples from the data distribution. That energy will be proportional to the (log) learned probability.
 
 <!--
 ```python
@@ -96,6 +95,13 @@ In the diagram above, the energy of the RBM will be equal to the negative sum of
 - the weights connecting the red and blue units (i.e. the bold lines)
 
 There are weights connecting every visible unit to every hidden unit, but no intra-layer (visible-visible, or hidden-hidden) weights. During training, the RBM will adjust these weights, and a vector of biases for the visible and hidden units, in such a way as to bring down the energy of training examples, without bringing down the energy of everything else along with it.
+
+<div class="panel panel-default">
+<div class="panel-heading">Aside</div>
+<div class="panel-body">
+We said that energy is defined for a configuration of the visible <i>and</i> hidden layer, so what does it mean when we talk about the energy of a training example? The energy of a visible configuration is defined as <code>sum(energy(my_visible, hidden) for hidden in all_possible_hidden_vectors)</code>. We can't feasibly iterate over all 2<sup>n</sup> possible hidden layers, but it turns out there's an equivalent closed-form that's easy to calculate.
+</div>
+</div>
 
 <!-- TODO: is this necessary?
 (That last part is important. The probability assigned to a vector `X` is equal to `E(x)` *divided by the sum of the energy assigned to all strings* - the [partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics\).)
