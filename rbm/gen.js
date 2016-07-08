@@ -1,6 +1,6 @@
 var MAX_HISTORY = 12;
 
-var enabled_temps = [0, 1];
+var weird = false;
 var names = [];
 var hearted = [];
 var gen_history = []
@@ -38,26 +38,10 @@ function rand_choice(arr) {
 }
 
 function rand_name() {
-    var names_metaindex = rand_choice(enabled_temps);
+    var names_metaindex = weird ? 1 : 0;
     return rand_choice(names[names_metaindex]);
 }
 
-function weirdness_button_clicked(event) {
-    // There always needs to be at least one source enabled. If the only one
-    // currently enabled just got clicked, squelch it.
-    var key = parseInt($(this).data("key"));
-    if (enabled_temps.length == 1 && $(this).data("key") == enabled_temps[0]) {
-        console.log("Suppressing click on last source");
-        event.stopPropagation();
-        return;
-    }
-    var metaindex = enabled_temps.indexOf(key);
-    if (metaindex === -1) {
-        enabled_temps.push(key);
-    } else {
-        enabled_temps.splice(metaindex, 1);
-    }
-}
 
 $( document ).ready(function() {
     var data_url = $("body").data("namesource");
@@ -82,7 +66,9 @@ $( document ).ready(function() {
 
     $("#heart").click(toggle_heart);
 
-    $(".weirdness-button").click(weirdness_button_clicked);
+    $("#weirdness-checkbox").change(function() {
+       weird = this.checked; 
+    });
 
     $(".nav-tabs a").click(function (e) {
         e.preventDefault();

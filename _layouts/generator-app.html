@@ -16,34 +16,27 @@
 <div class="widget col-md-9 col-xs-12">
 
     <div class="row">
-        <div id="porthole" class="col-md-8 col-xs-10">
+        <div id="porthole" class="col-md-9 col-xs-12">
             <div class="well"><span id="generated"></span>
                 <a role="button" id="heart">
                     <span id="heartglyph" class="glyphicon glyphicon-heart-empty"></span>
                 </a>
             </div>
         </div>
-        <div class="col-md-1 col-xs-2">
-            <div class="btn-group-vertical" role="group" data-toggle="buttons">
-                <label data-key="0" class="btn btn-success active weirdness-button" >
-                    <input type="checkbox" autocomplete="off" checked>Not weird
-                </label>
-                <label data-key="1" class="btn btn-warning active weirdness-button">
-                    <input type="checkbox" autocomplete="off" checked>A bit weird
-                </label>
-                <label data-key="2" class="btn btn-danger weirdness-button">
-                    <input type="checkbox" autocomplete="off">Weird
-                </label>
-            </div>
-        </div>
     </div>
   
     <!-- Refresh button row -->
     <div class="row">
-        <div class="col-xs-10 col-md-8">
+        <div class="col-xs-4 col-md-3 col-md-offset-3 col-xs-offset-4">
         <button id="thebutton" type="button" class="center-block btn btn-lg btn-primary">
             <span class="glyphicon glyphicon-refresh">
         </button></div>
+        
+        <div class="col-md-3 col-xs-4">
+            <h4>
+            <input type="checkbox" id="weirdness-checkbox" autocomplete="off">
+            <label class="label label-danger" for="weirdness-checkbox">Weird</label></h4>
+        </div>
     </div>
 
     <!-- History/Liked tabs -->
@@ -100,6 +93,15 @@
 <div class="about col-md-3 col-xs-12">
     <h2>{{ page.title }}</h2>
     {{ content }}
+
+    <p>People who enjoyed this nonsense also liked...</p>
+
+    <ul>
+        {% if page.data_file != "repos" %}<li><a>GitHub repo generator</a></li>{% endif %}
+        {% if page.data_file != "usgeo" %}<li><a>Place name generator</a></li>{% endif %}
+        {% if page.data_file != "actors" %}<li><a>Actor name generator</a></li>{% endif %}
+    </ul>
+
 </div> <!-- /about -->
 
 </div> <!-- /row -->
