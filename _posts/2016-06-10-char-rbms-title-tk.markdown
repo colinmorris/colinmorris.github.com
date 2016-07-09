@@ -107,28 +107,27 @@ We said that energy is defined for a configuration of the visible <i>and</i> hid
 (That last part is important. The probability assigned to a vector `X` is equal to `E(x)` *divided by the sum of the energy assigned to all strings* - the [partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics\).)
 -->
 
+#### Drawing samples
 
-#### Softmax units
+Once we've trained a model, how do we get it to talk? Starting from any random string, we sample the hidden layer. Then using that hidden layer, we sample the visible layer, getting a new string. If we repeat this process (called Gibbs sampling) a whole bunch of times, we should get a name out at the end.
 
-[TODO: With the section on Gibbs sampling gone, this no longer really makes sense.]()
+What does it mean to sample the hidden/visible layer? Our binary units are **stochastic**, so given a string, each hidden unit will want to turn on with some probability, according to its bias and the weights coming into it from active visible units. Sampling the hidden layer given a visible layer means turning each hidden unit on or off according to some rolls of the dice.
 
-One thing to notice is that, for every block of N visible units representing a character, there will always be exactly one unit turned on - the probability we assign to any vector failing this criterion should be 0. We should help the network out by giving it this information for free. We'll do that by treating each of those blocks as a single 'softmax' unit. Rather than sampling each visible binary unit independently, and turning it on with some probability according to the sum of the incoming weights from the hidden layer, we'll sample using the [softmax function](https://en.wikipedia.org/wiki/Softmax_function). 
+#### More details (for nerds)
 
-(Doing this is not strictly necessary. But, empirically, I observed that it helped training a lot.)
+If you're interested in reading more about RBMs, I highly recommend Geoff Hinton's [A Practical Guide to Training Restricted Boltzmann Machines](http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf), which was my bible during this project. 
 
-#### More reading
+I trained my models using [persistent contrastive divergence](http://www.cs.toronto.edu/~tijmen/pcd/pcd.pdf). I used softmax sampling (described in 13.1 of "Practical Guide") for the visible layer - without it, results were very poor.
 
-If you're interested in reading more about RBMs, I highly recommend Geoff Hinton's [A Practical Guide to Training Restricted Boltzmann Machines](http://www.cs.toronto.edu/~hinton/absps/guideTR.pdf), which was my bible during this project. The [Wikipedia article](https://en.wikipedia.org/wiki/Restricted_Boltzmann_machine) has a good overview if you prefer LaTeX formulas to code.
+When drawing samples, I actually used simulated annealing, which turned out to greatly improve sample quality compared to the naive sampling method described above.
+
+[This README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training them and the annealing schedule used to sample from them. 
 
 ### Results
 
-Evaluating generative models is hard! As [A note on the evaluation of generative models](https://arxiv.org/abs/1511.01844) describes, the commonly used quantitative metrics for this task can disagree with each other, and with qualitative human assessments. To make matters worse, the gold standard metric for generative models (likelihood of heldout data) is actually intractable for RBMs! 
+Let's look at what some RBMs dreamed up on a few different name-like datasets. [This README](https://github.com/colinmorris/char-rbm/blob/master/data/README.md) describes where each dataset was downloaded from and how it was preprocessed.
 
-But you didn't come here to see graphs anyways, right? So let's just look at some samples.
-
-(In fact, when tuning hyperparameters, I relied a lot on visual assesment of samples. I did find some metrics that correlated well with my assessments - a form of [pseudolikelihood](https://en.wikipedia.org/wiki/Pseudolikelihood) and denoising - but they weren't perfect. In the words of Geoff Hinton, "use them, but don't trust them".)
-
-If you're curious, [this README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training them and sampling from them. After sampling, repetitions were deduped and any strings that existed in the training data were filtered out (this was anywhere between .01% of samples to 10% depending on the model). [*This* README](https://github.com/colinmorris/char-rbm/blob/master/data/README.md) describes where each dataset was downloaded from and how it was preprocessed.
+Any samples that existed in the training data were filtered out of the lists below (and in the name generators). This was anywhere between .01% of samples to 10% depending on the model. 
 
 #### Human names
 
