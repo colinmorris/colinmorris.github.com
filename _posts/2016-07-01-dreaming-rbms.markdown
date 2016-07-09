@@ -44,7 +44,7 @@ If we can sample from this distribution, the effect should be like thumbing thro
 
 We've said we want to learn a function over strings, but anything we're going to feed into a neural network needs to be transformed into a vector of numbers first. How should we do that in this case?
 
-Most NLP models stop at the word level, representing texts by counts of words (or by word embeddings, such as those produced by word2vec). But breaking up GitHub repository names (like `tool_dbg`, `burgvan.github.io`, or `refcounting`) into words isn't trivial. And more to the point, we don't want to limit ourselves to regurgitating words we've seen in the training data. We want to generate whole new words (like, say, [Brinesville](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/usgeo_unique.txt#L191)). For that, we need to go deeper, down to the character level.
+Most NLP models stop at the word level, representing texts by counts of words (or by word embeddings, such as those produced by word2vec). But breaking up GitHub repository names (like `tool_dbg`, `burgvan.github.io`, or `refcounting`) into words isn't trivial. And more to the point, we don't want to limit ourselves to regurgitating words we've seen in the training data. We want to generate whole new words (like, say, [Brinesville](https://github.com/colinmorris/char-rbm/blob/master/samples/usgeo_unique.txt#L191)). For that, we need to go deeper, down to the character level.
 
 We'll represent names as sequences of [one-hot](https://en.wikipedia.org/wiki/One-hot) vectors of length **N**, where **N** is the size of our alphabet. 
 
@@ -65,11 +65,11 @@ For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is ou
 A restricted Boltzmann machine (henceforth RBM) is a neural network consisting of two layers of binary units, one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names. 
 
 <figure>
-    <img src="/img/rbm.svg">
+    <img src="/assets/rbm/rbm.svg">
     <figcaption>A tiny RBM with 3 hidden units and 24 visible units (not all shown) representing the name "deb". Two hidden units and 2 visible units (that we can see) are turned on - the rest are off.</figcaption>
 </figure>
 
-Again, RBMs try to learn a probability distribution from the data they're given. They do this by learning to assign relatively low **energy** to samples from the data distribution. That energy will be proportional to the (log) learned probability.
+Again, RBMs try to learn a probability distribution from the data they're given. They do this by learning to assign relatively low **energy** to samples from the data distribution. That energy will be proportional to the (negative log) learned probability.
 
 <!--
 ```python
@@ -99,7 +99,7 @@ There are weights connecting every visible unit to every hidden unit, but no int
 <div class="panel panel-default">
 <div class="panel-heading">Aside</div>
 <div class="panel-body">
-We said that energy is defined for a configuration of the visible <i>and</i> hidden layer, so what does it mean when we talk about the energy of a training example? The energy of a visible configuration is defined as <code>sum(energy(my_visible, hidden) for hidden in all_possible_hidden_vectors)</code>. We can't feasibly iterate over all 2<sup>n</sup> possible hidden layers, but it turns out there's an equivalent closed-form that's easy to calculate.
+We said that energy is defined for a configuration of the visible <i>and</i> hidden layer, so what does it mean when we talk about the energy of a training example? The energy of a visible configuration <code>v</code> is defined as <code>sum(energy(v, hidden) for hidden in all_possible_hidden_vectors)</code>. We can't feasibly iterate over all 2<sup>n</sup> possible hidden layers, but it turns out there's an equivalent closed-form that's easy to calculate.
 </div>
 </div>
 
@@ -111,7 +111,7 @@ We said that energy is defined for a configuration of the visible <i>and</i> hid
 
 Once we've trained a model, how do we get it to talk? Starting from any random string, we sample the hidden layer. Then using that hidden layer, we sample the visible layer, getting a new string. If we repeat this process (called Gibbs sampling) a whole bunch of times, we should get a name out at the end.
 
-What does it mean to sample the hidden/visible layer? Our binary units are **stochastic**, so given a string, each hidden unit will want to turn on with some probability, according to its bias and the weights coming into it from active visible units. Sampling the hidden layer given a visible layer means turning each hidden unit on or off according to some rolls of the dice.
+What does it mean to sample the hidden/visible layer? Our binary units are **stochastic**, so given a string, each hidden unit will want to turn on with some probability, according to its bias and the weights coming into it from active visible units. Sampling the hidden layer given a visible layer means turning each hidden unit on or off according to some rolls of the dice. (And vice-versa for sampling the visible layer.)
 
 #### More details (for nerds)
 
@@ -119,15 +119,15 @@ If you're interested in reading more about RBMs, I highly recommend Geoff Hinton
 
 I trained my models using [persistent contrastive divergence](http://www.cs.toronto.edu/~tijmen/pcd/pcd.pdf). I used softmax sampling (described in 13.1 of "Practical Guide") for the visible layer - without it, results were very poor.
 
-When drawing samples, I actually used simulated annealing, which turned out to greatly improve sample quality compared to the naive sampling method described above.
+Sampling was not quite as simple as my handwaving in the section above would suggest. I used simulated annealing, which turned out to help a lot. I wrote a separate little post about that [here](/blog/rbm-sampling). 
 
-[This README](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/README.markdown) has details on each of the models that generated the samples below, including the hyperparameters used for training them and the annealing schedule used to sample from them. 
+[This README](https://github.com/colinmorris/char-rbm/blob/master/samples/README.markdown) has details on hyperparameters used to train each of my models and the annealing schedule used to sample from them. 
 
-### Results
+## Results
 
-Let's look at what some RBMs dreamed up on a few different name-like datasets. [This README](https://github.com/colinmorris/char-rbm/blob/master/data/README.md) describes where each dataset was downloaded from and how it was preprocessed.
+Let's look at what some RBMs dreamed up on a few different name-like datasets. [This README](https://github.com/colinmorris/char-rbm/blob/master/README-datasets.md) describes where each dataset was downloaded from and how it was preprocessed.
 
-Any samples that existed in the training data were filtered out of the lists below (and in the name generators). This was anywhere between .01% of samples to 10% depending on the model. 
+Any names that existed in the training data were filtered out of the lists below (and in the name generator apps). This cut anywhere between .01% of samples to 10% depending on the model. 
 
 #### Human names
 
@@ -139,9 +139,9 @@ One of the first things I tried was generating first names (as Andrej Karpathy d
     dovin
     filker
 
-(For reasons of computational efficiency all but one model was trained on a lowercased version of the dataset. The exception is the GitHub repository dataset, where case is a very meaningful source of variation.)
+(For reasons of computational efficiency all but one model was trained on a lowercased data. The exception is the GitHub repository dataset, where case is a very meaningful source of variation.)
 
-But I suspect this is actually not a very hard problem. I noticed that just sampling according to the biases of the visible units (completely ignoring the weights/hidden units), produced kind of reasonable names already:
+But I suspect this is actually not a very hard problem. I noticed that just sampling according to the biases of the visible units (completely ignoring the weights/hidden units!), produced kind of reasonable names already:
 
     borme
     yareeh
@@ -151,7 +151,7 @@ But I suspect this is actually not a very hard problem. I noticed that just samp
     patya
     maegae
 
-A more difficult problem is generating *full* names. Here are some samples drawn from a model trained on the full names of 1.5m actors from IMDB (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/actors_unique.txt)): <!-- link to word lists or just the app? or both? -->
+A more difficult problem is generating *full* names. Here are some samples drawn from a model trained on the full names of 1.5m actors from IMDB (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/actors_unique.txt)): <!-- link to word lists or just the app? or both? -->
 
     omar vole
     r.j. pen
@@ -178,7 +178,7 @@ The model's favourite name (that is, the sample it assigned the lowest energy) w
 
 #### Geographic names
 
-It's not much of a stretch of the imagination to go from training on names of people to names of places (examples from the dataset: "Gall Creek", "Grovertown", "Aneta", "Goodyear Heights"). Here are some examples from our RBM's dreamed atlas (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/usgeo_unique.txt)):
+It's not much of a stretch of the imagination to go from training on names of people to names of places (examples from the dataset: "Gall Creek", "Grovertown", "Aneta", "Goodyear Heights"). Here are some examples from our RBM's dreamed atlas (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/usgeo_unique.txt)):
 
     sama
     marchestee hill
@@ -196,7 +196,7 @@ The model's favourite place name was `indian post office`, which exists in the t
 
 #### GitHub repository names
 
-How about some GitHub repos? More [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/repos_unique.txt):
+How about some GitHub repos? More [here](https://github.com/colinmorris/char-rbm/blob/master/samples/repos_unique.txt):
 <!-- These were better? :(
     testing_project
     css-qlation-server
@@ -231,7 +231,7 @@ Favourite name: `unity.github.io`, which doesn't exist in the training set.
 
 #### Bonus: Board games
 
-I spent a bit of time trying to learn board game names, but wasn't particularly successful. I suspect my dataset, at about 50k games, was just too small. Some samples (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/cleaned/games_unique.txt)):
+I spent a bit of time trying to learn board game names, but wasn't particularly successful. I suspect my dataset, at about 50k games, was just too small. Some samples (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/games_unique.txt)):
 
     stopeest game
     chef ths gome
@@ -315,7 +315,7 @@ Remember that lower energy corresponds to higher probability, so this is great! 
 It can be interesting to walk around the neighbours of a name to get a feel for the energy landscape of the model, and its robustness to small changes:
 
 <div class="imgcap">
-<img src="/assets/zohnsmith.png">
+<img src="/assets/rbm/zohnsmith.png">
 <div class="thecap">
     Energy assigned by our model to various single-character substitutions on <code>john smith</code>. Names are arranged into columns according to the affected index in the string. Note that the y-axis is reversed.
 </div>
@@ -330,12 +330,16 @@ This is a nice intuitive way of evaluating our model's density function. We can'
 
 A common trick when working with neural nets in the image domain is to visualize what a neuron in the first hidden layer is "seeing" by treating the weights between that neuron and each input pixel as pixel intensities. 
 
-<img src="http://neuralnetworksanddeeplearning.com/images/net_full_layer_0.png" style="width:400px">
-[TODO: Give credit and don't hotlink. You dick.]()
+<figure>
+<img src="/assets/rbm/net_full_layer_0.png" style="width:400px">
+<figcaption>
+Visualization of 20 learned image filters from a convolutional neural network trained for handwritten digit classification (from Michael Nielsen's <a href="http://neuralnetworksanddeeplearning.com/chap6.html">Neural Networks and Deep Learning</a>).
+</figcaption>
+</figure>
 
 We can do something similar here. The tables below each represent the 'receptive field' of a particular hidden unit. The columns correspond to positions in a 17-character GitHub repo name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
 
-These are just a couple examples taken from a model with 350 hidden units (the same model from which the above samples were taken). [This page](/assets/recep.html) has visualizations of all those units.
+These are just a couple examples taken from a model with 350 hidden units (the same model from which the above samples were taken). [This page](/assets/rbm/recep.html) has visualizations of all those units, as well as examples of strings having high affinity for each unit.
 
 {% include rbm/149.html %}
 
