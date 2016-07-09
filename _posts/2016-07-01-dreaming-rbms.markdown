@@ -442,7 +442,9 @@ One solution to this problem is to use a recurrent architecture. Another, which 
 
 We can do the same thing with text, except that our filters would be 1-d rather than 2-d. And if we stacked them, we could presumably also get low-level features at the bottom layer (e.g. common character bigrams and trigrams like "th", "ch", "ing") and more complex features at the top.
 
-Again, the promise of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are *already* looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions. With convolutional units, we could help the network do what it's already doing much more efficiently (in terms of the size of the model, and the amount of information learned per training instance).[TODO: link to github.io example hidden units]()
+Again, the promise of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are *already* looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions: [this page](/assets/recep.html) lists **20** hidden units that seem to be primarily responsible for recognizing `github.io` and `github.com` URLs. [Some](/assets/recep.html#unit109) are even pseudo-convolutional, trying to recognize two shifted versions simultaneously.
+
+With convolutional units, we could help the network do what it's already doing much more efficiently (in terms of the size of the model, and the amount of information learned per training instance).
 
 ### Practical Applications
 
