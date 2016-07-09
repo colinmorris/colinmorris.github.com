@@ -35,7 +35,8 @@
         <div class="col-md-3 col-xs-4">
             <h4>
             <input type="checkbox" id="weirdness-checkbox" autocomplete="off">
-            <label class="label label-danger" for="weirdness-checkbox">Weird</label></h4>
+            <label class="label label-danger" for="weirdness-checkbox" title="Switch to samples assigned lower energy (and therefore lower probability) by the model">Weird 
+            </label></h4>
         </div>
     </div>
 
@@ -94,9 +95,11 @@
     <h2>{{ page.title }}</h2>
     {{ content }}
 
+    <p class="plug">For more details, check out my <a href="/blog/dreaming-rbms">blog post</a>.</p>
+
     <p>People who enjoyed this nonsense also liked...</p>
 
-    <ul>
+    <ul class="plug">
         {% if page.data_file != "repos" %}<li><a>GitHub repo generator</a></li>{% endif %}
         {% if page.data_file != "usgeo" %}<li><a>Place name generator</a></li>{% endif %}
         {% if page.data_file != "actors" %}<li><a>Actor name generator</a></li>{% endif %}

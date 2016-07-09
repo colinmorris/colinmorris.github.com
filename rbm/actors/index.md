@@ -2,6 +2,9 @@
 layout: generator-app
 title: "Actor name generator"
 data_file: actors
+date: 2016-07-01
 ---
 
-Hello world. Here is some *content*!!
+I trained a neural network on 1.5 million names of actors taken from IMDB, then asked it to generate some more. These are all new names, not existing in the training data.
+
+(My dataset was all-male, which is why you'll only see male names generated.)

@@ -9,6 +9,14 @@
     color: rgb(255, 50, 128);
 }
 
+#heart .glyphicon-heart-empty {
+    opacity: 0.2;
+}
+
+#heart .glyphicon-heart-empty:hover {
+    opacity: 1.0;
+}
+
 #thebutton {
     font-size: xx-large;
     padding: .5em 1em .5em 1em;
@@ -40,4 +48,8 @@ body {
 input[type=checkbox] {
     transform: scale(1.5);
     -webkit-transform: scale(1.5);
+}
+
+.plug a {
+    font-size: larger;
 }
