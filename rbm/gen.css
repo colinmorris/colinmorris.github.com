@@ -27,6 +27,19 @@
     font-size: large;
 }
 
+.sample-list {
+    height: 350px;
+    overflow: auto;
+}
+
+.sample-list ul li {
+    padding-left: 10px;
+}
+
+#weirdlabel {
+    margin-left: 4px;
+}
+
 body {
     /*background-image: url("bg/octo_pixely.png");
     background-repeat: no-repeat;

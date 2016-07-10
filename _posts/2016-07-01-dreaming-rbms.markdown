@@ -253,7 +253,7 @@ Favourite name: `the : the card game`. The most commonly sampled name was `the b
 
 ### "Did they really need a neural network for that?"
 
-This is a question that probably doesn't get asked often enough. The results here are pretty neat, but before we claim another victory for the deep learning revolution, we should ask whether the problem we solved was actually difficult. I'll follow the example of [Yoav Goldberg](http://nbviewer.jupyter.org/gist/yoavg/d76121dfde2618422139) and use unsmoothed maximum-likelihood character level language models as my dumb baseline to compare against. In short, we'll generate strings one letter at a time, choosing the next letter by looking at the last n, and seeing which letters tended to follow that sequence in the training set.
+This is a question that probably doesn't get asked often enough. The results here are pretty neat, but before we claim another victory for trendy neural networks, we should ask whether the problem we solved was actually difficult. I'll follow the example of [this blog post by Yoav Goldberg](http://nbviewer.jupyter.org/gist/yoavg/d76121dfde2618422139) and use unsmoothed maximum-likelihood character level language models as a dumb baseline to compare against. In short, we'll generate strings one letter at a time, choosing the next letter by looking at the last n, and seeing which letters tended to follow that sequence in the training set.
 
 Some examples from an order-4 model trained on the US place names dataset: 
 
@@ -291,11 +291,11 @@ Let's see if we can salvage our dignity by comparing performance on the GitHub d
 Our baseline's not looking so hot now. It's interesting to note some mistakes here that the RBM model almost never makes. For example, it never flubs the formatting of a URL. It's also very good at picking a consistent scheme for case and separators for each name, e.g.:
 
     SAPAPP
-    ruby-fale-project
+    rails_work_app
     DataTownSample
     java-mails-rails
 
-This is where being able to see the whole string at once really comes in handy. When our Markov model has generated as far as "mails", it doesn't have enough context to know whether it should make `java-mails-rails` or `java-mailsRails` or `java-mails_Rails` (great repo name, btw). We can always feed it even *more* context, but a window of 5 already leads to a lot of copy-pasting from the training set. For example, `shutupmrnotific` is funny, but it's just a truncation of a repo from the training set, `shutupmrnotification`.
+This is where being able to see the whole string at once really comes in handy. When our Markov model has generated as far as "java-mails", it doesn't have enough context to know whether it should make `java-mails-rails` or `java-mailsRails` or `java-mails_Rails`. We can always feed it even *more* context, but a window of 5 already leads to a lot of copy-pasting from the training set. For example, `shutupmrnotific` is funny, but it's just a truncation of a repo from the training set, `shutupmrnotification`.
 
 <!-- But there are also other less flammable strawmen? HMMs? -->
 
@@ -310,19 +310,20 @@ The coolest thing we can do with our trained models is ask them to come up with 
     >>> E('mcn zgl jey')
     -34.25
 
-Remember that lower energy corresponds to higher probability, so this is great! Also, energy is proportional to the log of the probability, so the model thinks that Dweezil is about 4 orders of magnitude more likely than Mcn, and 37(!) orders of magnitude less likely than John.  (That sounds like a lot, but the name "Dweezil" [is globally unique](https://books.google.com/ngrams/graph?content=Dweezil&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CDweezil%3B%2Cc0). There are probably lots of alternate universes very similar to our own where no Dweezil will ever be born.)
+Remember that lower energy corresponds to higher probability, so this is great! Also, energy is proportional to the log of the probability, so the model thinks that Dweezil is about 4 orders of magnitude more likely than Mcn, and 37(!) orders of magnitude less likely than John.  (That sounds like a lot, but Dweezil is a pretty extreme example of a rare name - [it's globally unique!](https://books.google.com/ngrams/graph?content=Dweezil&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CDweezil%3B%2Cc0).) 
 
 It can be interesting to walk around the neighbours of a name to get a feel for the energy landscape of the model, and its robustness to small changes:
 
-<div class="imgcap">
+<figure>
 <img src="/assets/rbm/zohnsmith.png">
-<div class="thecap">
+<figcaption>
     Energy assigned by our model to various single-character substitutions on <code>john smith</code>. Names are arranged into columns according to the affected index in the string. Note that the y-axis is reversed.
-</div>
-</div>
+</figcaption>
+</figure>
 
 The chart above is heartening. First of all, it's great that our model assigned lower energy to the 'real' name than to any of the corrupted versions. But the order assigned to the corrupted names also seems very reasonable. The ones with the lowest energy - Messrs. Smitt, Smitz, and Smich - are the most plausible. The three samples with the highest energy are not only weird - they're not even pronouncable in English.
 
+<!-- TODO: this needs to be tightened up -->
 This is a nice intuitive way of evaluating our model's density function. We can't calculate the exact probability our model assigns to any instance, but we can compare probabilities. It seems clear that a good model should generally assign more energy to a sample from our dataset after we've randomly nudged it. In fact, we could have used something like this as a cost function to train our RBM, and if we had, we would have [wound up](http://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf) with a special case of a [denoising autoencoder](https://en.wikipedia.org/wiki/Autoencoder#Denoising_autoencoder), another powerful generative neural network.
 
 
@@ -337,15 +338,15 @@ Visualization of 20 learned image filters from a convolutional neural network tr
 </figcaption>
 </figure>
 
-We can do something similar here. The tables below each represent the 'receptive field' of a particular hidden unit. The columns correspond to positions in a 17-character GitHub repo name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
+We can do something similar here. The tables below each represent the 'receptive fields' of individual hidden units. The columns correspond to positions in a 17-character GitHub repo name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
 
 These are just a couple examples taken from a model with 350 hidden units (the same model from which the above samples were taken). [This page](/assets/rbm/recep.html) has visualizations of all those units, as well as examples of strings having high affinity for each unit.
 
 {% include rbm/149.html %}
 
-This hidden unit wants to see... `vndubnr`? Actually, this word search is hiding several useful words. How many can you spot?
+This hidden unit wants to see... `vndubnr`? Actually, this word search is hiding several useful words. 
 
-- vagrant (and Vagrant)
+- vagrant 
 - android
 - arduino
 - angular
@@ -363,7 +364,9 @@ Whereas the last unit was focused on a few domain-specific words, this unit is p
 
 Of course, our model has no explicit knowledge of what a "vowel" is, so it's neat to see it picked up naturally as a useful feature.
 
-Another emergent behaviour is the strong spatial locality. Most hidden units have their strong weights tightly clustered on a particular neighbourhood of contiguous character positions. This is neat because, again, we never told our model that certain visible units are "next to" each other - it knows nothing about the input geometry.
+Another emergent behaviour is the strong spatial locality. With few exceptions, hidden units have their strong weights tightly clustered on a particular neighbourhood of character positions. This is neat because, again, we never told our model that certain visible units are "next to" each other - it knows nothing about the input geometry.
+
+A few more examples below.
 
 <!-- WIP: carousel -->
 
@@ -382,7 +385,7 @@ Another emergent behaviour is the strong spatial locality. Most hidden units hav
 <div class="item">
 {% include rbm/29.html %}
 <div class="carousel-caption">
-    Short names (e.g. <code>CS3001</code>, <code>Team11</code>)
+    Short names (e.g. <code>CS3001</code>, <code>Team11</code>). '$' is the padding character.
 </div>
 </div>
 
@@ -428,7 +431,7 @@ If I wanted to promote this from a toy project, the first thing I'd do would be 
 
 #### Going Deeper
 
-RBMs can be (almost trivially) stacked on one another to form a [deep belief network](https://en.wikipedia.org/wiki/Deep_belief_network). It seems plausible that additional layers would be able to learn higher layers of abstraction and generate even better samples.
+RBMs can be stacked on one another to form a [deep belief network](https://en.wikipedia.org/wiki/Deep_belief_network). It seems plausible that additional layers would be able to learn higher layers of abstraction and generate even better samples.
 
 Remember how we saw above that most units learn patterns local to a particular region of the string? This may explain solecisms like `Lake Lake`, or `Church Swamp`. If, as seems to be the case, our initial layer of hidden units is mostly learning words, phonotactics, and low-level structural patterns (word lengths, spacing), another layer of hidden units on top of those could learn more semantic patterns. e.g. "Lake $foo", "$foo Lake", "$foo Swamp", but never "Lake Lake", "Lake Swamp", etc. I would be sad to see `Days Inn Oil Field` go though. That one was pretty good.
 

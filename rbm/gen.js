@@ -1,4 +1,4 @@
-var MAX_HISTORY = 12;
+var MAX_HISTORY = 100;
 
 var weird = false;
 var names = [];

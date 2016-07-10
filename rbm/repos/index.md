@@ -5,4 +5,4 @@ data_file: repos
 date: 2016-07-01
 ---
 
-Hello world. Here is some *content*!!
+I trained a neural network on the names of [4 million GitHub repositories](https://github.com/colinmorris/reponames-dataset), then asked it to generate some more. These are all new repos, not existing in the training set.
