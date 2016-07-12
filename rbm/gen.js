@@ -4,6 +4,7 @@ var weird = false;
 var names = [];
 var hearted = [];
 var gen_history = []
+var next_name_indices = [-1, -1];
 
 function save_history(generated) {
     if (gen_history.length > MAX_HISTORY) {
@@ -38,8 +39,18 @@ function rand_choice(arr) {
 }
 
 function rand_name() {
+    // Choose a random starting point for each subarray, and walk forward one-by-one. 
+    // In this way, it's virtually impossible to see dupes in one session (though it introduces
+    // the rare but catastrophic possibility that someone has a second session where they just
+    // see dupe after dupe after dupe).
     var names_metaindex = weird ? 1 : 0;
-    return rand_choice(names[names_metaindex]);
+    var maxidx = names[names_metaindex].length - 1;
+    if (next_name_indices[names_metaindex] == -1) {
+        next_name_indices[names_metaindex] = Math.floor(Math.random() * maxidx );
+    }
+    var name = names[names_metaindex][next_name_indices[names_metaindex]];
+    next_name_indices[names_metaindex] = next_name_indices[names_metaindex] == maxidx ? 0 : next_name_indices[names_metaindex] + 1; 
+    return name;
 }
 
 
