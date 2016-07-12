@@ -1,4 +1,5 @@
 var MAX_HISTORY = 100;
+var ANIMATION_DELAY = 200;
 
 var weird = false;
 var names = [];
@@ -51,12 +52,12 @@ function rand_name() {
 
 function update_generated(name) {
     var g = $("#generated");
-    g.fadeOut();
+    g.fadeOut(ANIMATION_DELAY);
     g.queue(function(next) {
         g.text(name);
         next();
     });
-    g.fadeIn();
+    g.fadeIn(ANIMATION_DELAY);
 }
 
 
