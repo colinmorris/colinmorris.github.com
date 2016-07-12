@@ -1,5 +1,7 @@
 <html>
-    <head><style>
+    <head>
+    <title>Hidden Unit Zoo</title>
+    <style>
         td {
             border-style: solid;
             border-width: thin;
@@ -27,7 +29,7 @@
 
 <h1>Hidden Unit Zoo</h1>
 
-<p>This page has visualizations of what each hidden unit "wants to see" in a restricted Boltzmann machine trained on <a href="https://github.com/colinmorris/reponames-dataset">4.6m GitHub repository names</a>. The columns in the tables below correspond to positions in a 17-character string. Characters with green backgrounds have strongly positive weights (the model likes these - the greener, the better). Characters with red backgrounds have strongly negative weights (the mode doesn't want to see this character in this position). <code>$</code> is a special padding character - names shorter than 17 characters are right-padded with it.</p>
+<p>This page has visualizations of all 350 hidden units of a restricted Boltzmann machine trained on <a href="https://github.com/colinmorris/reponames-dataset">4.6m GitHub repository names</a>. The columns in the tables below correspond to positions in a 17-character string. Characters with green backgrounds have strongly positive weights (the hidden unit wants to see these - the greener, the better). Characters with red backgrounds have strongly negative weights (the unit doesn't want to see this character in this position). <code>$</code> is a special padding character - names shorter than 17 characters are right-padded with it.</p>
 
 <p>Along with each table is a list of strings sampled from the model which have the highest affinity for this hidden unit. The number next to each string is the probability of this hidden unit turning on given that string.</p>
 
