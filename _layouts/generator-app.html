@@ -2,6 +2,7 @@
     <!-- TODO: there's probably a more jekyll-y way to do all of this -->
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ page.title }}</title>
     </head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
 <script src="/rbm/gen.js"></script>
@@ -104,6 +105,8 @@
         {% if page.data_file != "usgeo" %}<li><a href="/rbm/geo">Place name generator</a></li>{% endif %}
         {% if page.data_file != "actors" %}<li><a href="/rbm/actors">Actor name generator</a></li>{% endif %}
     </ul>
+
+    {% if page.data_file == "repos" %}<p class="plug"><a href="/assets/rbm/recep.html">A peek inside the brain of this network</a></p>{% endif %}
 
 </div> <!-- /about -->
 
