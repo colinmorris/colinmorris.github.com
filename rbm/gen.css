@@ -40,6 +40,14 @@
     margin-left: 4px;
 }
 
+.hist-weird {
+    background-color: rgba(217,83,29,.1);
+}
+
+.hist-nonweird { 
+    background-color: rgba(200,228,228,.1);
+}
+
 body {
     /*background-image: url("bg/octo_pixely.png");
     background-repeat: no-repeat;

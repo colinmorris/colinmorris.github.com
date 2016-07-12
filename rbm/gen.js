@@ -12,7 +12,8 @@ function save_history(generated) {
         $("#history>li:last").remove();
     }
     gen_history.unshift(generated);
-    $("#history").prepend("<li>" + generated + "</li>");
+    var classname = weird ? "hist-weird" : "hist-nonweird";
+    $("#history").prepend("<li class='" + classname + "'>" + generated + "</li>");
 
 }
 
