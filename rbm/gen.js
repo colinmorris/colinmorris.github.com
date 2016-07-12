@@ -33,11 +33,6 @@ function toggle_heart(event) {
     $(this).find("span.glyphicon").toggleClass("glyphicon-heart glyphicon-heart-empty");
 }
 
-function rand_choice(arr) {
-        var index = Math.floor(Math.random() * (arr.length-1) );
-        return arr[index];
-}
-
 function rand_name() {
     // Choose a random starting point for each subarray, and walk forward one-by-one. 
     // In this way, it's virtually impossible to see dupes in one session (though it introduces
