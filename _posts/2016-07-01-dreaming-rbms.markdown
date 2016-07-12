@@ -340,7 +340,7 @@ Visualization of 20 learned image filters from a convolutional neural network tr
 
 We can do something similar here. The tables below each represent the 'receptive fields' of individual hidden units. The columns correspond to positions in a 17-character GitHub repo name. A green character represents a strongly positive weight (i.e. this hidden unit "wants" to see that character at the position). Red characters have strongly negative weights. 
 
-These are just a couple examples taken from a model with 350 hidden units (the same model from which the above samples were taken). [This page](/assets/rbm/recep.html) has visualizations of all those units, as well as examples of strings having high affinity for each unit.
+These are just a couple examples taken from a model with 350 hidden units (the same model from which the above samples were taken). [This page](/rbm/zoo) has visualizations of all those units, as well as examples of strings having high affinity for each unit.
 
 {% include rbm/149.html %}
 
