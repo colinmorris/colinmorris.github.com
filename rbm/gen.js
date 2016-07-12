@@ -48,6 +48,16 @@ function rand_name() {
     return name;
 }
 
+function update_generated(name) {
+    var g = $("#generated");
+    g.fadeOut();
+    g.queue(function(next) {
+        g.text(name);
+        next();
+    });
+    g.fadeIn();
+}
+
 
 $( document ).ready(function() {
     var data_url = $("body").data("namesource");
@@ -61,9 +71,8 @@ $( document ).ready(function() {
         }});
 
     $("#thebutton").click(function(event) {
-        // TODO: animation?
         var name = rand_name();
-        $("#generated").text(name);
+        update_generated(name);
         $("#heart").removeClass("happy");
         $("#heartglyph").removeClass("glyphicon-heart");
         $("#heartglyph").addClass("glyphicon-heart-empty");
