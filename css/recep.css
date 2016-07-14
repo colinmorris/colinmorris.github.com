@@ -36,7 +36,8 @@ figcaption {
     font-family: mono;
 }
 
-#hidden-carousel div.carousel-inner {
+#hidden-carousel {
+    min-height: 330px;
 }
 
 div.carousel-caption {
@@ -50,7 +51,6 @@ div.carousel-caption {
 
 #hidden-carousel .carousel-inner .item .activations {
     padding-top: 20px;
-    min-height: 330px;
 }
 
 .carousel-control {
