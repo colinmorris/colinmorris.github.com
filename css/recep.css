@@ -37,15 +37,15 @@ figcaption {
 }
 
 #hidden-carousel div.carousel-inner {
-    height: 300px;
 }
 
 div.carousel-caption {
     color: black !important;
     text-shadow: none !important;
     position: relative !important;
-    left: -40px;
+    left: 10%;
     bottom: 0px;
+    width: 80%;
 }
 
 #hidden-carousel .carousel-inner .item .activations {
