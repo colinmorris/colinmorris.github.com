@@ -387,8 +387,14 @@ A few more examples below.
 <div class="carousel-caption">
     Three letter acronym prefixes (e.g. <code>PHP-Server</code>)
 </div>
-</div
->
+</div>
+
+<div class="item">
+<div class="carousel-caption">
+<h4>See all 350 in the <a href="/rbm/zoo">Hidden Unit Zoo</a></h4>
+</div>
+</div>
+
 </div><!-- /carousel-inner -->
 
 <!-- Controls -->
