@@ -127,27 +127,7 @@ Any names that existed in the training data were filtered out of the lists below
 
 #### Human names
 
-One of the first things I tried was generating first names (as Andrej Karpathy did in his [blog post on character-level RNNs](http://karpathy.github.io/2015/05/21/rnn-effectiveness/#generating-baby-names)). They turned out pretty well! e.g.
-
-    aluna
-    lamadona
-    ellin
-    dovin
-    filker
-
-(For reasons of computational efficiency all but one model was trained on a lowercased data. The exception is the GitHub repository dataset, where case is a very meaningful source of variation.)
-
-But I suspect this is actually not a very hard problem. I noticed that just sampling according to the biases of the visible units (completely ignoring the weights/hidden units!), produced kind of reasonable names already:
-
-    borme
-    yareeh
-    vestey
-    sexte
-    barise
-    patya
-    maegae
-
-A more difficult problem is generating *full* names. Here are some samples drawn from a model trained on the full names of 1.5m actors from IMDB (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/actors_unique.txt)): <!-- link to word lists or just the app? or both? -->
+Here are some samples drawn from a model trained on the full names of 1.5m actors from IMDB (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/actors_unique.txt)):
 
     omar vole
     r.j. pen
