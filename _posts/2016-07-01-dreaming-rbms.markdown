@@ -103,10 +103,6 @@ We said that energy is defined for a configuration of the visible <i>and</i> hid
 </div>
 </div>
 
-<!-- TODO: is this necessary?
-(That last part is important. The probability assigned to a vector `X` is equal to `E(x)` *divided by the sum of the energy assigned to all strings* - the [partition function](https://en.wikipedia.org/wiki/Partition_function_(mathematics\).)
--->
-
 #### Drawing samples
 
 Once we've trained a model, how do we get it to talk? Starting from any random string, we sample the hidden layer. Then using that hidden layer, we sample the visible layer, getting a new string. If we repeat this process (called Gibbs sampling) a whole bunch of times, we should get a name out at the end.
@@ -323,8 +319,12 @@ It can be interesting to walk around the neighbours of a name to get a feel for 
 
 The chart above is heartening. First of all, it's great that our model assigned lower energy to the 'real' name than to any of the corrupted versions. But the order assigned to the corrupted names also seems very reasonable. The ones with the lowest energy - Messrs. Smitt, Smitz, and Smich - are the most plausible. The three samples with the highest energy are not only weird - they're not even pronouncable in English.
 
-<!-- TODO: this needs to be tightened up -->
-This is a nice intuitive way of evaluating our model's density function. We can't calculate the exact probability our model assigns to any instance, but we can compare probabilities. It seems clear that a good model should generally assign more energy to a sample from our dataset after we've randomly nudged it. In fact, we could have used something like this as a cost function to train our RBM, and if we had, we would have [wound up](http://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf) with a special case of a [denoising autoencoder](https://en.wikipedia.org/wiki/Autoencoder#Denoising_autoencoder), another powerful generative neural network.
+<div class="panel panel-default">
+<div class="panel-heading">Aside - Score matching</div>
+<div class="panel-body">
+This is a nice intuitive way of evaluating our model's density function. It turns out we can't calculate the exact probability our model assigns to any instance, because of an intractable term called the <a href="https://en.wikipedia.org/wiki/Partition_function_(mathematics)">partition function</a>). But we can compare probabilities (the partition function cancels out when we divide). It seems clear that a good model should generally assign more energy to a sample from our dataset after we've randomly nudged it. In fact, we could have optimized for this directly during training. This is called <a href="https://www.cs.helsinki.fi/u/ahyvarin/papers/JMLR05.pdf">score matching</a>, and it has a <a href="http://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf">surprising connection</a> with denoising autoencoders, another powerful variety of generative neural network.
+</div>
+</div>
 
 
 ### Understanding what's going on
@@ -453,13 +453,11 @@ With convolutional units, we could help the network do what it's already doing m
 
 None whatsoever.
 
-<!--
 ### Acknowledgements
 
-[The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) by Andrej Karpathy inspired me to play with character-level representations (and was basically the first thing I read that got me excited about deep learning). If you haven't read it already, go do it now! [TODO: compare results to char-rnn?]()
+[The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) by Andrej Karpathy inspired me to play with character-level representations (and was basically the first thing I read that got me excited about deep learning). If you haven't read it already, go do it now! If you're curious how these results compare to char-rnn, [here](https://github.com/colinmorris/char-rbm/blob/workspace/samples/cleaned/repos_char-rnn_unique.txt) are some samples from a char-rnn model trained for around 24 hours on GitHub repos with rnn_size=256, seq_length=20 and all other options set to their defaults. 
 
 My RBM implementation was built on top of scikit-learn's [BernoulliRBM](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.BernoulliRBM.html#sklearn.neural_network.BernoulliRBM) class, which is cleanly written and well-commented, and easy to hack on out of the box.
 
 Thanks to Falsifian for reviewing a draft of this post and teaching me about simulated annealing.
 
--->
