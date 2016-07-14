@@ -427,8 +427,6 @@ A few more examples below.
 
 ### Making it better
 
-If I wanted to promote this from a toy project, the first thing I'd do would be to reimplement it using a library with GPU support like TensorFlow or Theano. There are also some technical RBM hacks I never got around to trying which probably would have helped (like a sparsity target on hidden units and fast weights for persistent contrastive divergence learning). A few more interesting improvements that suggest themselves...
-
 #### Going Deeper
 
 RBMs can be stacked on one another to form a [deep belief network](https://en.wikipedia.org/wiki/Deep_belief_network). It seems plausible that additional layers would be able to learn higher layers of abstraction and generate even better samples.
@@ -437,13 +435,13 @@ Remember how we saw above that most units learn patterns local to a particular r
 
 #### Translation Invariance
 
-Under the current architecture, for a model to learn the word "Pond" (a very useful word to learn), it needs to memorize a separate version for each place it can appear: `___ Pond`, `____ Pond`, `_____ Pond`, etc.
+Under the current architecture, for a model to learn the word "Pond" (a very useful word to learn if you want to generate place names), it needs to memorize a separate version for each position it can appear: `___ Pond`, `____ Pond`, `_____ Pond`, etc.
 
 We'd like our model to learn robust, position-invariant patterns and understand that "Hays Pond" and "Darby Pond" are quite similar (even though their vector representations are completely disjoint). 
 
-One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. This is just like CNNs for vision tasks, where we have many collections of units - 'filters' - that each see small patches of the image, and share weights. These can detect features both low-level (lines), or high (faces), no matter where they appear in the image.
+One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. This is just like [CNNs](https://en.wikipedia.org/wiki/Convolutional_neural_network) for vision tasks, where we have many collections of units - 'filters' - that each see small patches of the image, and share weights. These can detect features (e.g. lines, shapes), no matter where they appear in the image.
 
-We can do the same thing with text, except that our filters would be 1-d rather than 2-d. And if we stacked them, we could presumably also get low-level features at the bottom layer (e.g. common character bigrams and trigrams like "th", "ch", "ing") and more complex features at the top.
+We can do the same thing with text, except that our filters would be 1-d rather than 2-d. For example, one filter might learn to recognize a consonant followed by a vowel *anywhere in the string*. And just as in vision tasks, we could stack convolutional layers, with higher-level layers detecting more complex features (like words and combinations of words).
 
 Again, the promise of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are *already* looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions: [this page](/assets/recep.html) lists **20** hidden units that seem to be primarily responsible for recognizing `github.io` and `github.com` URLs. [Some](/assets/recep.html#unit109) are even pseudo-convolutional, trying to recognize two shifted versions simultaneously.
 
@@ -457,7 +455,7 @@ None whatsoever.
 
 [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) by Andrej Karpathy inspired me to play with character-level representations (and was basically the first thing I read that got me excited about deep learning). If you haven't read it already, go do it now! If you're curious how these results compare to char-rnn, [here](https://github.com/colinmorris/char-rbm/blob/workspace/samples/cleaned/repos_char-rnn_unique.txt) are some samples from a char-rnn model trained for around 24 hours on GitHub repos with rnn_size=256, seq_length=20 and all other options set to their defaults. 
 
-My RBM implementation was built on top of scikit-learn's [BernoulliRBM](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.BernoulliRBM.html#sklearn.neural_network.BernoulliRBM) class, which is cleanly written and well-commented, and easy to hack on out of the box.
+My RBM implementation was built on top of scikit-learn's lovely [BernoulliRBM](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.BernoulliRBM.html#sklearn.neural_network.BernoulliRBM) class, which is cleanly written and well-commented, and easy to hack on out of the box.
 
 Thanks to Falsifian for reviewing a draft of this post and teaching me about simulated annealing.
 
