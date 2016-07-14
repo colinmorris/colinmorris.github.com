@@ -3,7 +3,6 @@ var ANIMATION_DELAY = 200;
 
 var weird = false;
 var names = [];
-var hearted = [];
 var gen_history = []
 var next_name_indices = [-1, -1];
 
@@ -16,23 +15,6 @@ function save_history(generated) {
     var classname = weird ? "hist-weird" : "hist-nonweird";
     $("#history").prepend("<li class='" + classname + "'>" + generated + "</li>");
 
-}
-
-function toggle_heart(event) {
-    // Unlike
-    if ($(this).hasClass("happy")) {
-        hearted.pop();
-        $("#hearts>li:last").remove();
-    // Like
-    } else {
-        var text = $("#generated").text();
-        hearted.push(text);
-        // dedupe?
-        $("#hearts").append("<li>" + text + "</li>");
-    }
-    $(this).toggleClass("happy");
-    // TODO:animation?
-    $(this).find("span.glyphicon").toggleClass("glyphicon-heart glyphicon-heart-empty");
 }
 
 function rand_name() {
@@ -82,15 +64,8 @@ $( document ).ready(function() {
         save_history(name);
     });
 
-    $("#heart").click(toggle_heart);
-
     $("#weirdness-checkbox").change(function() {
        weird = this.checked; 
     });
-
-    $(".nav-tabs a").click(function (e) {
-        e.preventDefault();
-        $(this).tab('show');
-        });
 
 });

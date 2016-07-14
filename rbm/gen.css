@@ -3,20 +3,6 @@
     font-size: xx-large;
 }
 
-#heart {
-    float: right;
-    font-size: 1.3em;
-    color: rgb(255, 50, 128);
-}
-
-#heart .glyphicon-heart-empty {
-    opacity: 0.2;
-}
-
-#heart .glyphicon-heart-empty:hover {
-    opacity: 1.0;
-}
-
 #thebutton {
     font-size: xx-large;
     padding: .5em 1em .5em 1em;
@@ -27,12 +13,9 @@
     color: grey;
 }
 
-.tab-label {
-    font-size: large;
-}
 
 .sample-list {
-    height: 350px;
+    max-height: 350px;
     overflow: auto;
 }
 
@@ -77,4 +60,9 @@ input[type=checkbox] {
 
 .plug a {
     font-size: larger;
+}
+
+#historywrapper {
+    border-top-style: groove;
+    border-bottom-style: groove;
 }
