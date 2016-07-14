@@ -34,7 +34,7 @@ My code is available [here](https://github.com/colinmorris/char-rbm) on GitHub. 
 
 #### Background - generative models
 
-Our goal is to build a model that spits out funny names, but our path there will be a bit indirect. The problem that RBMs - and generative models in general - are trying to solve is **learning a probability distribution**. We want to learn a function `P` that assigns every string a probability according to its plausibility as a particular kind of name. e.g. in the case of personal names, we probably want...
+Our goal is to build a model that spits out funny names, but our path there will be a bit indirect. The problem that RBMs - and generative models in general - are trying to solve is **learning a probability distribution**. We want to learn a function `P` that assigns every string a probability according to its plausibility as a particular kind of name. e.g. in the case of human names, we probably want...
 
     P("John Smith") > P("Dweezil Zappa") >> P("mCN xGl  JeY")
 
@@ -115,7 +115,7 @@ If you're interested in reading more about RBMs, I highly recommend Geoff Hinton
 
 I trained my models using [persistent contrastive divergence](http://www.cs.toronto.edu/~tijmen/pcd/pcd.pdf). I used softmax sampling (described in 13.1 of "Practical Guide") for the visible layer - without it, results were very poor.
 
-Sampling was not quite as simple as my handwaving in the section above would suggest. I used simulated annealing, which turned out to help a lot. I wrote a separate little post about that [here](/blog/rbm-sampling). 
+Sampling was not quite as simple as my handwaving in the section above would suggest. I used simulated annealing, which turned out to help a lot. I wrote a separate little post about sampling [here](/blog/rbm-sampling). 
 
 [This README](https://github.com/colinmorris/char-rbm/blob/master/samples/README.markdown) has details on hyperparameters used to train each of my models and the annealing schedule used to sample from them. 
 
@@ -245,7 +245,7 @@ Well, it's certainly figured out that the word "game" is important to unlocking 
     brauk
     pocket quizs
 
-Favourite name: `the : the card game`. The most commonly sampled name was `the bile game`, which appeared **700** times in 35k samples. Neither game exists in the training set. If you do own a copy of "the bile game", don't invite me over for board game night. 
+Favourite name: `the : the card game`. The most commonly sampled name was `the bile game`, which appeared **700** times in 35k samples. Neither game exists in the training set. If you do own a copy of The Bile Game, don't invite me over for board game night. 
 
 ### "Did they really need a neural network for that?"
 
@@ -297,7 +297,7 @@ This is where being able to see the whole string at once really comes in handy. 
 
 ### More stupid RBM tricks
 
-The coolest thing we can do with our trained models is ask them to come up with new names, but that's not the only thing we can ask of them. We can also give them a name of our own choosing and ask them how good they think it is. Let's see if the model we trained on actor names has the hoped-for behaviour on the examples we described at the beginning:
+The coolest thing we can do with our trained models is ask them to come up with new names, but that's not the only thing we can ask of them. We can also give them a name of our own choosing and ask them how good they think it is. Let's see if the model we trained on actor names has the hoped-for behaviour on the example names we described at the beginning:
 
     >>> E('john smith')
     -75.10
@@ -306,7 +306,7 @@ The coolest thing we can do with our trained models is ask them to come up with 
     >>> E('mcn zgl jey')
     -34.25
 
-Remember that lower energy corresponds to higher probability, so this is great! Also, energy is proportional to the log of the probability, so the model thinks that Dweezil is about 4 orders of magnitude more likely than Mcn, and 37(!) orders of magnitude less likely than John.  (That sounds like a lot, but Dweezil is a pretty extreme example of a rare name - [it's globally unique!](https://books.google.com/ngrams/graph?content=Dweezil&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CDweezil%3B%2Cc0).) 
+Remember that lower energy corresponds to higher probability, so this is great! Energy is proportional to the log of the probability, so the model thinks that Dweezil is about 4 orders of magnitude more likely than Mcn, and 37(!) orders of magnitude less likely than John.  (That sounds like a lot, but Dweezil is a pretty extreme example of a rare name - [it's globally unique!](https://books.google.com/ngrams/graph?content=Dweezil&year_start=1800&year_end=2000&corpus=15&smoothing=3&share=&direct_url=t1%3B%2CDweezil%3B%2Cc0))
 
 It can be interesting to walk around the neighbours of a name to get a feel for the energy landscape of the model, and its robustness to small changes:
 
