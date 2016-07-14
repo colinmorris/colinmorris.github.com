@@ -70,6 +70,7 @@ $( document ).ready(function() {
         success: function(data, status) {
             names = data.names;
             $("#generated").text(rand_name());
+            $("#generated").removeClass("loading");
         }});
 
     $("#thebutton").click(function(event) {

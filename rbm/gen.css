@@ -23,6 +23,10 @@
     margin-bottom: 15px;
 }
 
+#generated.loading {
+    color: grey;
+}
+
 .tab-label {
     font-size: large;
 }
