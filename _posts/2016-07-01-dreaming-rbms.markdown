@@ -65,7 +65,7 @@ For example, let's take our alphabet to be just `{a,b,c,d,e,$}`, where '$' is ou
 A restricted Boltzmann machine (henceforth RBM) is a neural network consisting of two layers of binary units, one visible and one hidden. The visible units represent examples of the data distribution we're interested in - in this case, names. 
 
 <figure>
-    <img src="/assets/rbm/rbm.svg">
+    <img class="img-responsive center-block" src="/assets/rbm/rbm.svg">
     <figcaption>A tiny RBM with 3 hidden units and 24 visible units (not all shown) representing the name "deb". Two hidden units and 2 visible units (that we can see) are turned on - the rest are off.</figcaption>
 </figure>
 
@@ -308,7 +308,10 @@ This is a nice intuitive way of evaluating our model's density function. It turn
 A common trick when working with neural nets in the image domain is to visualize what a neuron in the first hidden layer is "seeing" by treating the weights between that neuron and each input pixel as pixel intensities. 
 
 <figure>
-<img src="/assets/rbm/net_full_layer_0.png" style="width:400px">
+<div class="row">
+<div class="col-xs-8 col-xs-offset-2">
+<img src="/assets/rbm/net_full_layer_0.png">
+</div></div>
 <figcaption>
 Visualization of 20 learned image filters from a convolutional neural network trained for handwritten digit classification (from Michael Nielsen's <a href="http://neuralnetworksanddeeplearning.com/chap6.html">Neural Networks and Deep Learning</a>).
 </figcaption>
