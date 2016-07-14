@@ -22,7 +22,7 @@ I wrote some code to do this using restricted Boltzmann machines, a nifty (if sl
     Slick-Android-App
     sublime-app
     Backbone-Switcher
-    thenchon
+    MODEL1302110000
 
 If you want to flip through more examples, I wrote a little [web app](/rbm/repos/) for that (and analogous ones for generating [US place names](/rbm/geo/) and [actor names](/rbm/actors/)). If you want to learn about how I got there, read on. 
 
@@ -242,10 +242,6 @@ Some examples from an order-4 model trained on the US place names dataset:
     Spenceton
     Jay Canal Cemetery
     Oriflamming Beach
-    Duncaster Reservoir
-    The Gravel Creek
-    Tunnel
-    Old Park
 
 Huh. Those are, uh, actually pretty excellent. And with 4-grams it's not at the point where it's just copying the training data. Around 25% of generated names exist in the training set, but I filtered those out of the list above. Several of the individual tokens above don't exist in the training set either, including the excellent "Goatyard".
 

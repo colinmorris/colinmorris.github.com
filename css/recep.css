@@ -1,6 +1,8 @@
 table {
     border-collapse: collapse;
     margin-bottom: 20px;
+    margin-left: 50px;
+    margin-top: 15px;
 }
 
 th {
@@ -17,6 +19,7 @@ td {
     font-family: mono;
     width: 20px;
     height: 20px;
+    white-space: nowrap;
 }
 
 figure {

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Some notes on sampling from character-level RBMs"
+custom_css: recep
 ---
 
 This is a (somewhat boring and technical) accompaniment to my blog post [Dreaming of GitHub repositories with RBMs](/blog/dreaming-rbms). I was able to find lots of great literature with practical tips on training RBMs (my favourite being Geoff Hinton's [A Practical Guide to Training Restricted Boltzmann Machines](https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf)), but almost nothing on sampling from them. This may reflect the fact that generative models have more often been used to pretrain discriminative models rather than, y'know, generate stuff.
@@ -120,7 +121,7 @@ Here are some samples drawn after 1000 rounds of Gibbs sampling on a model train
       Kcsoolstorjs-Domo
       jx-nitkmesu
 
-<img src="/assets/rbm/yikes.gif">
+Yikes!
 
 Here are samples from the same model, with the same number of iterations, but annealing from T=1.5 to T=0.2:
      
