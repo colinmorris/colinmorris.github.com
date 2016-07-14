@@ -66,3 +66,7 @@ input[type=checkbox] {
     border-top-style: groove;
     border-bottom-style: groove;
 }
+
+#hidden-carousel {
+    min-height: 330px;
+}
