@@ -50,6 +50,7 @@ div.carousel-caption {
 
 #hidden-carousel .carousel-inner .item .activations {
     padding-top: 20px;
+    min-height: 330px;
 }
 
 .carousel-control {
