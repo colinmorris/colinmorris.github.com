@@ -32,7 +32,8 @@ function rand_name() {
     return name;
 }
 
-function update_generated(name) {
+function refresh_name() {
+    var name = rand_name();
     var g = $("#generated");
     g.fadeOut(ANIMATION_DELAY);
     g.queue(function(next) {
@@ -40,7 +41,11 @@ function update_generated(name) {
         next();
     });
     g.fadeIn(ANIMATION_DELAY);
+    
+    save_history(name);
 }
+
+
 
 
 $( document ).ready(function() {
@@ -56,16 +61,14 @@ $( document ).ready(function() {
         }});
 
     $("#thebutton").click(function(event) {
-        var name = rand_name();
-        update_generated(name);
-        $("#heart").removeClass("happy");
-        $("#heartglyph").removeClass("glyphicon-heart");
-        $("#heartglyph").addClass("glyphicon-heart-empty");
-        save_history(name);
+        refresh_name();
     });
 
     $("#weirdness-checkbox").change(function() {
        weird = this.checked; 
+       refresh_name();
     });
+
+    $('[data-toggle="tooltip"]').tooltip();
 
 });
