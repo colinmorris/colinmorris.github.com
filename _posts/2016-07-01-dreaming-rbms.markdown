@@ -430,13 +430,15 @@ Under the current architecture, for a model to learn the word "Pond" (a very use
 
 We'd like our model to learn robust, position-invariant patterns and understand that "Hays Pond" and "Darby Pond" are quite similar (even though their vector representations are completely disjoint). 
 
-One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. This is just like [CNNs](https://en.wikipedia.org/wiki/Convolutional_neural_network) for vision tasks, where we have many collections of units - 'filters' - that each see small patches of the image, and share weights. These can detect features (e.g. lines, shapes), no matter where they appear in the image.
+One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. If you're familiar with the use of [CNNs](https://en.wikipedia.org/wiki/Convolutional_neural_network) for vision tasks, this will sound familiar.
 
-We can do the same thing with text, except that our filters would be 1-d rather than 2-d. For example, one filter might learn to recognize a consonant followed by a vowel *anywhere in the string*. And just as in vision tasks, we could stack convolutional layers, with higher-level layers detecting more complex features (like words and combinations of words).
+In a convolutional RBM, each hidden unit will only have connections to a small substring of the input. Weakening our hidden units like this doesn't sound like much of a win, but because each unit has fewer weights, we can use a lot more of them without slowing down training. Yet another way we can be more efficient is to use weight sharing to group hidden units into 'filters'. As an example, the model might learn a filter that recognizes a consonant followed by a vowel *anywhere in the string*. Imagine taking the [consonant-vowel](http://colinmorris.github.io/rbm/zoo/#unit122) hidden unit from before, and making 15 copies of it, one copy for a vowel at index 0 and consonant at index 1, another copy for vowel at index 1 and consonant at index 2, etc.
+
+And just as in vision tasks, we could stack convolutional layers, with low-level layers detecting simple character bigrams or trigrams, and higher layers learning words or combinations of words.
 
 Again, the promise of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are *already* looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions: [the hidden unit zoo](/rbm/zoo) lists **20** hidden units that seem to be primarily responsible for recognizing `github.io` and `github.com` URLs. [Some](/rbm/zoo#unit109) are even pseudo-convolutional, trying to recognize two shifted versions simultaneously.
 
-With convolutional units, we could help the network do what it's already doing much more efficiently (in terms of the size of the model, and the amount of information learned per training instance).
+With convolutional units, we could help the network do what it's already doing much more efficiently (in terms of the size of the model, *and* the amount of information learned per training instance).
 
 ### Practical Applications
 
