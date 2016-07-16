@@ -180,23 +180,6 @@ The model's favourite place name was `indian post office`, which exists in the t
 #### GitHub repository names
 
 How about some GitHub repos? More [here](https://github.com/colinmorris/char-rbm/blob/master/samples/repos_unique.txt):
-<!-- These were better? :(
-    testing_project
-    css-qlation-server
-    Learning_Gitertion
-    Spee-Sample-Server
-    Learning_Generator
-    MS-Service-Manager
-    my_pert_stsi
-    CSC-1201-Semplate
-    san
-    node-book-mite
-    datasian.github.io
-    node-ation-minder
-    CS_Codes_Project
-    sliding.js
-    Google-Application
--->
 
     frost2
     gruntus.js
@@ -209,8 +192,19 @@ How about some GitHub repos? More [here](https://github.com/colinmorris/char-rbm
     redget-2014
     tumber_server
 
+Some of the [favourites](https://github.com/colinmorris/char-rbm/blob/workspace/HallOfFame.txt) I jotted down as I hacked on different models:
 
-Favourite name: `unity.github.io`, which doesn't exist in the training set.
+    supervaluation
+    JustQuery
+    hello-bool
+    dataserverclient
+    bachbone.github.io
+    2048-ing-master
+    jonky-howler
+    PinglePlungerDemo
+    faceboogler
+
+Model's favourite name: `unity.github.io`, which doesn't exist in the training set.
 
 #### Bonus: Board games
 
