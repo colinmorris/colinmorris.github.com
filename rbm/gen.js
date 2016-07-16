@@ -71,4 +71,10 @@ $( document ).ready(function() {
 
     $('[data-toggle="tooltip"]').tooltip();
 
+    $('#historytoggle').click(function(event) {
+        var chev = $('#historytogglechevron');
+        chev.toggleClass('glyphicon-chevron-up');
+        chev.toggleClass('glyphicon-chevron-down');
+    });
+
 });

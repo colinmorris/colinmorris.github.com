@@ -62,11 +62,6 @@ input[type=checkbox] {
     font-size: larger;
 }
 
-#historywrapper {
-    border-top-style: groove;
-    border-bottom-style: groove;
-}
-
 #mobilebuffer {
     height: 50px;
 }

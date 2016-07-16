@@ -46,21 +46,23 @@
     <!-- History -->
     <div class="row">
         <div class="col-xs-6 col-md-3">
-            <h4><a href="#history-tab" data-toggle="collapse">
+            <div class="panel panel-warning">
+            <div class="panel-heading">
+            <h4 class="panel-title"><a id="historytoggle" href="#history-tab" data-toggle="collapse">
                 <span class="glyphicon glyphicon-time"></span>
-                <span class="glyphicon glyphicon-chevron-up"></span>
+                <span id="historytogglechevron" class="glyphicon glyphicon-chevron-up"></span>
             </a></h4>
+            </div>
 
-            <div id="historywrapper">
-            <div class="collapse sample-list" id="history-tab">
+            <div class="panel-body collapse sample-list" id="history-tab">
                 <ul id="history" class="list-unstyled">
                 </ul>
             </div>
-            </div>
+            </div> <!-- /panel -->
             
         </div>
 
-    </div> <!-- /tabs row -->
+    </div> <!-- /history row -->
 
 </div> <!-- /widget -->
 
