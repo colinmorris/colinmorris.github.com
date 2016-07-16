@@ -6,6 +6,6 @@ date: 2016-07-01
 favicon: actor_favicon
 ---
 
-I trained a neural network on 1.5 million names of actors taken from IMDB, then asked it to generate some more. These are all new names, not existing in the training data.
+I trained a neural network on 1.5 million names of actors taken from IMDB, then asked it to generate some new ones. 
 
 (My dataset was all-male, which is why you'll only see male names generated.)

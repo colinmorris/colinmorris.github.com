@@ -6,4 +6,4 @@ date: 2016-07-01
 favicon: octocat_favicon
 ---
 
-I trained a neural network on the names of [4 million GitHub repositories](https://github.com/colinmorris/reponames-dataset), then asked it to generate some more. These are all new repos, not existing in the training set.
+I trained a neural network on the names of [4 million GitHub repositories](https://github.com/colinmorris/reponames-dataset), then asked it to generate some new ones.
