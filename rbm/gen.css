@@ -16,7 +16,7 @@
 
 
 .sample-list {
-    max-height: 350px;
+    max-height: 30vh;
     overflow: auto;
 }
 
