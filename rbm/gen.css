@@ -28,11 +28,7 @@
 }
 
 .hist-weird {
-    background-color: rgba(217,83,29,.1);
-}
-
-.hist-nonweird { 
-    background-color: rgba(200,228,228,.1);
+    color: rgb(148,34,34);
 }
 
 body {
