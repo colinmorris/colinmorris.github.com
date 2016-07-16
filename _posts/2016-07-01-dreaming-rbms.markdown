@@ -428,7 +428,7 @@ One solution to this problem is to use a recurrent architecture. Another, which 
 
 We can do the same thing with text, except that our filters would be 1-d rather than 2-d. For example, one filter might learn to recognize a consonant followed by a vowel *anywhere in the string*. And just as in vision tasks, we could stack convolutional layers, with higher-level layers detecting more complex features (like words and combinations of words).
 
-Again, the promise of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are *already* looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions: [this page](/assets/recep.html) lists **20** hidden units that seem to be primarily responsible for recognizing `github.io` and `github.com` URLs. [Some](/assets/recep.html#unit109) are even pseudo-convolutional, trying to recognize two shifted versions simultaneously.
+Again, the promise of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are *already* looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions: [the hidden unit zoo](/rbm/zoo) lists **20** hidden units that seem to be primarily responsible for recognizing `github.io` and `github.com` URLs. [Some](/rbm/zoo#unit109) are even pseudo-convolutional, trying to recognize two shifted versions simultaneously.
 
 With convolutional units, we could help the network do what it's already doing much more efficiently (in terms of the size of the model, and the amount of information learned per training instance).
 
