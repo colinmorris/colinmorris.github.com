@@ -16,7 +16,7 @@ Generating named entities with RBMs: Journey to Hilford Hills
 
 A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem - i.e. **named entity generation**? What if we ask a model to dream up new names of people, places and things? 
 
-I wrote some code to do this using restricted Boltzmann machines, a nifty (if slightly passé) variety of generative neural network. It turns out they come up with some funny stuff! For example, if we train an RBM on GitHub repository names, it can come up with new ones like...
+I wrote some code to do this using restricted Boltzmann machines, a nifty (if passé) variety of generative neural network. It turns out they come up with some funny stuff! For example, if we train an RBM on GitHub repository names, it can come up with new ones like...
 
     fuzzyTools
     Slick-Android-App
@@ -24,9 +24,16 @@ I wrote some code to do this using restricted Boltzmann machines, a nifty (if sl
     Backbone-Switcher
     MODEL1302110000
 
-If you want to flip through more examples, I wrote a little [web app](/rbm/repos/) for that (and analogous ones for generating [US place names](/rbm/geo/) and [actor names](/rbm/actors/)). If you want to learn about how I got there, read on. 
+If you want to flip through more examples, there's a (web) app for that. Check out...
 
-In this post, I'll give a brief overview of restricted Boltzmann machines and how I applied them to this problem, and try to give some intuition about what's going on in the brain of one of these models.
+
+<ul class="plug">
+    <a href="/rbm/repos"><li id="repoplug">GitHub repo generator</li></a>
+    <a href="/rbm/geo"><li id="geoplug">Place name generator</li></a>
+    <a href="/rbm/actors"><li id="actorplug">Actor name generator</li></a>
+</ul>
+
+If you want to learn about how I got there, read on. In this post, I'll give a brief overview of restricted Boltzmann machines and how I applied them to this problem, and try to give some intuition about what's going on in the brain of one of these models.
 
 My code is available [here](https://github.com/colinmorris/char-rbm) on GitHub. Feel free to play with it (with the caveat that it's more of a research notebook than a polished library). 
 

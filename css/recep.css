@@ -56,3 +56,27 @@ div.carousel-caption {
 .carousel-control {
     width: 10% !important;
 }
+
+#repoplug:before {
+    background-image: url("/assets/octocat_favicon_2.png");
+}
+#geoplug:before {
+    background-image: url("/assets/geo_favicon.png");
+}
+#actorplug:before {
+    background-image: url("/assets/actor_favicon.png");
+}
+
+ul.plug li {
+    list-style: none;
+}
+
+ul.plug li:before {
+    content: '';
+    display: inline-block;
+    height: 32px;
+    width: 32px;
+    background-size: contain;
+    margin-right: 10px;
+}
+
