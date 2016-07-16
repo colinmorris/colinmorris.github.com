@@ -43,19 +43,6 @@ body {
     padding-top: 25px;
 }
 
-.btn-group-vertical label { 
-    opacity: .5;
-}
-
-.btn-group-vertical label.active {
-    opacity: 1.0;
-}
-
-input[type=checkbox] {
-    transform: scale(1.5);
-    -webkit-transform: scale(1.5);
-}
-
 .plug a {
     font-size: larger;
 }
