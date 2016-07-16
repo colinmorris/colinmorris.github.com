@@ -64,6 +64,35 @@ input[type=checkbox] {
     height: 50px;
 }
 
-#whatsweird {
-    font-size: small;
+#weird span {
+    vertical-align: baseline;
 }
+
+#whatsweird {
+    font-size: smaller;
+    font-size: 1.3em;
+    opacity: 0.5;
+    padding-left: 5px;
+}
+
+#fire {
+    font-size: 2.0em;
+    background-image: linear-gradient(to bottom,#fcf8e3 0,#faf2cc 100%);
+}
+
+#fire.cool {
+    color: rgba(0,0,0,.3);
+}
+
+#fire.cool:hover {
+    color: rgba(244,67,54,0.5);
+}
+
+#fire.hot {
+    color: rgba(244,67,54,1.0);
+}
+
+#fire.hot:hover {
+    color: rgba(244,67,54,0.5);
+}
+

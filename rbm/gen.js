@@ -64,8 +64,10 @@ $( document ).ready(function() {
         refresh_name();
     });
 
-    $("#weirdness-checkbox").change(function() {
-       weird = this.checked; 
+    $("#fire").click(function() {
+       weird = !weird;
+       $(this).toggleClass('cool');
+       $(this).toggleClass('hot');
        refresh_name();
     });
 
