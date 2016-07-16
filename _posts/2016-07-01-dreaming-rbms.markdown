@@ -298,7 +298,12 @@ The chart above is heartening. First of all, it's great that our model assigned 
 <div class="panel panel-default">
 <div class="panel-heading">Aside - Score matching</div>
 <div class="panel-body">
-This is a nice intuitive way of evaluating our model's density function. It turns out we can't calculate the exact probability our model assigns to any instance, because of an intractable term called the <a href="https://en.wikipedia.org/wiki/Partition_function_(mathematics)">partition function</a>). But we can compare probabilities (the partition function cancels out when we divide). It seems clear that a good model should generally assign more energy to a sample from our dataset after we've randomly nudged it. In fact, we could have optimized for this directly during training. This is called <a href="https://www.cs.helsinki.fi/u/ahyvarin/papers/JMLR05.pdf">score matching</a>, and it has a <a href="http://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf">surprising connection</a> with denoising autoencoders, another powerful variety of generative neural network.
+<p>
+This is a nice intuitive way of evaluating our model's density function - it seems obvious that our model should generally assign more energy to a sample from our dataset after we've randomly nudged it. It also plays around a key weakness of RBMs: we can't calculate the exact probability they assign to any instance, because of an intractable term called the <a href="https://en.wikipedia.org/wiki/Partition_function_(mathematics)">partition function</a>. But we <i>can</i> compare probabilities. When we take the energy difference between two instances, the partition function cancels out, and we get the exact log-ratio of their probabilities.</p>
+
+<p>
+In fact, this is the basis for a clever training technique called <a href="https://www.cs.helsinki.fi/u/ahyvarin/papers/JMLR05.pdf">score matching</a>, which turns out to have a <a href="http://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf">surprising connection</a> with denoising autoencoders, another powerful variety of generative neural network.
+</p>
 </div>
 </div>
 
