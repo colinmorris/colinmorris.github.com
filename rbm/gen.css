@@ -67,3 +67,6 @@ input[type=checkbox] {
     border-bottom-style: groove;
 }
 
+#mobilebuffer {
+    height: 50px;
+}
