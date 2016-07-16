@@ -75,9 +75,11 @@
     <p>People who enjoyed this nonsense also liked...</p>
 
     <ul class="plug">
-        {% if page.data_file != "repos" %}<li><a href="/rbm/repos">GitHub repo generator</a></li>{% endif %}
-        {% if page.data_file != "usgeo" %}<li><a href="/rbm/geo">Place name generator</a></li>{% endif %}
-        {% if page.data_file != "actors" %}<li><a href="/rbm/actors">Actor name generator</a></li>{% endif %}
+        {% if page.data_file != "repos" %}<a href="/rbm/repos"><li id="repoplug">GitHub repo generator</li></a>{% endif %}
+        {% if page.data_file != "usgeo" %}<a href="/rbm/geo"><li id="geoplug">Place name generator</li></a>
+        {% endif %}
+        {% if page.data_file != "actors" %}<a href="/rbm/actors"><li id="actorplug">Actor name generator</li></a>
+        {% endif %}
     </ul>
 
     {% if page.data_file == "repos" %}<p class="plug"><a href="/rbm/zoo">A peek inside the brain of this network</a></p>{% endif %}
