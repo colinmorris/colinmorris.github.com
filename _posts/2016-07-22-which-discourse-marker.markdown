@@ -157,3 +157,19 @@ Ron Butters [pipes up](http://listserv.linguistlist.org/pipermail/ads-l/2009-Jan
 I'm surprised by the claim that this is a distinctly Southern phenomenon. I was raised in Southern Ontario, and the construction seems pretty natural to me. The tweets above include a couple authors from Georgia, but also authors from Portland, Toronto, and New York. Has its reach spread recently?
 
 Above all, I was surprised to find no more than these two mentions, despite persistent Googling. This might just mean that I'm way off in interpreting this as a DM, and that this phenomenon has been more widely studied but under a different name. If you have any ideas, give me a shout!
+
+**Update**: Mark Liberman kindly pointed me to [this 2003 Language Log](http://itre.cis.upenn.edu/~myl/languagelog/archives/000118.html) post which describes an instance of this phenomenon, which he calls "linking *which*", in Patrick O'Brian's "The Far Side of the World":
+
+>   'What luck?' asked Jack.  
+'Well, sir,' said Killick, 'Joe Plaice says he would venture upon a lobscouse, and Jemmy Ducks believes he could manage a goose-pie.'  
+'What about pudding? Did you ask Mrs Lamb about pudding? About her frumenty?'  
+'**Which** she is belching so and throwing up you can hardly hear yourself speak,' said Killick, laughing merrily. 'And has been ever since we left Gib. Shall I ask the gunner's wife?'  
+'No, no,' said Jack. No one the shape of the gunner's wife could make frumenty, or spotted dog, or syllabub, and he did not wish to have anything to do with her.  
+
+He turns up this corresponding OED gloss:
+
+> 14\. a. (as pron. or adj.) With pleonastic personal pronoun or equivalent in the latter part of the relative clause, referring to the antecedent, which thus serving merely to link the clauses together: (a) with the pers. pron. (or the antecedent noun repeated) as subj. or obj. to a verb (principal or subordinate) in the relative clause, which is usually complex; [...]
+
+This "pleonastic which" adequately describes all of my pre-2009 examples, but does not fit with later examples like "which Jesus was accused...", "Which, don't get me wrong, if you are in a hard spot...", or "Which, no".
+
+(I'm embarrassed to not have done my OED due diligence before writing this post. Would you believe me if I said that I went to my local library and found they were missing volume 20 of their OED set? If you need to look up a word greater than 'wauwau', don't bother going to Toronto's Northern District Library.)
