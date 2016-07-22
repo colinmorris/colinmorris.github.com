@@ -54,6 +54,8 @@ From [Women on Fire](https://books.google.ca/books?id=TzRjTZC3PuQC&pg=PA36&dq=%2
 
 > I was paralyzed. I couldn’t write, **which** why don’t you just pull a plastic bag over my head and tie it around my neck.
 
+(Perhaps we should say that, in cases such as this, *which* is acting as a conjunction, but not as a DM, because of the violation of rule #2 above. Removing *which* here does in fact render the host sentence ungrammatical - though it seems like the author could just as well have used a period or a dash in place of the comma.)
+
 From [A Work in Progress Life Love Fun Living in Australia - Part 1](https://books.google.ca/books?id=-luqAVct4ukC&pg=PA6&dq=%22which+yes%22&hl=en&sa=X&ved=0ahUKEwiyzOuOzv3NAhXJ1IMKHSVfChQ4ChDoAQg3MAU#v=onepage&q=%22which%20yes%22&f=false), a 2013 collection of stories:
 
 > I needed a “drop my bags spot” just off the floor, again, because I don’t want to put my hand inside a bag and have a cockroach run up my arm making me scream - **which**, yes, it actually did happen, and I’m embarrassed to say, yes, I did scream.
