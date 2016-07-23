@@ -84,92 +84,35 @@ JULIE:  Yeah. Well, that was Havens was taking it out. Um, Orville Havens. and u
 
 # What does it mean?
 
-The pattern I see in these examples is that *which* introduces some commentary, reaction, or elaboration on the foregoing utterance. It virtually always seems to accompany some shift to a more author-centric voice, even in cases where the clause being introduced isn't conveying an opinion. 
+When I started writing this post, I thought I had discovered new linguistic territory, making the mistake of thinking that if something isn't on the internet, it doesn't exist. But in fact, The Dictionary of American Regional English gives three definitions of *which*-as-conjunction, starting with:
 
-Consider the first example from the Santa Barbara Corpus: 
+> 1. Used with a following anaphoric pronoun or pronomial adj or adv to form the equivalent of a non-restrictive relative pronoun or adv.
 
-> Um, Orville Havens. and uh his son. Which I can't remember his name. Starts with an el. Lenny or something.
-
-We can't really call this commentary. Julie isn't giving a subjective opinion on Orville Havens' son, she's just giving some information about his name. But it's by way of describing *her own* memories. She's gone from describing some event in the world ("that was Havens [that] was taking it out"), to describing a belief that she holds about the world. While this version sounds okay:
-
-> Which, I think his name was Lenny.  
-
-I'd argue that removing the "I think" is enough to make it sound a bit weird:
-
-> * Which, his name is Lenny.
+This definition (also described in [this 2003 Language Log post](http://itre.cis.upenn.edu/~myl/languagelog/archives/000118.html) - thanks to Mark Liberman for pointing it out) covers such examples as...
 
 
-# Where did it come from?
+> Generally, installation failures can be fixed by running the same line again, which, yeah, **[that]**'s super janky, whatever.   
 
-How did *which* get "pragmaticalized"? I have some ideas, but I should note at this point that this is the speculative hand-waving of a non-linguist.
-
-Some of the examples above can be regarded as straightforward instances of *which* as a relative pronoun, made redundant by restating  its antecedent. Removing the NPs in square brackets in the examples below turns the *which* clause into a straightforward relative clause.
-
-
-> Generally, installation failures can be fixed by running the same line again, which, yeah, **[that]**'s super janky, whatever. 
-
-> this one ... guy was t- say it was like,  they got sent to the village. Which you don't wanna get sent to **[the village]**. But they do.
+> this one ... guy was t- say it was like,  they got sent to the village. Which you don't wanna get sent to **[the village]**. But they do.  
 
 > because their experience would be totally different. If a man exposes himself, which, a man would never do **[that]**.
 
-Others are harder to reshape this way. Take this sentence from the London Lund Corpus of Spoken English:
+Removing the bolded NPs above gives a normal relative clause.
 
-> this was a mysterious phrase, which, I knew perfectly well what it meant
+The dictionary describes this construction as chiefly southern (which agrees with [this mention of conjunctive *which*](https://news.google.com/newspapers?nid=1356&dat=19830123&id=jZ9PAAAAIBAJ&sjid=5gUEAAAAIBAJ&pg=6902,3729262&hl=en) in a 1983 William Safire column, where it's described as a "confusing" Southern regionalism).
 
-Like before, we seem to have in "it" a restatement of the NP that *which* could or should refer to. But dropping "it" leaves us with something unparseable
+The other two definitions are:
 
-> \* this was a mysterious phrase, which, I knew perfectly well what meant
+> 2\. Used without an anaphoric pronoun as a connective particle to introduce a parenthetical, usu explanatory remark  
+> 3\. also **and which**, **but which**; Used without an anaphoric pronoun to mark the connection of a clause or sentence to what precedes: and, and so, as to that.
 
-The difficulty here seems to arise because the thing that *which* naturally refers to (the mysterious phrase), is neither the subject nor the object of the second clause. To get a proper relative clause out of this, we need to do some more extreme surgery, like:
+Incidentally, 1 and 2 have corresponding OED glosses, but 3 does not. The OED flags them as '*\*\*\*\* Peculiar constructions*', and begins its version of #2 with "hence, in vulgar use...".
 
-> (1) this was a mysterious phrase, the meaning of which I knew perfectly well  
-> (2) this was a mysterious phrase, whose meaning I knew perfectly well  
-> (3) this was a mysterious phrase, which I knew perfectly well the meaning of
+These cover the remaining examples, such as "which, are you serious?", or "Which, okay.". Though this is hardly surprising, given how broad these definitions are, particularly #3, which in some sense describes any discourse marker.
 
-But all these options seem a little stilted in a conversational context. I think they also all fail to match the rhetorical force of "I knew perfectly well what that meant". 
+This is unsatisfying because it feels like there's more subtlety governing which clauses can be naturally linked up with "which". My sense is that all or most examples falling under #3 (the 'leftovers' which have no anaphoric pronoun and which aren't particularly parenthetical), could be described as giving the speaker's reaction to or commentary on the clause or sentence that immediately precedes.
 
-By far the oldest example I was able to find of conjunctive-which, from an [1812 commentary on a Jacobean play](https://books.google.ca/books?id=21ArAQAAIAAJ&pg=RA1-PA189&dq=%22which+why%22&hl=en&sa=X&ved=0ahUKEwjhgruayf3NAhVK7YMKHa2sDgA4FBDoAQgzMAQ#v=onepage&q=%22which%20why%22&f=false), suffers from a similar dilemma:  
+This accords well with examples like "which, are you serious?", "which... why is he even in this conversation?", and "Which, okay.". 
 
-> This fine speech I have recovered from the folio of 1647, which why it should have been dropped, all but the first line, by the two last editors, I am at a loss to understand.
+I get the sense that conjunctive-*which* - particularly without an anaphoric pronoun - has gained popularity in the last 10 years or so, and that parenthetical/commentary *which* is a promising up-and-coming discourse marker. But I don't have any data to back that up. If I find some, I'll totally write another post about it.
 
-Again, turning this into a proper relative clause results in some really ugly periphrasis, like "the dropping of which... I am at a loss to understand". 
-
-Maybe examples like this (where conjunctive *which* arises as the least-bad option when trying to construct a tricky relative clause), were the foot in the door that led to normalizing `<S> which <S>`, and leading to examples that seemingly have no relation to *which*-as-relativizer ("Which, okay."). But without any data to back it up, I don't have much conviction in this guess.
-
-Why is *which* undergoing this shift but not the other English relativizers? I'm not sure. Here's an example of what might be called conjunctive "who" from a [2004 interview with wrestler "The Dirst Bike Kid"](http://www.wrestlezone.com/editorials/236527-on-the-ropes-an-interview-with-the-dirt-bike-kid):
-
-> I am not 100% sure myself really, and don’t think I’ll ever really know the full-score. I understand that there was a lot of shit-stirring going on behind the scenes by some people, **who** I was eventually told by Phyllis Lee that it was the British guys on the tour that were creating trouble for me behind my back. I was unaware of this at the time.
-
-But this seems to be much less common, and you could make the argument that this is just a speech error. 
-
-# History
-
-I was able to find precisely two previous references to this phenomenon, separated by almost 30 years. Remarkably, both are due to [Ronald Butters](https://english.duke.edu/people/ronald-r-butters), a professor of linguistics at Duke University. William Safire quotes Prof. Butters in [a 1983 column on regionalisms in American speech](https://news.google.com/newspapers?nid=1356&dat=19830123&id=jZ9PAAAAIBAJ&sjid=5gUEAAAAIBAJ&pg=6902,3729262&hl=en):
-
-> [Southerners] often use the conjunctive which in a confusing way, according to Ronald Butters, who cites: “The President was not happy with the results of the election, which I couldn’t be happier about that”.
-
-Then in 2009, someone sent [an inquiry](http://listserv.linguistlist.org/pipermail/ads-l/2009-January/086794.html) to the mailing list for the American Dialect Society, regarding this utterance from an interview on Good Morning America:
-
-> I would often go down to the bar, sit up at the counter, drink a beer and talk about God, which, Jesus was accused of being a glutton and a drunkard.
-
-Ron Butters [pipes up](http://listserv.linguistlist.org/pipermail/ads-l/2009-January/086795.html), suggesting it to be an instance of conjuctive *which*, and describing it as "a feature (rather startingly to my ears) of the speech of North Carolina (and doubtless other parts of the South)".
-
-I'm surprised by the claim that this is a distinctly Southern phenomenon. I was raised in Southern Ontario, and the construction seems pretty natural to me. The tweets above include a couple authors from Georgia, but also authors from Portland, Toronto, and New York. Has its reach spread recently?
-
-Above all, I was surprised to find no more than these two mentions, despite persistent Googling. This might just mean that I'm way off in interpreting this as a DM, and that this phenomenon has been more widely studied but under a different name. If you have any ideas, give me a shout!
-
-**Update**: Mark Liberman kindly pointed me to [this 2003 Language Log](http://itre.cis.upenn.edu/~myl/languagelog/archives/000118.html) post which describes an instance of this phenomenon, which he calls "linking *which*", in Patrick O'Brian's "The Far Side of the World":
-
->   'What luck?' asked Jack.  
-'Well, sir,' said Killick, 'Joe Plaice says he would venture upon a lobscouse, and Jemmy Ducks believes he could manage a goose-pie.'  
-'What about pudding? Did you ask Mrs Lamb about pudding? About her frumenty?'  
-'**Which** she is belching so and throwing up you can hardly hear yourself speak,' said Killick, laughing merrily. 'And has been ever since we left Gib. Shall I ask the gunner's wife?'  
-'No, no,' said Jack. No one the shape of the gunner's wife could make frumenty, or spotted dog, or syllabub, and he did not wish to have anything to do with her.  
-
-He turns up this corresponding OED gloss:
-
-> 14\. a. (as pron. or adj.) With pleonastic personal pronoun or equivalent in the latter part of the relative clause, referring to the antecedent, which thus serving merely to link the clauses together: (a) with the pers. pron. (or the antecedent noun repeated) as subj. or obj. to a verb (principal or subordinate) in the relative clause, which is usually complex; [...]
-
-This "pleonastic which" adequately describes all of my pre-2009 examples, but does not fit with later examples like "which Jesus was accused...", "Which, don't get me wrong, if you are in a hard spot...", or "Which, no".
-
-(I'm embarrassed to not have done my OED due diligence before writing this post. Would you believe me if I said that I went to my local library and found they were missing volume 20 of their OED set? If you need to look up a word greater than 'wauwau', don't bother going to Toronto's Northern District Library.)
