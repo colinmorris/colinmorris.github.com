@@ -1,7 +1,46 @@
+#historyrow {
+    margin-top: 5px;
+}
+
+#kicksville {
+    margin-top: 2.5em;
+    max-width: 196px;
+}
+
+#tweet {
+    position: absolute;
+    bottom: .9em;
+    right: .2em;
+}
+
+#tweet img {
+    opacity: .2;
+    border-radius: 2px;
+    padding: 3px;
+}
+
+#tweet img:hover {
+    opacity: .8;
+}
+
+/* Names can be up to 20 characters long, so let's make sure they can fit in one line of history, 
+ * plus a little wiggle because the vertical scroll bar steals some space */
+#history-container {
+    font-family: monospace;
+    min-width: 26ch;
+}
+
 #porthole {
     text-align: center;
     font-size: xx-large;
     font-family: monospace;
+}
+
+@media (max-width: 400px) {
+#porthole {
+    /* old phones suck */
+    font-size: 21px;
+}
 }
 
 #thebutton {
@@ -22,7 +61,6 @@
 
 .sample-list ul li {
     padding-left: 10px;
-    font-family: monospace;
 }
 
 #weirdlabel {
