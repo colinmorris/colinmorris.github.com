@@ -1,8 +1,9 @@
 ---
 layout: post
-title: "Dreaming of GitHub repositories with RBMs"
+title: "Dreaming of names with RBMs"
 categories: machine-learning
 custom_css: recep
+header-img: "/assets/rbm/kicksville.png"
 ---
 
 <!-- title candidates...
