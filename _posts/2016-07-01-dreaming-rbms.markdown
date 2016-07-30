@@ -6,15 +6,6 @@ custom_css: recep
 header-img: "/assets/rbm/kicksville.png"
 ---
 
-<!-- title candidates...
-Dreaming of GitHub repositories with RBMs
-Generating named entities with RBMs: Journey to Hilford Hills
--->
-
-<!-- Graphic goes here? -->
-
-<!-- ### Named entity generation -->
-
 A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem - i.e. **named entity generation**? What if we ask a model to dream up new names of people, places and things? 
 
 I wrote some code to do this using restricted Boltzmann machines, a nifty (if passé) variety of generative neural network. It turns out they come up with some funny stuff! For example, if we train an RBM on GitHub repository names, it can come up with new ones like...
@@ -162,7 +153,7 @@ The model's favourite name (that is, the sample it assigned the lowest energy) w
 
 #### Geographic names
 
-It's not much of a stretch of the imagination to go from training on names of people to names of places (examples from the dataset: "Gall Creek", "Grovertown", "Aneta", "Goodyear Heights"). Here are some examples from our RBM's dreamed atlas (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/usgeo_unique.txt)):
+It's not much of a stretch of the imagination to go from training on names of people to names of places (examples from the dataset: "Gall Creek", "Grovertown", "Aneta", "Goodyear Heights"). Here are some random examples from our RBM's dreamed atlas (more [here](https://github.com/colinmorris/char-rbm/blob/master/samples/usgeo_unique.txt)):
 
     sama
     marchestee hill
@@ -174,7 +165,9 @@ It's not much of a stretch of the imagination to go from training on names of pe
     oste
     lake day
 
-Not bad! Who wouldn't enjoy a picnic in Jicky Park?
+Not bad! Who wouldn't enjoy a picnic in Jicky Park? 
+
+The map at the top of this post is a terrifying vision of a whole territory dreamed up by an RBM - full version [here](/assets/rbm/kicksville.png).
 
 The model's favourite place name was `indian post office`, which exists in the training set. It's second favourite is `wester post office`, which doesn't. 
 
@@ -451,5 +444,7 @@ None whatsoever.
 
 My RBM implementation was built on top of scikit-learn's lovely [BernoulliRBM](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.BernoulliRBM.html#sklearn.neural_network.BernoulliRBM) class, which is cleanly written and well-commented, and easy to hack on out of the box.
 
-Thanks to Falsifian for reviewing a draft of this post and teaching me about simulated annealing.
+Thanks to [Falsifian](http://www.falsifian.org/) for reviewing a draft of this post and teaching me about simulated annealing. 
+
+Thanks to an anonymous brilliant artist for drawing the Tolkien-esque map of ["Kicksville"](/assets/rbm/kicksville.png).
 
