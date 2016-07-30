@@ -426,9 +426,13 @@ We'd like our model to learn robust, position-invariant patterns and understand 
 
 One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. If you're familiar with the use of [CNNs](https://en.wikipedia.org/wiki/Convolutional_neural_network) for vision tasks, this will sound familiar.
 
-In a convolutional RBM, each hidden unit will only have connections to a small substring of the input. Weakening our hidden units like this doesn't sound like much of a win, but because each unit has fewer weights, we can use a lot more of them without slowing down training. Yet another way we can be more efficient is to use weight sharing to group hidden units into 'filters'. As an example, the model might learn a filter that recognizes a consonant followed by a vowel *anywhere in the string*. Imagine taking the [consonant-vowel](http://colinmorris.github.io/rbm/zoo/#unit122) hidden unit from before, and making 15 copies of it, one copy for a vowel at index 0 and consonant at index 1, another copy for vowel at index 1 and consonant at index 2, etc.
+In a convolutional RBM, each hidden unit will only have connections to a small substring of the input. Weakening our hidden units like this doesn't sound like much of a win, but because each unit has fewer weights, we can use a lot more of them without slowing down training. Not only that, but each hidden unit will work together with many siblings that share the exact same weights but look at different regions of the string. Together these make up what's often called a "filter".
 
+As an example, the model might learn a filter that recognizes a consonant followed by a vowel *anywhere in the string*. Imagine taking the [consonant-vowel](http://colinmorris.github.io/rbm/zoo/#unit122) hidden unit from before, and making 15 copies of it, one copy for a vowel at index 0 and consonant at index 1, another copy for vowel at index 1 and consonant at index 2, etc.
+
+{% comment %}
 This combines nicely with the previous idea of adding more depth. If we have a simple convolutional layer on the bottom learning low-level phonetic/formatting features or specific character bigrams/trigrams, a layer on top of that could learn words and more global features (such as CamelCase vs. pothole_case) based on those local features.
+{% endcomment %}
 
 Again, the promise of this is strongly suggested by the weights we see on the hidden units above. Our hidden units are *already* looking at local regions of the input, and there's clear evidence that the model is having to learn and store the same pattern multiple times for different positions: [the hidden unit zoo](/rbm/zoo) lists **20** hidden units that seem to be primarily responsible for recognizing `github.io` and `github.com` URLs. [Some](/rbm/zoo#unit109) are even pseudo-convolutional, trying to recognize two shifted versions simultaneously.
 
@@ -442,9 +446,5 @@ None whatsoever.
 
 [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/) by Andrej Karpathy inspired me to play with character-level representations (and was basically the first thing I read that got me excited about deep learning). If you haven't read it already, go do it now! If you're curious how these results compare to char-rnn, [here](https://github.com/colinmorris/char-rbm/blob/workspace/samples/cleaned/repos_char-rnn_unique.txt) are some samples from a char-rnn model trained for around 24 hours on GitHub repos with rnn_size=256, seq_length=20 and all other options set to their defaults. 
 
-My RBM implementation was built on top of scikit-learn's lovely [BernoulliRBM](http://scikit-learn.org/stable/modules/generated/sklearn.neural_network.BernoulliRBM.html#sklearn.neural_network.BernoulliRBM) class, which is cleanly written and well-commented, and easy to hack on out of the box.
-
-Thanks to [Falsifian](http://www.falsifian.org/) for reviewing a draft of this post and teaching me about simulated annealing. 
-
-Thanks to an anonymous brilliant artist for drawing the Tolkien-esque map of ["Kicksville"](/assets/rbm/kicksville.png).
+Thanks to [Falsifian](http://www.falsifian.org/) for reviewing a draft of this post and teaching me about simulated annealing. Thanks to an anonymous brilliant artist for drawing that Tolkien-esque map of ["Kicksville"](/assets/rbm/kicksville.png) in the header.
 
