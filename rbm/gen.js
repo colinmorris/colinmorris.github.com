@@ -56,8 +56,10 @@ $( document ).ready(function() {
         error: function(xhr, status, error) {},
         success: function(data, status) {
             names = data.names;
-            $("#generated").text(rand_name());
+            var first_name = rand_name();
+            $("#generated").text(first_name);
             $("#generated").removeClass("loading");
+            save_history(first_name);
         }});
 
     $("#thebutton").click(function(event) {

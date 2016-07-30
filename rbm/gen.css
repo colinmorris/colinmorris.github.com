@@ -72,7 +72,7 @@ body {
 }
 
 #fire.cool:hover {
-    color: rgba(244,67,54,0.5);
+    color: rgba(244,67,54,0.3);
 }
 
 #fire.hot {
@@ -80,7 +80,7 @@ body {
 }
 
 #fire.hot:hover {
-    color: rgba(244,67,54,0.5);
+    color: rgba(244,67,54,0.8);
 }
 
 #repoplug:before {
