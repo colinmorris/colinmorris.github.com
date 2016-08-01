@@ -4,6 +4,7 @@ title: "Dreaming of names with RBMs"
 categories: machine-learning
 custom_css: recep
 header-img: "/assets/rbm/kicksville.png"
+thumbnail: "/assets/rbm/mount_mountain.png"
 ---
 
 A classic problem in natural language processing is [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition). Given a text, we have to identify the proper nouns. But what about the generative mirror image of this problem - i.e. **named entity generation**? What if we ask a model to dream up new names of people, places and things? 
