@@ -426,7 +426,7 @@ We'd like our model to learn robust, position-invariant patterns and understand 
 
 One solution to this problem is to use a recurrent architecture. Another, which is more readily applicable to RBMs, is to use convolutional units. If you're familiar with the use of [CNNs](https://en.wikipedia.org/wiki/Convolutional_neural_network) for vision tasks, this will sound familiar.
 
-In a convolutional RBM, each hidden unit will only have connections to a small substring of the input. Weakening our hidden units like this doesn't sound like much of a win, but because each unit has fewer weights, we can use a lot more of them without slowing down training. Not only that, but each hidden unit will work together with many siblings that share the exact same weights but look at different regions of the string. Together these make up what's often called a "filter".
+In a convolutional RBM, each hidden unit will only have connections to a small substring of the input. Weakening our hidden units like this doesn't sound like much of a win, but because each unit has fewer weights, we can use a lot more of them without slowing down training. Not only that, but each hidden unit will work together with many siblings that share the exact same weights but look at different regions of the string. Together these make up what's called a "filter".
 
 As an example, the model might learn a filter that recognizes a consonant followed by a vowel *anywhere in the string*. Imagine taking the [consonant-vowel](http://colinmorris.github.io/rbm/zoo/#unit122) hidden unit from before, and making 15 copies of it, one copy for a vowel at index 0 and consonant at index 1, another copy for vowel at index 1 and consonant at index 2, etc.
 
