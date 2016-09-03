@@ -20,7 +20,7 @@ Some day I will sit down and learn how this sausage gets made, but right now I w
 
 ## A quick and dirty gh-pages deploy in 5 steps
 
-I'm assuming your project is based on the [Quickstart](https://angular.io/docs/ts/latest/quickstart.html) guide (in particular, that it uses SystemJS). 
+I'm assuming your project is based on the [Quickstart](https://angular.io/docs/ts/latest/quickstart.html) guide (in particular, that it uses SystemJS). My app uses Angular 2 RC5, though there's a good chance this approach will work for other versions.
 
 In case I haven't been explicit enough about it, we're following worst practices here. If you were a good developer, you would bundle, uglify, and minify your js, and use ahead-of-time compilation. But today you're an impatient developer who just wants to get something out the door, so here's what you're going to do.
 
