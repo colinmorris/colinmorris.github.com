@@ -1,0 +1,77 @@
+.topscore {
+  padding-right: 15px;
+}
+
+.topwords-row {
+  background-color: rgba(220, 244, 245, 0.25);
+}
+
+.char {
+  padding-right: 5px;
+  text-align: right;
+  font-family: monospace;
+}
+
+
+.topwords {
+  font-family: monospace;
+  list-style: none;
+}
+
+.topword {
+}
+
+.wtopscore {
+  float: right;
+}
+
+.ngram-match {
+  font-weight: bold;
+  color: blue;
+}
+
+.charcol {
+  width: 14%;
+}
+
+progress.abbrev {
+  width: 5ex;
+}
+
+.botscore {
+  display: none;
+}
+
+.botscore.char {
+  color: firebrick;
+}
+
+.botscore progress {
+  /* Apparently setting the color of a progress bar is literally impossible, 
+  so this'll have to do. */
+  opacity: .5;
+}
+
+#show-neg-label {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-size: small;
+  z-index: 1;
+  background-color: white;
+}
+
+/*
+progress::-webkit-progress-bar {
+  background-color: white;
+}
+*/
+/*
+progress {
+  color: yellow;
+  background-color: white;
+}
+progress::-webkit-progress-bar { background-color: white !important; }
+progress::-webkit-progress-value {background-color: violet !important;}
+progress::-moz-progress-bar {background:red !important;}
+*/
