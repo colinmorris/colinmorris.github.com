@@ -21696,9 +21696,8 @@ RK5CYII=
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>These (pretty huge) error bars span a range that we can be 95% confident contains the true win rate for a given colour.</p>
-<p>Based on this, we can at least be pretty confident of a significant difference between grey and black, but not of much else.</p>
-<p><strong>TODO: Actually, so for any colour there's a 5% chance the true mean is outside the range of the error bar. For simplicity, we can say there's a 2.5% chance of it being under/over. So the probability that, say, black and grey draconians have the same win rate isn't just like 5%. It should be less than .025^2 = .0006%! Teensy. Okay, so how do we use these bars in general to make inferences about how likely two colours are to differ significantly? (with the caveat of multiple comparisons pushed aside for now)</strong></p>
-<p><strong>Can I choose a (smaller) interval size for each colour such that the probability of two colours having the same win rate given that their err-bars don't overlap <em>is</em> bounded by 5%, or any other desired threshold?</strong></p>
+<p>These are useful for guiding our intuition about how much uncertainty we have about each measurement, though we can't really use them to make any rigorous claims about which pairs are significantly different.</p>
+<p>It's tempting to assume that two colours differ with p &lt; .05 if-and-only-if their confidence intervals fail to overlap, but that doesn't hold up. The probability that black's win rate is outside the C.I. is 5%, same for grey. If grey and black are to have the same win rate, then <em>both</em> those unlikely things need to happen (or one of their win rates needs to be <em>way</em> outside the confidence interval). C.I.'s failing to overlap is at least a sufficient condition to conclude that two means are likely different, but that's not taking into account multiple comparisons.</p>
 
 </div>
 </div>
