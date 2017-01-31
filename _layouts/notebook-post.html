@@ -1,0 +1,24 @@
+---
+layout: post
+---
+
+<p class="bg-info">This post was auto-generated from an IPython notebook. By default only the output cells are shown.
+<label>
+    <input id="codetoggle" type="checkbox" value="">
+    Show code
+</label>
+</p>
+<script>
+$(function() {
+    $('.input_area').toggle();
+    $('.prompt').toggle();
+});
+
+$('#codetoggle').change(function() {
+    $('.input_area').toggle();
+    $('.prompt').toggle();
+});
+</script>
+    
+
+{{ content }}

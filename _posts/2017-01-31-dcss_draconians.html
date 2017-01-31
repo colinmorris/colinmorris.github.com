@@ -1,0 +1,562 @@
+---
+layout: notebook-post
+title: "Statistical Hypothesis Testing and Dragon Colours"
+---
+
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">vis_common</span> <span class="kn">import</span> <span class="n">load_frame</span><span class="p">,</span> <span class="n">STORE</span>
+<span class="kn">from</span> <span class="nn">crawl_data</span> <span class="kn">import</span> <span class="n">CANON_SPECIES</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="n">load_frame</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[])</span>
+<span class="n">ilost</span> <span class="o">=</span> <span class="n">STORE</span><span class="p">[</span><span class="s">&#39;ilost&#39;</span><span class="p">]</span>
+<span class="n">iwon</span> <span class="o">=</span> <span class="n">STORE</span><span class="p">[</span><span class="s">&#39;iwon&#39;</span><span class="p">]</span>
+<span class="n">iquit</span> <span class="o">=</span> <span class="n">STORE</span><span class="p">[</span><span class="s">&#39;iquit&#39;</span><span class="p">]</span>
+
+<span class="n">species</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span>
+<span class="n">drac_species</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">species</span> <span class="k">if</span> <span class="s">&#39;draconian&#39;</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">]</span>
+<span class="n">idrac</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">drac_species</span><span class="p">)</span>
+<span class="n">colored_dracs</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">drac_species</span> <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="s">&#39;draconian&#39;</span><span class="p">]</span>
+<span class="n">cdrac_index</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">colored_dracs</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In my <a href="/blog/dcss_species">previous post</a> analyzing data from the roguelike Dungeon Crawl Stone Soup, I showed this chart of win rates for different colours of draconians:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">colours</span> <span class="o">=</span> <span class="p">[(</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span><span class="o">.</span><span class="mi">2</span><span class="p">),</span> <span class="s">&#39;pink&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">.</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="s">&#39;aliceblue&#39;</span><span class="p">,</span> <span class="s">&#39;ivory&#39;</span><span class="p">,</span> <span class="s">&#39;purple&#39;</span><span class="p">,</span> <span class="s">&#39;green&#39;</span><span class="p">,</span> <span class="s">&#39;crimson&#39;</span><span class="p">,</span> <span class="s">&#39;grey&#39;</span><span class="p">]</span>
+<span class="n">color_winrates</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">cdrac_index</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;species&#39;</span><span class="p">)[</span><span class="s">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+<span class="nb">xrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colours</span><span class="p">))</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">color_winrates</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">xrange</span><span class="p">,</span> <span class="n">color_winrates</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+               <span class="n">color</span><span class="o">=</span><span class="n">colours</span><span class="p">,</span> <span class="n">tick_label</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
+              <span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="p">)</span>
+<span class="n">bars</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_hatch</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&#39;Win % per draconian colour&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_draconians/draconian_stats_2_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To recap: Draconians are one of the starting species in DCSS. When draconian characters hit level 7, they're randomly assigned one of 9 colours, each of which comes with a unique 'breath' ability and set of passive traits. There's some debate as to which colours are the strongest and weakest.</p>
+<p>This data certainly seems to suggest that grey draconians are the best and black are the worst. By a lot, even - a random grey draconian game from our dataset is about 3 times as likely to end in victory as a black one. But I wanted to know: could these differences just be random noise from a small sample size?</p>
+<p>To start, let's see just how many games we have for each colour.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">games</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">cdrac_index</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="n">colored_dracs</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s">&#39;games played&#39;</span><span class="p">)</span>
+<span class="n">wins</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cdrac_index</span> <span class="o">&amp;</span> <span class="n">iwon</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="n">colored_dracs</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s">&#39;games won&#39;</span><span class="p">)</span>
+<span class="n">pct</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span> <span class="o">*</span> <span class="n">wins</span><span class="o">/</span><span class="n">games</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s">&#39;win %&#39;</span><span class="p">)</span>
+<span class="n">drac_table</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">games</span><span class="p">,</span> <span class="n">wins</span><span class="p">,</span> <span class="n">pct</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">&#39;win %&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">dt2</span> <span class="o">=</span> <span class="n">drac_table</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">dt2</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">dt2</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s">&#39;object&#39;</span><span class="p">)</span>
+<span class="n">dt2</span> <span class="o">=</span> <span class="n">dt2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drac_table</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s">&#39;Overall&#39;</span><span class="p">))</span>
+<span class="n">ov</span> <span class="o">=</span> <span class="n">dt2</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">&#39;Overall&#39;</span><span class="p">]</span>
+<span class="n">ov</span><span class="p">[</span><span class="s">&#39;win %&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s">&#39;games won&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">/</span> <span class="n">ov</span><span class="p">[</span><span class="s">&#39;games played&#39;</span><span class="p">]</span>
+<span class="n">cdrac_wr</span> <span class="o">=</span> <span class="n">ov</span><span class="p">[</span><span class="s">&#39;win %&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
+<span class="k">print</span> <span class="n">dt2</span>
+<span class="c"># TODO: number formatting</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>                   games played  games won     win %
+species                                             
+grey draconian           2200.0       53.0  2.409091
+red draconian            2282.0       45.0  1.971954
+green draconian          2206.0       43.0  1.949229
+purple draconian         2174.0       36.0  1.655934
+white draconian          2222.0       36.0  1.620162
+pale draconian           2174.0       29.0  1.333947
+yellow draconian         2272.0       28.0  1.232394
+mottled draconian        2206.0       27.0  1.223935
+black draconian          2311.0       24.0  1.038511
+Overall                 20047.0      321.0  1.601237
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That's a lot of games, but the number of victories per colour is just a few dozen. So <strong>are these differences statistically significant?</strong> Let's math!</p>
+<p>Our null hypothesis here is that the probability of winning the game is equal for all draconian colours.</p>
+<h3 id="Using-the-binomial-test">Using the binomial test<a class="anchor-link" href="#Using-the-binomial-test">&#182;</a></h3><p>The <a href="https://en.wikipedia.org/wiki/Binomial_test">binomial test</a> is a nice simple place to start. It's a test that can answer questions like "how unlikely is it that a fair coin would land heads at least 15 times out of 20 tosses?", and answer them exactly. We can calculate the probability of exactly k heads as...</p>
+$$P(H=k) = \binom{20}{k} .5^{20}$$<p>So the answer to our question is just...</p>
+$$\sum_{k=15}^{20} P(H=k)$$<p>In general, the binomial test can answer any question of the form "how likely is it to get an outcome as extreme as k successes in n trials given a probability of success p?".</p>
+<p>So let's imagine the true probability of winning for any colour of draconian is just the average win rate over all colours in our sample (1.6%). Assuming this is the case, what's the chance that, when sampling ~2200 games, we get a win rate as few as 24 wins, or as many as 53?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">binom_test</span>
+
+<span class="k">def</span> <span class="nf">binom_pvalue</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="n">played</span><span class="p">,</span> <span class="n">won</span> <span class="o">=</span> <span class="n">row</span><span class="p">[[</span><span class="s">&#39;games played&#39;</span><span class="p">,</span> <span class="s">&#39;games won&#39;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">binom_test</span><span class="p">(</span><span class="n">won</span><span class="p">,</span> <span class="n">played</span><span class="p">,</span> <span class="n">cdrac_wr</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s">&#39;two-sided&#39;</span><span class="p">)</span>
+
+<span class="n">drac_table</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">binom_pvalue</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s">&#39;p-value&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[4]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>species
+grey draconian       0.004826
+red draconian        0.155936
+green draconian      0.202078
+purple draconian     0.797601
+white draconian      0.932517
+pale draconian       0.391743
+yellow draconian     0.180546
+mottled draconian    0.174336
+black draconian      0.030657
+Name: p-value, dtype: float64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>So under our null hypothesis, the chances of randomly observing a win rate as extreme as those of grey or black draconians are .5% and 3%, respectively. If we choose a typical significance level of 5%, then <strong>these are good enough to call significant</strong>. The other colours, however, don't meet that significance threshold.</p>
+<p>But there's a problem here. The chance of any given group having a significant p-value given the null hypothesis is 5%, but I tested <em>nine</em> groups. The more hypotheses I test, the greater the chance that one will produce a false positive (<a href="https://xkcd.com/882/">relevant xkcd</a>).</p>
+<p>A really simple mitigation is the <a href="https://en.wikipedia.org/wiki/Bonferroni_correction">Bonferroni correction</a>, which just cuts the significance threshold for each of n tests down to 1/nth of the desired overall significance level. With a new threshold of .05 / 9 ~= 0.006, only grey draconians' p-value makes the cut.</p>
+<p>While we were lucky enough to get a significant result here, a major problem with this method is that it's too conservative with respect to our null hypothesis. It's possible to have a situation where none of our colours differs from the overall mean with p&lt;.05, but where the probability of all the observations together given the null hypothesis is less than .05. Imagine, for example, 60 rolls of a die, with {1, 2, 3} coming up about 5 times each, and {4, 5, 6} coming up about 15 times each. Rolling 15 6's out of 60 rolls is not really enough evidence to conclude that the dice are rigged, but considering all 6 moderately weird counts together, we can be pretty confident the die isn't fair.</p>
+<p>If we really wanted to nitpick, we might also complain that the hypothesis we're testing against is stronger than it needs to be. Our original null hypothesis was just that the win rates of all draconian colours are the same, <em>not</em> that the win rates of all draconian colours are equal to the overall draconian sample mean that we measured at 1.6%.</p>
+<p>So rather than calculating grey draconians' p-value as</p>
+
+<pre><code>prob(&gt;=53 games won out of 2200 | winrate=.016)
+
+</code></pre>
+<p>What we'd really like is to take the integral of that function over all win rates <code>p</code> from 0 to 1, weighted by a suitable prior on <code>p</code> (a <a href="https://en.wikipedia.org/wiki/Beta_distribution">beta distribution</a> having α = 321, β = 20047 is a good representation of where we would expect the overall win rate to fall, given the wins and losses in our sample).</p>
+<p>It turns out this kind of compound distribution is common enough to have a name and a Wikipedia article: it's a <a href="https://en.wikipedia.org/wiki/Beta-binomial_distribution">beta-binomial distribution</a>. Neat.</p>
+<p>But this still doesn't help us with the main problem of combining p-values per colour to get a single p-value for our null hypothesis. Let's move on to the conventional test for these kinds of situations, which does address this problem.</p>
+<h3 id="The-chi-squared-test">The chi-squared test<a class="anchor-link" href="#The-chi-squared-test">&#182;</a></h3><p><a href="https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test">Pearson's chi-squared test</a> takes as input a table of the frequencies of some outcomes (e.g. winning and losing) over some categories (e.g. draconian colours), and gives us a measure of the likelihood of these observations given a hypothetical distribution (e.g. our null hypothesis that all colours having the same win rate).</p>
+<p>It's not as intuitive as the binomial test, and unlike the binomial test, it is <em>not exact</em>. It relies on the data being normally distributed, which is <a href="https://en.wikipedia.org/wiki/Binomial_distribution#Normal_approximation">asymptotically true</a> for binomially/multinomially distributed data such as ours. (That Wikipedia section gives some rules of thumb for whether the normal approximation is appropriate, which our data conform to.) There is an equivalent exact test, <a href="https://en.wikipedia.org/wiki/Fisher%27s_exact_test">Fisher's exact test</a>, but it's computationally expensive.</p>
+<p>On the other hand, a nice aspect of this test is that we don't need to worry about combining p-values from several tests, or raising our threshold to account for multiple comparisons. Whereas before we separately tested 9 hypotheses ("Do grey draconians win significantly more?", "Do purple draconians win significantly more?", ...), now we're applying one test to all the data to test one hypothesis: are there any significant differences in win rate among colours?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">chi2_contingency</span>
+
+<span class="n">chi2</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dof</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">chi2_contingency</span><span class="p">(</span>
+    <span class="n">drac_table</span><span class="p">[</span> <span class="p">[</span><span class="s">&#39;games played&#39;</span><span class="p">,</span> <span class="s">&#39;games won&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;chi^2 = {}</span><span class="se">\t</span><span class="s">p-value = {}</span><span class="se">\t</span><span class="s">degrees of freedom={}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chi2</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">dof</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>chi^2 = 21.682640495	p-value = 0.00553897436172	degrees of freedom=8
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Significant! <strong>There's likely a real difference in win rate among colours.</strong></p>
+<p>But this doesn't tell us <em>which</em> groups differ significantly from the overall mean, or which pairs of colours differ significantly from one another. For the former, the p-values per colour that we calculated previously probably serve as a pretty good key to sort on. But the latter is tricky to do in a principled way.</p>
+<h3 id="Comparing-colours-pair-wise">Comparing colours pair-wise<a class="anchor-link" href="#Comparing-colours-pair-wise">&#182;</a></h3><p>A <a href="https://people.richland.edu/james/lecture/m113/two_proportions.html">z-test</a> is a simple way to test whether two samples of some event frequencies differ in proportion. Like the chi-square test, it takes advantage of the normal approximation of binomial data. Let's use it to compare grey dragons with their lesser siblings.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="k">def</span> <span class="nf">z_test</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">x1</span><span class="o">/</span><span class="n">n1</span>
+    <span class="n">p2</span> <span class="o">=</span> <span class="n">x2</span><span class="o">/</span><span class="n">n2</span>
+    <span class="n">pbar</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span><span class="o">+</span><span class="n">x2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">n1</span><span class="o">+</span><span class="n">n2</span><span class="p">)</span>
+    <span class="n">qbar</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">pbar</span><span class="p">)</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">-</span> <span class="n">p2</span>
+    <span class="n">denom</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pbar</span> <span class="o">*</span> <span class="n">qbar</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">n1</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="n">n2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">numerator</span><span class="o">/</span><span class="n">denom</span>
+
+<span class="n">n1</span><span class="p">,</span> <span class="n">x1</span> <span class="o">=</span> <span class="n">drac_table</span><span class="p">[[</span><span class="s">&#39;games played&#39;</span><span class="p">,</span> <span class="s">&#39;games won&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">&#39;grey draconian&#39;</span><span class="p">]</span>
+<span class="n">std_norm</span> <span class="o">=</span> <span class="n">norm</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">ztest_pvalue</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="n">n2</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">row</span><span class="p">[[</span><span class="s">&#39;games played&#39;</span><span class="p">,</span> <span class="s">&#39;games won&#39;</span><span class="p">]]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z_test</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">std_norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">))</span> <span class="o">*</span> <span class="mi">2</span> <span class="c"># times 2 for 2-tailed test. Which I assume is appropriate.</span>
+
+<span class="n">drac_table</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">ztest_pvalue</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s">&#39;p-value&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt output_prompt">Out[6]:</div>
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>species
+grey draconian       1.000000
+red draconian        0.317117
+green draconian      0.295831
+purple draconian     0.077734
+white draconian      0.061783
+pale draconian       0.008760
+yellow draconian     0.003179
+mottled draconian    0.003220
+black draconian      0.000382
+Name: p-value, dtype: float64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's start with the easy conclusions. If we wish to keep using a significance level of 5% (i.e. mistakenly reject the null hypothesis no more than 5% of the time), then we do not have sufficient evidence to conclude that grey draconians are significantly better than red, green, purple, or white draconians. Or grey draconians, I guess.</p>
+<p>Can we conclude that pale, yellow, mottled and black draconians are all worse than grey? Unfortunately the problem of multiple comparisons rears its head again, and even dividing our p-value threshold by 9 isn't enough to save us this time, because I've committed a new crime: <a href="https://en.wikipedia.org/wiki/Testing_hypotheses_suggested_by_the_data">Testing hypotheses suggested by the data</a>.</p>
+<p>The decision to fix grey as the colour to compare all others against wasn't arbitrary. I chose that colour because I saw it had the highest win rate.</p>
+<p>In some sense, my p-values should probably be adjusted according to the number of tests I'd need to do to find a given effect <em>without being guided by snooping the data</em>. So perhaps I need to go as far as dividing my threshold by the number of all possible pairs?</p>
+<p>Let's give it a shot, applying the slightly more powerful <a href="https://en.wikipedia.org/wiki/Holm%E2%80%93Bonferroni_method">Holm-Bonferroni method</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="k">def</span> <span class="nf">ztest_pair_pvalue</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="n">n1</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">n2</span><span class="p">,</span> <span class="n">x2</span> <span class="o">=</span> <span class="n">row</span><span class="p">[[</span><span class="s">&#39;games played_x&#39;</span><span class="p">,</span> <span class="s">&#39;games won_x&#39;</span><span class="p">,</span> <span class="s">&#39;games played_y&#39;</span><span class="p">,</span> <span class="s">&#39;games won_y&#39;</span><span class="p">]]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">z_test</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">std_norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">))</span> <span class="o">*</span> <span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">holm_bonferonni</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mo">05</span>
+    <span class="n">rank</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">row</span><span class="p">[[</span><span class="s">&#39;rank&#39;</span><span class="p">,</span> <span class="s">&#39;p&#39;</span><span class="p">]]</span>
+    <span class="n">thresh</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">/</span> <span class="p">(</span><span class="n">m</span><span class="o">-</span><span class="n">rank</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">thresh</span>
+
+<span class="n">drac1</span> <span class="o">=</span> <span class="n">drac_table</span><span class="p">[[</span><span class="s">&#39;games played&#39;</span><span class="p">,</span> <span class="s">&#39;games won&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">drac1</span><span class="p">[</span><span class="s">&#39;tmp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">drac1</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">drac_table</span><span class="o">.</span><span class="n">index</span>
+<span class="n">drac2</span> <span class="o">=</span> <span class="n">drac1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">pairs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">drac1</span><span class="p">,</span> <span class="n">drac2</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">&#39;tmp&#39;</span><span class="p">)</span>
+<span class="c"># One row for each distinct pair with non-identical species</span>
+<span class="n">iuniq</span> <span class="o">=</span> <span class="n">pairs</span><span class="p">[</span><span class="s">&#39;species_x&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">pairs</span><span class="p">[</span><span class="s">&#39;species_y&#39;</span><span class="p">]</span>
+<span class="n">pairs</span> <span class="o">=</span> <span class="n">pairs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iuniq</span><span class="p">]</span>
+<span class="n">paired_p</span> <span class="o">=</span> <span class="n">pairs</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">ztest_pair_pvalue</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s">&#39;p&#39;</span><span class="p">)</span>
+<span class="n">paired_p</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">paired_p</span> <span class="o">=</span> <span class="n">paired_p</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="n">paired_p</span><span class="p">[</span><span class="s">&#39;rank&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paired_p</span><span class="p">))</span>
+<span class="n">paired_p</span><span class="p">[</span><span class="s">&#39;thresh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">paired_p</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">holm_bonferonni</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">paired_p</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">pairs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">paired_p</span><span class="o">.</span><span class="n">index</span><span class="p">][[</span><span class="s">&#39;species_x&#39;</span><span class="p">,</span> <span class="s">&#39;species_y&#39;</span><span class="p">]]</span>
+<span class="n">under</span> <span class="o">=</span> <span class="n">paired_p</span><span class="p">[</span><span class="s">&#39;p&#39;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">paired_p</span><span class="p">[</span><span class="s">&#39;thresh&#39;</span><span class="p">]</span>
+<span class="k">print</span> <span class="s">&quot;Significant pairs...</span><span class="se">\n</span><span class="s">&quot;</span>
+<span class="k">print</span> <span class="n">pairs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">under</span><span class="p">[</span><span class="n">under</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">][[</span><span class="s">&#39;species_x&#39;</span><span class="p">,</span> <span class="s">&#39;species_y&#39;</span><span class="p">]]</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Significant pairs...
+
+          species_x       species_y
+72  black draconian  grey draconian
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As it turns out, <strong>(black, grey) is the only pair whose difference we can be confident about</strong>.</p>
+<p>(Holm-)Bonferroni has the nice properties of being simple and working everywhere, but it can be overly conservative. There seem to be some more powerful methods tailored to this specific problem, which use the <a href="https://en.wikipedia.org/wiki/Studentized_range_distribution">Studentized range distribution</a>, but they're tricky.</p>
+<h2 id="Dredging-vs.-spear-fishing">Dredging vs. spear-fishing<a class="anchor-link" href="#Dredging-vs.-spear-fishing">&#182;</a></h2><p>The reason we're needing to apply such harsh penalties to our p-values is that we're <a href="https://en.wikipedia.org/wiki/Data_dredging">data dredging</a>. We're exhaustively checking all possible relationships, and the more comparisons we do, the more stringent we need to be about the p-value of any particular test.</p>
+<p>Therefore, an attractive alternative is to test a smaller number of targeted hypotheses formed <em>before</em> looking at the data, based on some prior knowledge of the domain. I looked at a few forum posts about draconian colours...</p>
+<ul>
+<li><a href="https://crawl.develz.org/tavern/viewtopic.php?f=5&amp;t=10176&amp;p=140405">Rank the draconian colors</a></li>
+<li><a href="https://crawl.develz.org/tavern/viewtopic.php?f=17&amp;t=19271&amp;p=261183">Tier list: Draconian colors</a></li>
+<li><a href="https://crawl.develz.org/tavern/viewtopic.php?f=8&amp;t=20683&amp;p=279050">Buff certain draconian colors</a></li>
+</ul>
+<p>and took five posts that assessed all nine colours, and roughly translated them into grades of low/medium/high. There was a lot of disagreement, but Yellow was clearly the worst ranked (5/5 low ratings), and Red the best (4 high ratings, 1 medium). This suggests a single hypothesis to test: <strong>are red draconians better than yellow?</strong></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="k">print</span> <span class="s">&#39;p = {:.4f}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">paired_p</span><span class="p">[</span><span class="s">&#39;p&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">pairs</span><span class="p">[</span><span class="s">&#39;species_x&#39;</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;red draconian&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">pairs</span><span class="p">[</span><span class="s">&#39;species_y&#39;</span><span class="p">]</span><span class="o">==</span><span class="s">&#39;yellow draconian&#39;</span><span class="p">)]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>p = 0.0469
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Yes.</strong> The wisdom of the masses prevails! (With p &lt; .05)</p>
+<p>And actually, we can cut that measured p-value in half, because we're doing a one-tailed test. That is, we're testing the hypothesis that red's win rate is significantly <em>better than</em> yellow's, not just significantly different from it.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Error-bars">Error bars<a class="anchor-link" href="#Error-bars">&#182;</a></h2><p>Finally, let's see if we can stick some error bars on our chart. I'll be using 95% confidence intervals, though another valid approach would be to use the <a href="https://en.wikipedia.org/wiki/Standard_error">standard error of the mean</a>.</p>
+<p>Wikipedia describes at least <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval">seven</a> methods for calculating confidence intervals for binomial proportions. None of them have scipy oneliners, so I mopped a code snippet from on <a href="http://stackoverflow.com/a/24023800/262271">StackOverflow</a>. (It implements the <a href="https://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval#Wilson_score_interval">Wilson score interval</a>).</p>
+<p>Let's use it to calculate 95% confidence intervals for each win rate, and plot them as error bars.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">bin_conf</span> <span class="kn">import</span> <span class="n">binconf</span>
+
+<span class="n">err_low</span> <span class="o">=</span> <span class="n">drac_table</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">binconf</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;games won&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;games played&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;games won&#39;</span><span class="p">]),</span> <span class="n">c</span><span class="o">=.</span><span class="mi">95</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">err_high</span> <span class="o">=</span> <span class="n">drac_table</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">binconf</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;games won&#39;</span><span class="p">],</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;games played&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">row</span><span class="p">[</span><span class="s">&#39;games won&#39;</span><span class="p">]),</span> <span class="n">c</span><span class="o">=.</span><span class="mi">95</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+<span class="n">cwr</span> <span class="o">=</span> <span class="n">color_winrates</span>
+<span class="c"># matplotlib wants offsets, not positions</span>
+<span class="n">err_low</span> <span class="o">=</span> <span class="n">color_winrates</span> <span class="o">-</span> <span class="n">err_low</span><span class="p">[</span><span class="n">cwr</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+<span class="n">err_high</span> <span class="o">=</span> <span class="n">err_high</span><span class="p">[</span><span class="n">cwr</span><span class="o">.</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">color_winrates</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">colours</span> <span class="o">=</span> <span class="p">[(</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span><span class="o">.</span><span class="mi">2</span><span class="p">),</span> <span class="s">&#39;pink&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">.</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="s">&#39;aliceblue&#39;</span><span class="p">,</span> <span class="s">&#39;ivory&#39;</span><span class="p">,</span> <span class="s">&#39;purple&#39;</span><span class="p">,</span> <span class="s">&#39;green&#39;</span><span class="p">,</span> <span class="s">&#39;crimson&#39;</span><span class="p">,</span> <span class="s">&#39;grey&#39;</span><span class="p">]</span>
+<span class="n">cdrac_index</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">colored_dracs</span><span class="p">)</span>
+<span class="n">color_winrates</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">cdrac_index</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;species&#39;</span><span class="p">)[</span><span class="s">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+<span class="nb">xrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colours</span><span class="p">))</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">color_winrates</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">xrange</span><span class="p">,</span> <span class="n">color_winrates</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+               <span class="n">color</span><span class="o">=</span><span class="n">colours</span><span class="p">,</span> <span class="n">tick_label</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
+              <span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">yerr</span><span class="o">=</span><span class="p">[</span><span class="n">err_low</span><span class="p">[</span><span class="n">color_winrates</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">err_high</span><span class="p">[</span><span class="n">color_winrates</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">],</span>
+              <span class="p">)</span>
+<span class="n">bars</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_hatch</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&#39;Win rate per draconian colour (with 95</span><span class="si">% c</span><span class="s">onfidence intervals)&#39;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;y&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_draconians/draconian_stats_17_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>These (pretty huge) error bars span a range that we can be 95% confident contains the true win rate for a given colour.</p>
+<p>These are useful for guiding our intuition about how much uncertainty we have about each measurement, though we can't really use them to make any rigorous claims about which pairs are significantly different.</p>
+<p>It's tempting to assume that two colours differ with p &lt; .05 if-and-only-if their confidence intervals fail to overlap, but that doesn't hold up. The probability that black's win rate is outside the C.I. is 5%, same for grey. If grey and black are to have the same win rate, then <em>both</em> those unlikely things need to happen (or one of their win rates needs to be <em>way</em> outside the confidence interval). C.I.'s failing to overlap is at least a sufficient condition to conclude that two means are (<em>very</em>) likely to be different, but that's not taking into account multiple comparisons.</p>
+<h2 id="Conclusions">Conclusions<a class="anchor-link" href="#Conclusions">&#182;</a></h2><p>From these experiments, a really anal-retentive statistician would probably be willing to accept the following conclusions:</p>
+<ul>
+<li>Grey draconians are better than black draconians.</li>
+<li>Red draconians are better than yellow draconians.</li>
+</ul>
+<p>(We also separately showed that draconian colour is not independent of win rate, though this is implied by either of the two claims above.)</p>
+<p>We could reasonably intuit some more claims about the data ("grey draconians are better than mottled", "pale draconians aren't the best colour"), but it's surprisingly difficult to make sound statistical arguments for some seemingly obvious patterns.</p>
+<p>It's interesting to compare the statistics with the opinions players gave on the forums. Yellow, the only colour that got consistently bad ratings, did turn out to have a low win rate, and Red, the colour with the most consistently positive ratings, did have a high win rate. On the other hand:</p>
+<ul>
+<li>None of the five posters I reviewed put grey draconians in their top bracket. They were consistently rated in the middle or just above the middle.</li>
+<li>No-one put black draconians in their bottom bracket. Three posters rated them below average, and two rated them above average.</li>
+</ul>
+
+</div>
+</div>
+</div>
+ 
+

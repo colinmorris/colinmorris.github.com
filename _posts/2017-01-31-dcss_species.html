@@ -1,0 +1,3089 @@
+---
+layout: notebook-post
+title: "Data Crawl Stone Soup: analyzing species in DCSS"
+---
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>I recently got back into <a href="https://crawl.develz.org/">Dungeon Crawl Stone Soup</a>, a charming old-school roguelike. Not only is DCSS free and open source, it's a gift to an armchair data scientist like me, since it has a lot of publicly available gameplay data. Each completed game yields a 'morgue' file, which gives lots of information about the game, like what level the player reached, which god they worshipped, what was in their inventory, and so on. <a href="http://crawl.akrasiac.org/rawdata/scone/morgue-scone-20161225-013224.txt">Here's</a> an example from one of my games.</p>
+<p>I downloaded all the morgue files from one popular DCSS server, <a href="http://crawl.akrasiac.org/">http://crawl.akrasiac.org/</a>, and parsed out about a million games. My code is available on GitHub <a href="https://github.com/colinmorris/crawl-coroner">here</a>.</p>
+<p>In this notebook, I'll be doing some analysis involving the 26* different species that players choose from when starting a game.</p>
+<p>*(This data spans 10 major versions, from 0.10 to 0.20, some of which added or removed species. I'm including all extant species in the most recent release, 0.19. This excludes species removed between 0.10 and 0.19 like sludge elves, and experimental species like lava orcs and barachians. It includes high elves, even though they're set to be removed in 0.20.)</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">vis_common</span> <span class="kn">import</span> <span class="n">load_frame</span><span class="p">,</span> <span class="n">STORE</span>
+<span class="kn">from</span> <span class="nn">crawl_data</span> <span class="kn">import</span> <span class="n">CANON_SPECIES</span>
+<span class="kn">from</span> <span class="nn">plotting_helpers</span> <span class="kn">import</span> <span class="n">xlabel_pct</span><span class="p">,</span> <span class="n">ylabel_pct</span><span class="p">,</span> <span class="n">plot_percent</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">IPython.core.display</span> <span class="kn">as</span> <span class="nn">di</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="n">load_frame</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;saw_temple&#39;</span><span class="p">,</span> <span class="s">&#39;saw_lair&#39;</span><span class="p">,</span> <span class="s">&#39;saw_vaults&#39;</span><span class="p">,</span> <span class="s">&#39;saw_zot&#39;</span><span class="p">])</span>
+<span class="k">print</span> <span class="s">&quot;Loaded data frame with {} records and {} columns&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+
+<span class="c"># Some reusable indices. These are just boolean arrays I can use to index into my data</span>
+<span class="c"># frame to get games that were lost, or won, or quit</span>
+<span class="n">ilost</span> <span class="o">=</span> <span class="n">STORE</span><span class="p">[</span><span class="s">&#39;ilost&#39;</span><span class="p">]</span>
+<span class="n">iwon</span> <span class="o">=</span> <span class="n">STORE</span><span class="p">[</span><span class="s">&#39;iwon&#39;</span><span class="p">]</span>
+<span class="n">iquit</span> <span class="o">=</span> <span class="n">STORE</span><span class="p">[</span><span class="s">&#39;iquit&#39;</span><span class="p">]</span>
+
+<span class="n">species</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">categories</span>
+<span class="n">drac_species</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">species</span> <span class="k">if</span> <span class="s">&#39;draconian&#39;</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">]</span>
+<span class="n">idrac</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">drac_species</span><span class="p">)</span>
+<span class="n">colored_dracs</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">drac_species</span> <span class="k">if</span> <span class="n">sp</span> <span class="o">!=</span> <span class="s">&#39;draconian&#39;</span><span class="p">]</span>
+<span class="n">cdrac_index</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">colored_dracs</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_original_species</span><span class="p">(</span><span class="n">sp</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&#39;draconian&#39;</span> <span class="k">if</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">drac_species</span> <span class="k">else</span> <span class="n">sp</span>
+    
+<span class="c"># The draconian species presents a little problem. When draconians hit level 7, they </span>
+<span class="c"># get a random colour, and their species label changes accordingly. We&#39;d rather lump</span>
+<span class="c"># black/red/green/baby draconians all into one species, or we&#39;ll get some funny results.</span>
+<span class="c"># (For example, the win rate for coloured draconians is very high, because of the survivor</span>
+<span class="c"># bias. On the other hand, baby draconians win 0% of the time, because it&#39;s basically </span>
+<span class="c"># impossible to win the game before level 7.)</span>
+<span class="n">f</span><span class="p">[</span><span class="s">&#39;orig_species&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">get_original_species</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Loaded data frame with 1295053 records and 16 columns
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Pick-rate">Pick rate<a class="anchor-link" href="#Pick-rate">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">pr</span> <span class="o">=</span> <span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">))</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_percent</span><span class="p">(</span><span class="n">pr</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Pick rate by species (</span><span class="si">% o</span><span class="s">f games)&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">8</span><span class="p">));</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">&#39;</span><span class="si">% o</span><span class="s">f all games picked&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_3_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The most surprising thing here to me was just how much demonspawn exceed every other species in popularity. They're almost twice as popular as the second-place species, with an absolute difference of around 40,000 games.</p>
+<p>The popularity of minotaurs and deep elves isn't too surprising, since they're the archetypal melee fighter and caster species, respectively. There's maybe some tendency for species with complex mechanics or heavy restrictions to be less popular, but there are lots of exceptions. (Halflings are very vanilla, and unpopular, and mummies, spriggans, and octopodes are weird but popular)</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Win-rate">Win rate<a class="anchor-link" href="#Win-rate">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[25]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">wr</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)[</span><span class="s">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_percent</span><span class="p">(</span><span class="n">wr</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&#39;Win rate by species&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;x&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_6_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There's quite a lot of variation here. A random deep dwarf game is 10x as likely to be won as a random octopode game. What makes good species good and bad species bad? I'm going to focus on the two extremes cases to start.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Why-do-deep-dwarves-win-so-much?">Why do deep dwarves win so much?<a class="anchor-link" href="#Why-do-deep-dwarves-win-so-much?">&#182;</a></h2><h3 id="Hypothesis-1:-Pakellas-abuse">Hypothesis 1: Pakellas abuse<a class="anchor-link" href="#Hypothesis-1:-Pakellas-abuse">&#182;</a></h3><p>When I showed these results to a friend who plays DCSS, he suggested that maybe this was an effect of the god Pakellas being overpowered. Deep dwarves would benefit disproportionately from worshipping Pakellas because of their high evocation aptitude, and the ability to recharge Heal wounds wands to overcome their lack of HP regeneration.</p>
+<p>Pakellas was added in 0.18 and removed in 0.19, so if this is the reason, we would expect their win rate to be higher in version 0.18, and for most of their wins to come from that version.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[26]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">idd</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;deep dwarf&#39;</span> <span class="c"># reusable index</span>
+<span class="n">dd_winr</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">idd</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;version&#39;</span><span class="p">)[</span><span class="s">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">dd_plays</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">idd</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;version&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">plot_percent</span><span class="p">(</span><span class="n">dd_winr</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&quot;Win rate&quot;</span><span class="p">)</span>
+<span class="n">dd_plays</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">&quot;Games played&quot;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_9_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Nope!</strong> Their win rate is actually kinda low in 0.18. Well what if most of these DDs are secretly bots?</p>
+<h3 id="Hypothesis-2:-Deep-Dwarf-bots">Hypothesis 2: Deep Dwarf bots<a class="anchor-link" href="#Hypothesis-2:-Deep-Dwarf-bots">&#182;</a></h3><p>It turns out that, as crushingly difficult as DCSS is, there exists at least one bot that can beat it. Elliptic's <a href="https://github.com/elliptic/qw">qw</a> bot can apparently win 15% of games with its best combination, Deep Dwarf(!) fighter of Makhleb.</p>
+<p>qw leaves some distinctive patterns in the notes section. By looking for them, I was able to positively id on the order of 10,000 bot games. Those games are excluded from the data I'm analyzing here, but I can't be totally certain there don't exist other bots, or variants of qw that don't leave these patterns.</p>
+<p>One hallmark of bots is that they play really fast. Let's plot turns taken against wallclock time, and see if there's a noticeable difference between DDs and non-DDs.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[27]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">s</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.3</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">250</span>
+<span class="n">lw</span><span class="o">=.</span><span class="mi">5</span>
+<span class="k">def</span> <span class="nf">plot_turn_time</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">)):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iwon</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">idd</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;time&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;turns&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;red&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">&quot;s&quot;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span> <span class="n">loglog</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                      <span class="n">label</span><span class="o">=</span><span class="s">&#39;non-DD winners&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">);</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iwon</span> <span class="o">&amp;</span> <span class="n">idd</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;time&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;turns&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;blue&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;deep dwarf winners&#39;</span><span class="p">,</span>
+                      <span class="n">marker</span><span class="o">=</span><span class="s">&quot;o&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+    <span class="n">l</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">5</span><span class="o">*</span><span class="mi">10</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">5</span>
+    <span class="n">b</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Time taken vs. turns&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span>
+<span class="n">plot_turn_time</span><span class="p">();</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_11_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>(Note the log-log scale, and the truncated axes.)</p>
+<p>Looks pretty well mixed. If anything, DDs seem to be a little slower, with respect to turns taken per second.</p>
+<p>Just to make it really clear, let's load up some known bot games and add them to the mix.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[28]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">bots</span> <span class="o">=</span> <span class="n">STORE</span><span class="p">[</span><span class="s">&#39;bots&#39;</span><span class="p">]</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_turn_time</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">bots</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iwon</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">&#39;time&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">&#39;turns&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;green&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;bot winners&#39;</span><span class="p">,</span>
+                  <span class="n">marker</span><span class="o">=</span><span class="s">&quot;^&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">s</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+
+<span class="n">l</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">5</span>
+<span class="n">b</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">4</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">turns_per_second</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span class="p">]:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">l</span><span class="p">,</span> <span class="n">t</span><span class="o">/</span><span class="n">turns_per_second</span><span class="p">],</span>
+        <span class="p">[</span><span class="n">l</span><span class="o">*</span><span class="n">turns_per_second</span><span class="p">,</span> <span class="n">t</span><span class="p">],</span>
+        <span class="n">color</span><span class="o">=</span><span class="s">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_13_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The diagonal lines represent, from left to right, 16/8/4/2/1 turns taken per second. The bots are clearly in a league of their own here. When they win, they win in a small number of turns and a <em>really</em> small amount of time (I had to move the x-axis back to make that one bot with the ~20 minute time visible - it was literally off the chart).</p>
+<h3 id="Hypothesis-3:-Newb-reppelent">Hypothesis 3: Newb reppelent<a class="anchor-link" href="#Hypothesis-3:-Newb-reppelent">&#182;</a></h3><p>My best guess is just that deep dwarves are unattractive to inexperienced players. Not being able to regenerate HP is really scary. So DD games are skewed towards experienced players, who are more likely to win (no matter what species they're playing).</p>
+<p>We could try to test this directly, but it'd be tricky. Number of games played is going to be a poor approximation of level of experience, because lots of users will have played DCSS locally (or on another server, or under another username), before playing their first CAO game.</p>
+<p>But this hypothesis is at least partially supported by the earlier chart of species pick rate, which showed DDs as the 4th least picked species. Does a general relationship hold between a species' popularity and its win rate? Let's make a scatterplot!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[146]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="kn">from</span> <span class="nn">adjustText</span> <span class="kn">import</span> <span class="n">adjust_text</span>
+<span class="n">sp</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">index</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">wr</span><span class="p">[</span><span class="n">sp</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">pr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">species</span><span class="p">],</span> <span class="n">wr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">species</span><span class="p">],</span> <span class="n">species</span><span class="p">)</span> <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="n">sp</span><span class="p">]</span>
+<span class="n">adjust_text</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">5</span><span class="p">),</span> <span class="n">force_points</span><span class="o">=.</span><span class="mi">7</span><span class="p">,</span> <span class="n">force_text</span><span class="o">=.</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Pick rate vs. Win rate&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">&#39;Pick rate&#39;</span><span class="p">)</span>
+<span class="n">xlabel_pct</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">&#39;Win rate&#39;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.025</span><span class="p">)</span>
+<span class="n">ylabel_pct</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_15_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>There does seem to be a weak correlation here. Demonspawn, the most played class, has a poor win rate. Octopodes, the species with the lowest win rate, is in the top 5 most picked. Centaurs, ghouls, and deep dwarves are very unpopular and win a lot.</p>
+<p>The two big exceptions are minotaurs and gargoyles, which are very popular and have a high win rate.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Why-do-octopodes-suck?">Why do octopodes suck?<a class="anchor-link" href="#Why-do-octopodes-suck?">&#182;</a></h2><p>At around 1 in 400, octopodes have the lowest win rate of any species.</p>
+<p>We could make the claim that, whereas DDs are a newb repellent, Octopodes are a newb magnet. "8 rings? Cool!". And they are quite popular.</p>
+<p>But let's try to dig a bit deeper. How and when do octopodes meet their demise?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Kinda slow. Probably a more efficient way to do this, without looping. </span>
+<span class="c"># I wish the pandas group by documentation was better.</span>
+<span class="n">dr_given_level</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ioct</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;octopode&#39;</span>
+<span class="k">for</span> <span class="n">lvl</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">):</span>
+    <span class="n">dr_given_level</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="o">~</span><span class="n">ioct</span> <span class="o">&amp;</span> <span class="n">ilost</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;level&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">lvl</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> 
+                          <span class="p">(</span><span class="mf">0.0</span><span class="o">+</span><span class="p">(</span><span class="o">~</span><span class="n">ioct</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;level&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lvl</span><span class="p">))</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="p">)</span>
+<span class="c"># TODO: download more RAM</span>
+<span class="kn">import</span> <span class="nn">gc</span><span class="p">;</span> <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+<span class="n">oc_dr_given_level</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">lvl</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">):</span>
+    <span class="n">oc_dr_given_level</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="p">(</span><span class="n">ilost</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;level&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">lvl</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">ioct</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> 
+                          <span class="p">(</span><span class="mf">0.0</span><span class="o">+</span><span class="p">((</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;level&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lvl</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">ioct</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span> <span class="p">)</span>
+<span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">();</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[134]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">common_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">28</span><span class="p">),</span> <span class="n">dr_given_level</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;brown&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;non-octopodes&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">common_kwargs</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">28</span><span class="p">),</span> <span class="n">oc_dr_given_level</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;octopodes&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">common_kwargs</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">27.25</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span class="n">ylabel_pct</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Given that you just reached player level X, what&#39;s your chance of dying there?&quot;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;both&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_19_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The first three levels are about as deadly for octopodes as for anyone else. But the death rate diverges massively at level 4 and doesn't equalize until the mid to late teens. It takes a long time to fill 8 ring slots!</p>
+<p>(Aside: The huge bump at level 11, and the lesser one around 16/17 are both interesting. I think the first bump corresponds to when most players enter the lair, and the second corresponds to when players start venturing into rune branches. I'll go into more of this stuff in another post.)</p>
+<p>This suggests octopodes are pretty decent in the mid-to-late game, but frequently die before they can get there.</p>
+<p>The dramatic jump at level 27 makes sense. Because it's the level cap, players spend a lot more time at level 27 than they do at any other level, so it presents a lot more opportunities to die.</p>
+<p>What's less clear is why level 27 is almost 5% more deadly for octopodes, after they managed to stay about even with other species since the mid-to-late teens. Aren't octopodes a good late game species?</p>
+<p>Maybe too late-game for their own good!</p>
+<h3 id="Ambitious-octopodes">Ambitious octopodes<a class="anchor-link" href="#Ambitious-octopodes">&#182;</a></h3><p>One factor that may affect a species' win rate is the rate at which they tend to seek more than 3 runes. Let's see how often each species goes into the extended game.</p>
+<p>In particular, let's measure: given that a player of species X earned 3 runes, how likely were they to continue on to earn more than 5 runes?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[136]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">extended</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;nrunes&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="p">(</span><span class="n">extended</span> <span class="o">/</span> <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;nrunes&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">())</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>\
+ <span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">&#39;</span><span class="si">% o</span><span class="s">f games electing to go into extended&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">));</span>
+<span class="n">xlabel_pct</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;x&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_21_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Well, I'm starting to understand octopodes' abysmal win rate. They die like goldfish for most of the early-to-mid game, and when they do manage to get their tentacles on 3 runes, half the time they continue on to the most dangerous branches in the game. Presumably there are lots of octopodes who <em>could</em> have easily won with 3 runes, but ended up as an ink-blot on the floor of pandemonium.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[33]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">octo_death_places</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ilost</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;octopode&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;level&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">24</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;wheredied&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">octo_death_places</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;octopodes&#39;</span>
+<span class="n">human_death_places</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">ilost</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;species&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;kobold&#39;</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;level&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">24</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;wheredied&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">human_death_places</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;kobolds&#39;</span>
+<span class="n">dp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">octo_death_places</span><span class="p">,</span> <span class="n">human_death_places</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;Where do octopodes/kobolds die after level 24?&quot;</span>
+<span class="k">print</span> <span class="n">dp</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">dp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">&#39;octopodes&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Where do octopodes/kobolds die after level 24?
+               octopodes  kobolds
+wheredied                        
+ziggurat              32        8
+pits of slime         28       17
+realm of zot          23       55
+pandemonium           22       15
+tomb                  16        9
+vaults                15       28
+depths                11       20
+dungeon                7        5
+abyss                  6       12
+crypt                  4        7
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A higher % of kobolds who make it to level 25 will win than octopodes, but the kobolds who fail to win from that position mostly die in Zot trying to get the orb. The octopodes who fail to win from that point mostly die in exotic extended game locales like ziggurats.</p>
+<h2 id="Controlling-for-number-of-runes-sought">Controlling for number of runes sought<a class="anchor-link" href="#Controlling-for-number-of-runes-sought">&#182;</a></h2><p>It seems like the variation in ambition across species makes our table of win rates harder to interpret. Let's try to control for this. What's the win rate for each species, <em>in a world where players always go for just 3 runes</em>?</p>
+<p>We can calculate this counterfactual as:</p>
+
+<pre><code>P(earning &gt;= 3 runes | species) * P(success | species, trying to win with 3 runes)
+
+</code></pre>
+<p>The first term we can easily calculate directly from the data. The second term is more tricky: the chance of a given species winning given that they've already earned 3 runes, and given that they don't intend to get any more. It's tricky because it involves a latent variable: the player's intentions. But we can approximate it as:</p>
+
+<pre><code>#(3 rune wins | species) / 
+  (#(3 rune wins | species) + #(deaths in Zot, the depths, and the dungeon | species, 3 runes))
+
+</code></pre>
+<p>The denominator should be a pretty good approximation of the number of 3-rune win attempts by a given species. We can't just count the number of deaths by characters holding 3 runes, because that will include lots of deaths that occurred while trying to get a 4th rune in the slime pits, the abyss, etc. We only want to count deaths that occurred while diving down to Zot to get the orb, or while ascending back up to D:1 with the orb.</p>
+<p>(This may slightly undercount, since some 3 rune win attempts may end in the Vaults/Shoals/Swamp/etc. whilst trying to get back up to the dungeon with the third rune, especially if it was "ninja'd". They may also occasionally end in the abyss as a result of being banished on the way to the orb.)</p>
+<p>Here's a graph just showing the value of that second term for each species:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[137]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">geq_three_runes</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;nrunes&#39;</span><span class="p">]</span><span class="o">&gt;=</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+<span class="n">three_rune_wins</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">iwon</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;nrunes&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">3</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">three_rune_deathspots</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;dungeon&#39;</span><span class="p">,</span> <span class="s">&#39;realm of zot&#39;</span><span class="p">,</span> <span class="s">&#39;depths&#39;</span><span class="p">]</span>
+<span class="n">three_rune_win_attempts</span> <span class="o">=</span> <span class="p">(</span><span class="n">three_rune_wins</span> <span class="o">+</span> 
+    <span class="n">f</span><span class="p">[(</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;nrunes&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">f</span><span class="p">[</span><span class="s">&#39;wheredied&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">three_rune_deathspots</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">())</span>
+
+<span class="n">zot_success</span> <span class="o">=</span> <span class="n">three_rune_wins</span> <span class="o">/</span> <span class="n">three_rune_win_attempts</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plot_percent</span><span class="p">(</span><span class="n">zot_success</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> 
+             <span class="n">title</span><span class="o">=</span><span class="s">&quot;What </span><span class="si">% o</span><span class="s">f 3-rune win attempts succeed, once 3 runes are earned?&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;y&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">3</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_25_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A pretty small spread, relatively speaking. Let's see the full adjusted win rates.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[140]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">adjusted_wr</span> <span class="o">=</span> <span class="p">(</span><span class="n">geq_three_runes</span> <span class="o">/</span> <span class="n">f</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">*</span> <span class="n">zot_success</span>
+<span class="n">wr2</span> <span class="o">=</span> <span class="n">wr</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">))</span>
+<span class="n">x</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wr2</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">wr2</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Raw win rate&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">adjusted_wr</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">wr2</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Adjusted win rate&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;crimson&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-.</span><span class="mi">8</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-.</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">wr2</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">xlabel_pct</span><span class="p">(</span><span class="n">ax</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_27_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The new red bars represent each species' hypothetical win rate if players always tried to win as soon as they had 3 runes. In some sense, this should be a fairer measure by which to compare species' power.</p>
+<p>Popular 15-rune species like gargoyles and especially formicids go up a few ranks. For species like felids and vampires that were already doing mostly 3-rune runs, the adjusted win rate is not much higher than their raw win rate, so they drop a few ranks.</p>
+<p>Relative to their original win rate, octopodes get a pretty big bump (their 3-rune win rate is the 7th highest), but they're still a solid dead last. It looks like it's their early game fragility that accounts for their low win rate, more so than their tendency to go for 15 runes.</p>
+<h2 id="Win-rates-at-different-stages-of-the-game">Win rates at different stages of the game<a class="anchor-link" href="#Win-rates-at-different-stages-of-the-game">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">w</span> <span class="o">=</span> <span class="o">.</span><span class="mi">8</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">temple_wr</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;saw_temple&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)[</span><span class="s">&#39;won&#39;</span><span class="p">]</span> <span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()[</span><span class="n">wr</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">color</span> <span class="ow">in</span> <span class="p">[(</span><span class="s">&#39;made it to temple&#39;</span><span class="p">,</span> <span class="n">temple_wr</span><span class="p">,</span> <span class="s">&#39;pink&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;baseline&#39;</span><span class="p">,</span> <span class="n">wr</span><span class="p">,</span> <span class="s">&#39;brown&#39;</span><span class="p">)]:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">)),</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="n">w</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">wr</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wr</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">wr</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">xlabel_pct</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Base win rate vs. win rate at temple&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s">&#39;x&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_29_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The brown bars here are our familiar win-rates from before, but the pink bars are new: they show what % of games each species wins <em>given that it reaches the ecumenical temple</em>.</p>
+<p>A disproportionately small pink bar (like the one on trolls), suggests that this species has a strong early game. Getting to the temple doesn't much increase their chance of winning, because they were expecting to make it to the temple. A large pink bar (e.g. ghoul, naga), suggests that going from D:1 to the temple is a significant filter for this species.</p>
+<p>Let's throw in a few more milestones: the lair, the vaults, and the realm of zot.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[141]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">width</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">11</span><span class="p">))</span>
+<span class="n">colours</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;brown&#39;</span><span class="p">,</span> <span class="s">&#39;pink&#39;</span><span class="p">,</span> <span class="s">&#39;green&#39;</span><span class="p">,</span> <span class="s">&#39;grey&#39;</span><span class="p">,</span> <span class="s">&#39;violet&#39;</span><span class="p">]</span>
+<span class="n">branches</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;D:1&#39;</span><span class="p">,</span> <span class="s">&#39;temple&#39;</span><span class="p">,</span> <span class="s">&#39;lair&#39;</span><span class="p">,</span> <span class="s">&#39;vaults&#39;</span><span class="p">,</span> <span class="s">&#39;zot&#39;</span><span class="p">]</span>
+<span class="c"># Order species by win rate given vaults</span>
+<span class="n">sp</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;saw_vaults&#39;</span><span class="p">]</span><span class="o">==</span><span class="bp">True</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)[</span><span class="s">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+<span class="n">ranked</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">branch</span><span class="p">,</span> <span class="n">colour</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">branches</span><span class="p">,</span> <span class="n">colours</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">branch</span> <span class="o">==</span> <span class="s">&#39;D:1&#39;</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">f</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">f</span><span class="p">[</span><span class="s">&#39;saw_&#39;</span><span class="o">+</span><span class="n">branch</span><span class="p">]</span> <span class="o">==</span> <span class="bp">True</span><span class="p">]</span>
+    <span class="n">branch_wr</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;orig_species&#39;</span><span class="p">)[</span><span class="s">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()[</span><span class="n">sp</span><span class="p">]</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">barh</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">branch_wr</span><span class="o">.</span><span class="n">index</span><span class="p">)),</span> <span class="n">branch_wr</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+           <span class="n">width</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">branch</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colour</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;black&#39;</span><span class="p">,</span>
+          <span class="p">)</span>
+    <span class="n">ranked</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">branch_wr</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">ranked</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;Win rate given branch reached&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">branch_wr</span><span class="o">.</span><span class="n">index</span><span class="p">)))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-.</span><span class="mi">5</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">branch_wr</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">-.</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">(</span><span class="n">branch_wr</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">xlabel_pct</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_31_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This time species are sorted by their win rate given that the vaults are reached (the grey bars).</p>
+<p>The table below might make it easier to see how species go up and down in win rate at different stages of the game - it shows only species' ranking relative to one another.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">ranked</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">ranked</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+<span class="n">cm</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s">&#39;jet&#39;</span><span class="p">)</span>
+<span class="n">color_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ranked</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">canon_sort</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ranked</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mi">3</span>
+<span class="k">def</span> <span class="nf">color_species</span><span class="p">(</span><span class="n">sp</span><span class="p">):</span>
+    <span class="c"># I think maybe this can be accomplished with style.background_gradient, but I wrote this before seeing it.</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">canon_sort</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sp</span><span class="p">)</span>
+    <span class="n">ctup</span> <span class="o">=</span> <span class="n">cm</span><span class="p">(</span><span class="n">color_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">csstup</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="mi">255</span><span class="p">),</span> <span class="n">ctup</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="n">alpha</span><span class="p">,)</span>
+    <span class="k">return</span> <span class="s">&#39;;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;background-color: rgba{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">csstup</span><span class="p">),</span>
+                    <span class="s">&#39;text-align: center&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;font-size: 16px&#39;</span><span class="p">,</span>
+                     <span class="s">&#39;padding: .3em, .6em&#39;</span><span class="p">,</span>
+            <span class="p">])</span>
+                              
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">ranked</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">branches</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">style</span>\
+    <span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="n">color_species</span><span class="p">)</span>\
+    <span class="o">.</span><span class="n">set_caption</span><span class="p">(</span><span class="s">&#39;Species ranked by win rate given milestone reached&#39;</span><span class="p">)</span>
+
+<span class="c"># Hack to avoid obscure rendering issues with the HTML generated by </span>
+<span class="c"># pandas&#39; style.render() (not XHTML compliant) and kramdown</span>
+<span class="kn">from</span> <span class="nn">BeautifulSoup</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span> <span class="k">as</span> <span class="n">BS</span>
+<span class="k">def</span> <span class="nf">sanitize_style</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="n">soup</span> <span class="o">=</span> <span class="n">BS</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">soup</span><span class="o">.</span><span class="n">prettify</span><span class="p">()</span>
+    
+<span class="n">di</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">di</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">sanitize_style</span><span class="p">(</span><span class="n">s</span><span class="p">)))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+<div class="output_html rendered_html output_subarea ">
+<style type="text/css">
+ #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col0 {
+            
+                background-color:  rgba(0, 0, 127, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col1 {
+            
+                background-color:  rgba(0, 0, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col2 {
+            
+                background-color:  rgba(0, 0, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col3 {
+            
+                background-color:  rgba(8, 240, 237, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col4 {
+            
+                background-color:  rgba(0, 0, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col0 {
+            
+                background-color:  rgba(0, 0, 172, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col1 {
+            
+                background-color:  rgba(0, 0, 127, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col2 {
+            
+                background-color:  rgba(0, 76, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col3 {
+            
+                background-color:  rgba(0, 0, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col4 {
+            
+                background-color:  rgba(255, 215, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col0 {
+            
+                background-color:  rgba(0, 0, 218, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col1 {
+            
+                background-color:  rgba(0, 76, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col2 {
+            
+                background-color:  rgba(8, 240, 237, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col3 {
+            
+                background-color:  rgba(0, 76, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col4 {
+            
+                background-color:  rgba(141, 255, 105, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col0 {
+            
+                background-color:  rgba(0, 0, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col1 {
+            
+                background-color:  rgba(0, 0, 218, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col2 {
+            
+                background-color:  rgba(0, 0, 218, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col3 {
+            
+                background-color:  rgba(255, 215, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col4 {
+            
+                background-color:  rgba(0, 76, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col0 {
+            
+                background-color:  rgba(0, 32, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col1 {
+            
+                background-color:  rgba(8, 240, 237, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col2 {
+            
+                background-color:  rgba(0, 0, 127, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col3 {
+            
+                background-color:  rgba(0, 0, 127, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col4 {
+            
+                background-color:  rgba(73, 255, 173, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col0 {
+            
+                background-color:  rgba(0, 76, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col1 {
+            
+                background-color:  rgba(0, 116, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col2 {
+            
+                background-color:  rgba(255, 215, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col3 {
+            
+                background-color:  rgba(237, 255, 8, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col4 {
+            
+                background-color:  rgba(237, 255, 8, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col0 {
+            
+                background-color:  rgba(0, 116, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col1 {
+            
+                background-color:  rgba(141, 255, 105, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col2 {
+            
+                background-color:  rgba(41, 255, 205, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col3 {
+            
+                background-color:  rgba(0, 0, 218, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col4 {
+            
+                background-color:  rgba(0, 156, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col0 {
+            
+                background-color:  rgba(0, 156, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col1 {
+            
+                background-color:  rgba(0, 32, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col2 {
+            
+                background-color:  rgba(0, 116, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col3 {
+            
+                background-color:  rgba(41, 255, 205, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col4 {
+            
+                background-color:  rgba(0, 0, 127, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col0 {
+            
+                background-color:  rgba(0, 196, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col1 {
+            
+                background-color:  rgba(41, 255, 205, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col2 {
+            
+                background-color:  rgba(141, 255, 105, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col3 {
+            
+                background-color:  rgba(255, 177, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col4 {
+            
+                background-color:  rgba(0, 0, 218, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col0 {
+            
+                background-color:  rgba(8, 240, 237, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col1 {
+            
+                background-color:  rgba(255, 215, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col2 {
+            
+                background-color:  rgba(237, 255, 8, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col3 {
+            
+                background-color:  rgba(73, 255, 173, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col4 {
+            
+                background-color:  rgba(41, 255, 205, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col0 {
+            
+                background-color:  rgba(41, 255, 205, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col1 {
+            
+                background-color:  rgba(73, 255, 173, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col2 {
+            
+                background-color:  rgba(0, 196, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col3 {
+            
+                background-color:  rgba(0, 196, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col4 {
+            
+                background-color:  rgba(255, 177, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col0 {
+            
+                background-color:  rgba(73, 255, 173, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col1 {
+            
+                background-color:  rgba(0, 196, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col2 {
+            
+                background-color:  rgba(73, 255, 173, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col3 {
+            
+                background-color:  rgba(0, 116, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col4 {
+            
+                background-color:  rgba(0, 196, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col0 {
+            
+                background-color:  rgba(105, 255, 141, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col1 {
+            
+                background-color:  rgba(0, 0, 172, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col2 {
+            
+                background-color:  rgba(0, 32, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col3 {
+            
+                background-color:  rgba(0, 156, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col4 {
+            
+                background-color:  rgba(8, 240, 237, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col0 {
+            
+                background-color:  rgba(141, 255, 105, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col1 {
+            
+                background-color:  rgba(237, 255, 8, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col2 {
+            
+                background-color:  rgba(205, 255, 41, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col3 {
+            
+                background-color:  rgba(141, 255, 105, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col4 {
+            
+                background-color:  rgba(105, 255, 141, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col0 {
+            
+                background-color:  rgba(173, 255, 73, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col1 {
+            
+                background-color:  rgba(205, 255, 41, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col2 {
+            
+                background-color:  rgba(255, 177, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col3 {
+            
+                background-color:  rgba(0, 32, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col4 {
+            
+                background-color:  rgba(0, 116, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col0 {
+            
+                background-color:  rgba(205, 255, 41, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col1 {
+            
+                background-color:  rgba(105, 255, 141, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col2 {
+            
+                background-color:  rgba(255, 140, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col3 {
+            
+                background-color:  rgba(172, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col4 {
+            
+                background-color:  rgba(205, 255, 41, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col0 {
+            
+                background-color:  rgba(237, 255, 8, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col1 {
+            
+                background-color:  rgba(255, 140, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col2 {
+            
+                background-color:  rgba(0, 0, 172, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col3 {
+            
+                background-color:  rgba(255, 140, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col4 {
+            
+                background-color:  rgba(255, 63, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col0 {
+            
+                background-color:  rgba(255, 215, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col1 {
+            
+                background-color:  rgba(255, 177, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col2 {
+            
+                background-color:  rgba(105, 255, 141, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col3 {
+            
+                background-color:  rgba(105, 255, 141, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col4 {
+            
+                background-color:  rgba(255, 26, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col0 {
+            
+                background-color:  rgba(255, 177, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col1 {
+            
+                background-color:  rgba(255, 63, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col2 {
+            
+                background-color:  rgba(172, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col3 {
+            
+                background-color:  rgba(205, 255, 41, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col4 {
+            
+                background-color:  rgba(255, 140, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col0 {
+            
+                background-color:  rgba(255, 140, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col1 {
+            
+                background-color:  rgba(173, 255, 73, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col2 {
+            
+                background-color:  rgba(255, 63, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col3 {
+            
+                background-color:  rgba(127, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col4 {
+            
+                background-color:  rgba(127, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col0 {
+            
+                background-color:  rgba(255, 103, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col1 {
+            
+                background-color:  rgba(172, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col2 {
+            
+                background-color:  rgba(173, 255, 73, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col3 {
+            
+                background-color:  rgba(255, 63, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col4 {
+            
+                background-color:  rgba(172, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col0 {
+            
+                background-color:  rgba(255, 63, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col1 {
+            
+                background-color:  rgba(0, 156, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col2 {
+            
+                background-color:  rgba(0, 156, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col3 {
+            
+                background-color:  rgba(0, 0, 172, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col4 {
+            
+                background-color:  rgba(255, 103, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col0 {
+            
+                background-color:  rgba(255, 26, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col1 {
+            
+                background-color:  rgba(255, 103, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col2 {
+            
+                background-color:  rgba(255, 26, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col3 {
+            
+                background-color:  rgba(255, 26, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col4 {
+            
+                background-color:  rgba(0, 0, 172, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col0 {
+            
+                background-color:  rgba(218, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col1 {
+            
+                background-color:  rgba(255, 26, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col2 {
+            
+                background-color:  rgba(255, 103, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col3 {
+            
+                background-color:  rgba(218, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col4 {
+            
+                background-color:  rgba(0, 32, 255, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col0 {
+            
+                background-color:  rgba(172, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col1 {
+            
+                background-color:  rgba(218, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col2 {
+            
+                background-color:  rgba(127, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col3 {
+            
+                background-color:  rgba(173, 255, 73, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col4 {
+            
+                background-color:  rgba(218, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col0 {
+            
+                background-color:  rgba(127, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col1 {
+            
+                background-color:  rgba(127, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col2 {
+            
+                background-color:  rgba(218, 0, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col3 {
+            
+                background-color:  rgba(255, 103, 0, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+        
+            #T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col4 {
+            
+                background-color:  rgba(173, 255, 73, 0.3);
+            
+                text-align:  center;
+            
+                font-size:  16px;
+            
+                padding:  .3em, .6em;
+            
+            }
+</style>
+<table id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" none="None">
+ <caption>
+  Species ranked by win rate given milestone reached
+ </caption>
+ <thead>
+  <tr>
+   <th class="blank level0">
+   </th>
+   <th class="col_heading level0 col0" colspan="1">
+    D:1
+   </th>
+   <th class="col_heading level0 col1" colspan="1">
+    temple
+   </th>
+   <th class="col_heading level0 col2" colspan="1">
+    lair
+   </th>
+   <th class="col_heading level0 col3" colspan="1">
+    vaults
+   </th>
+   <th class="col_heading level0 col4" colspan="1">
+    zot
+   </th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row0" rowspan="1">
+    0
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col0" class="data row0 col0">
+    deep dwarf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col1" class="data row0 col1">
+    ghoul
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col2" class="data row0 col2">
+    ghoul
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col3" class="data row0 col3">
+    naga
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row0_col4" class="data row0 col4">
+    ghoul
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row1" rowspan="1">
+    1
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col0" class="data row1 col0">
+    minotaur
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col1" class="data row1 col1">
+    deep dwarf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col2" class="data row1 col2">
+    halfling
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col3" class="data row1 col3">
+    ghoul
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row1_col4" class="data row1 col4">
+    human
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row2" rowspan="1">
+    2
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col0" class="data row2 col0">
+    centaur
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col1" class="data row2 col1">
+    halfling
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col2" class="data row2 col2">
+    naga
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col3" class="data row2 col3">
+    halfling
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row2_col4" class="data row2 col4">
+    felid
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row3" rowspan="1">
+    3
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col0" class="data row3 col0">
+    ghoul
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col1" class="data row3 col1">
+    centaur
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col2" class="data row3 col2">
+    centaur
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col3" class="data row3 col3">
+    human
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row3_col4" class="data row3 col4">
+    halfling
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row4" rowspan="1">
+    4
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col0" class="data row4 col0">
+    gargoyle
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col1" class="data row4 col1">
+    naga
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col2" class="data row4 col2">
+    deep dwarf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col3" class="data row4 col3">
+    deep dwarf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row4_col4" class="data row4 col4">
+    demigod
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row5" rowspan="1">
+    5
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col0" class="data row5 col0">
+    halfling
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col1" class="data row5 col1">
+    hill orc
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col2" class="data row5 col2">
+    human
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col3" class="data row5 col3">
+    mummy
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row5_col4" class="data row5 col4">
+    mummy
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row6" rowspan="1">
+    6
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col0" class="data row6 col0">
+    hill orc
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col1" class="data row6 col1">
+    felid
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col2" class="data row6 col2">
+    merfolk
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col3" class="data row6 col3">
+    centaur
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row6_col4" class="data row6 col4">
+    troll
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row7" rowspan="1">
+    7
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col0" class="data row7 col0">
+    troll
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col1" class="data row7 col1">
+    gargoyle
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col2" class="data row7 col2">
+    hill orc
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col3" class="data row7 col3">
+    merfolk
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row7_col4" class="data row7 col4">
+    deep dwarf
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row8" rowspan="1">
+    8
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col0" class="data row8 col0">
+    ogre
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col1" class="data row8 col1">
+    merfolk
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col2" class="data row8 col2">
+    felid
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col3" class="data row8 col3">
+    tengu
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row8_col4" class="data row8 col4">
+    centaur
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row9" rowspan="1">
+    9
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col0" class="data row9 col0">
+    naga
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col1" class="data row9 col1">
+    human
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col2" class="data row9 col2">
+    mummy
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col3" class="data row9 col3">
+    demigod
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row9_col4" class="data row9 col4">
+    merfolk
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row10" rowspan="1">
+    10
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col0" class="data row10 col0">
+    merfolk
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col1" class="data row10 col1">
+    demigod
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col2" class="data row10 col2">
+    ogre
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col3" class="data row10 col3">
+    ogre
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row10_col4" class="data row10 col4">
+    tengu
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row11" rowspan="1">
+    11
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col0" class="data row11 col0">
+    demigod
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col1" class="data row11 col1">
+    ogre
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col2" class="data row11 col2">
+    demigod
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col3" class="data row11 col3">
+    hill orc
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row11_col4" class="data row11 col4">
+    ogre
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row12" rowspan="1">
+    12
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col0" class="data row12 col0">
+    vine stalker
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col1" class="data row12 col1">
+    minotaur
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col2" class="data row12 col2">
+    gargoyle
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col3" class="data row12 col3">
+    troll
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row12_col4" class="data row12 col4">
+    naga
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row13" rowspan="1">
+    13
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col0" class="data row13 col0">
+    felid
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col1" class="data row13 col1">
+    mummy
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col2" class="data row13 col2">
+    kobold
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col3" class="data row13 col3">
+    felid
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row13_col4" class="data row13 col4">
+    vine stalker
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row14" rowspan="1">
+    14
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col0" class="data row14 col0">
+    formicid
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col1" class="data row14 col1">
+    kobold
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col2" class="data row14 col2">
+    tengu
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col3" class="data row14 col3">
+    gargoyle
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row14_col4" class="data row14 col4">
+    hill orc
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row15" rowspan="1">
+    15
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col0" class="data row15 col0">
+    kobold
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col1" class="data row15 col1">
+    vine stalker
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col2" class="data row15 col2">
+    demonspawn
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col3" class="data row15 col3">
+    high elf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row15_col4" class="data row15 col4">
+    kobold
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row16" rowspan="1">
+    16
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col0" class="data row16 col0">
+    mummy
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col1" class="data row16 col1">
+    demonspawn
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col2" class="data row16 col2">
+    minotaur
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col3" class="data row16 col3">
+    demonspawn
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row16_col4" class="data row16 col4">
+    vampire
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row17" rowspan="1">
+    17
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col0" class="data row17 col0">
+    human
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col1" class="data row17 col1">
+    tengu
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col2" class="data row17 col2">
+    vine stalker
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col3" class="data row17 col3">
+    vine stalker
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row17_col4" class="data row17 col4">
+    draconian
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row18" rowspan="1">
+    18
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col0" class="data row18 col0">
+    tengu
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col1" class="data row18 col1">
+    vampire
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col2" class="data row18 col2">
+    high elf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col3" class="data row18 col3">
+    kobold
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row18_col4" class="data row18 col4">
+    demonspawn
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row19" rowspan="1">
+    19
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col0" class="data row19 col0">
+    demonspawn
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col1" class="data row19 col1">
+    formicid
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col2" class="data row19 col2">
+    vampire
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col3" class="data row19 col3">
+    octopode
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row19_col4" class="data row19 col4">
+    octopode
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row20" rowspan="1">
+    20
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col0" class="data row20 col0">
+    spriggan
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col1" class="data row20 col1">
+    high elf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col2" class="data row20 col2">
+    formicid
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col3" class="data row20 col3">
+    vampire
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row20_col4" class="data row20 col4">
+    high elf
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row21" rowspan="1">
+    21
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col0" class="data row21 col0">
+    vampire
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col1" class="data row21 col1">
+    troll
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col2" class="data row21 col2">
+    troll
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col3" class="data row21 col3">
+    minotaur
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row21_col4" class="data row21 col4">
+    spriggan
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row22" rowspan="1">
+    22
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col0" class="data row22 col0">
+    draconian
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col1" class="data row22 col1">
+    spriggan
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col2" class="data row22 col2">
+    draconian
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col3" class="data row22 col3">
+    draconian
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row22_col4" class="data row22 col4">
+    minotaur
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row23" rowspan="1">
+    23
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col0" class="data row23 col0">
+    deep elf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col1" class="data row23 col1">
+    draconian
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col2" class="data row23 col2">
+    spriggan
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col3" class="data row23 col3">
+    deep elf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row23_col4" class="data row23 col4">
+    gargoyle
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row24" rowspan="1">
+    24
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col0" class="data row24 col0">
+    high elf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col1" class="data row24 col1">
+    deep elf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col2" class="data row24 col2">
+    octopode
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col3" class="data row24 col3">
+    formicid
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row24_col4" class="data row24 col4">
+    deep elf
+   </td>
+  </tr>
+  <tr>
+   <th id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7" class="row_heading level0 row25" rowspan="1">
+    25
+   </th>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col0" class="data row25 col0">
+    octopode
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col1" class="data row25 col1">
+    octopode
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col2" class="data row25 col2">
+    deep elf
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col3" class="data row25 col3">
+    spriggan
+   </td>
+   <td id="T_6fc61342_e7e5_11e6_9bb0_889ffafd94e7row25_col4" class="data row25 col4">
+    formicid
+   </td>
+  </tr>
+ </tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Species that move up in rank (like tengu, octopodes, and ghouls), tend to be weak in the early game, and more powerful in the late game.</p>
+<p>Species that move down in rank (like spriggans, formicids, minotaurs, and trolls) generally have a more powerful early game.</p>
+<p>This also comes back to the number of runes each species tends to seek. Species like gargoyles and formicids may have a relatively low win rate given that they've seen the entrance to zot, not because they have a weak late game and are in danger of dying in zot, but because they have a high risk of dying in pan or hell, compared to a felid/human/vampire who's probably going for 3 runes. (Gargoyles and formicids are the two species that got the largest increase when we calculated adjusted win rates, assuming only 3-rune games.)</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Which-draconian-colour-is-best?">Which draconian colour is best?<a class="anchor-link" href="#Which-draconian-colour-is-best?">&#182;</a></h2><p>When draconians reach level 7, they're assigned one of 9 colours, each of which has different skill aptitudes, and a unique breath ability. There has been some debate on the forums about which colour is best:</p>
+<ul>
+<li><a href="https://crawl.develz.org/tavern/viewtopic.php?f=5&amp;t=10176&amp;p=140405">Rank the draconian colors</a></li>
+<li><a href="https://crawl.develz.org/tavern/viewtopic.php?f=17&amp;t=19271&amp;p=261183">Tier list: Draconian colors</a></li>
+<li><a href="https://crawl.develz.org/tavern/viewtopic.php?f=8&amp;t=20683&amp;p=279050">Buff certain draconian colors</a></li>
+</ul>
+<p>Let's see if we can use data to answer this question.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[142]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+<span class="n">colours</span> <span class="o">=</span> <span class="p">[(</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span><span class="o">.</span><span class="mi">2</span><span class="p">,</span><span class="o">.</span><span class="mi">2</span><span class="p">),</span> <span class="s">&#39;pink&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">.</span><span class="mi">9</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="s">&#39;aliceblue&#39;</span><span class="p">,</span> <span class="s">&#39;ivory&#39;</span><span class="p">,</span> <span class="s">&#39;purple&#39;</span><span class="p">,</span> <span class="s">&#39;green&#39;</span><span class="p">,</span> <span class="s">&#39;crimson&#39;</span><span class="p">,</span> <span class="s">&#39;grey&#39;</span><span class="p">]</span>
+<span class="n">color_winrates</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="n">cdrac_index</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">&#39;species&#39;</span><span class="p">)[</span><span class="s">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+<span class="nb">xrange</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">colours</span><span class="p">))</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">color_winrates</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+<span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">xrange</span><span class="p">,</span> <span class="n">color_winrates</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+               <span class="n">color</span><span class="o">=</span><span class="n">colours</span><span class="p">,</span> <span class="n">tick_label</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
+              <span class="n">edgecolor</span><span class="o">=</span><span class="s">&#39;black&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="p">)</span>
+<span class="n">bars</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_hatch</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">ylabel_pct</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&#39;Win % per draconian colour&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_species/species_36_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>#justiceforblackdraconians</strong></p>
+<p>Wait, but are these differences statistically significant?</p>
+<p>If you have a burning curiosity about this question or just want to enjoy watching a mediocre mind struggle to understand the intricacies of statistical hypothesis testing, check out <a href="/blog/dcss_draconians">my companion post</a> on the subject.</p>
+
+</div>
+</div>
+</div>
+ 
+
