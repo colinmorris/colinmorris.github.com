@@ -414,6 +414,80 @@ Name: p-value, dtype: float64</pre>
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As it turns out, <strong>(black, grey) is the only pair whose difference we can be confident about</strong>.</p>
 <p>(Holm-)Bonferroni has the nice properties of being simple and working everywhere, but it can be overly conservative. There seem to be some more powerful methods tailored to this specific problem, which use the <a href="https://en.wikipedia.org/wiki/Studentized_range_distribution">Studentized range distribution</a>, but they're tricky.</p>
+<p><strong>UPDATE</strong>: <a href="https://www.reddit.com/r/dcss/comments/5razuf/analyzing_species_in_dcss_over_a_million_games/dd62g3u/">pleasingfungus</a> was kind enough to share the results of a sequell query that give draconian win rates for about 5x as many games as in my dataset (since it aggregates data over several servers). Running the same analysis on that data gives the following significant pairs:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span class="c"># Output from `!lg * recentish dr s=race / won o=%`</span>
+<span class="n">sequell_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s">&#39;Grey&#39;</span><span class="p">,</span> <span class="mi">146</span><span class="p">,</span> <span class="mi">3407</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;Green&#39;</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">3386</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;Red&#39;</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">3457</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;Purple&#39;</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">3319</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;White&#39;</span><span class="p">,</span> <span class="mi">77</span><span class="p">,</span> <span class="mi">3486</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;Pale&#39;</span><span class="p">,</span> <span class="mi">71</span><span class="p">,</span> <span class="mi">3456</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;Black&#39;</span><span class="p">,</span> <span class="mi">66</span><span class="p">,</span> <span class="mi">3452</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;Yellow&#39;</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">3446</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">&#39;Mottled&#39;</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">3101</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">ps</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">d1</span><span class="p">,</span> <span class="n">w1</span><span class="p">,</span> <span class="n">n1</span> <span class="ow">in</span> <span class="n">sequell_data</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">d2</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">n2</span> <span class="ow">in</span> <span class="n">sequell_data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">d1</span> <span class="o">&lt;=</span> <span class="n">d2</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">z_test</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">std_norm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">z</span><span class="p">))</span> <span class="o">*</span><span class="mi">2</span>
+        <span class="n">ps</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">p</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">])</span>
+        
+<span class="n">ps</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ps</span><span class="p">):</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="o">.</span><span class="mo">05</span>
+    <span class="n">thresh</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ps</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="n">thresh</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;{}</span><span class="se">\t</span><span class="s">{}</span><span class="se">\t</span><span class="s">p = {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d1</span><span class="p">,</span> <span class="n">d2</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Mottled	Grey	p = 2.52709891357e-11
+Yellow	Grey	p = 9.01925396403e-09
+Grey	Black	p = 1.35870060007e-08
+Pale	Grey	p = 1.28623893595e-07
+White	Grey	p = 1.10758338266e-06
+Purple	Grey	p = 0.000103503868222
+Red	Grey	p = 0.000131516682826
+Grey	Green	p = 0.000186903967754
+Mottled	Green	p = 0.00124997457836
+Red	Mottled	p = 0.00148467329552
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That took us from 1 significant pair to 10. More data definitely helps here.</p>
 <h2 id="Dredging-vs.-spear-fishing">Dredging vs. spear-fishing<a class="anchor-link" href="#Dredging-vs.-spear-fishing">&#182;</a></h2><p>The reason we're needing to apply such harsh penalties to our p-values is that we're <a href="https://en.wikipedia.org/wiki/Data_dredging">data dredging</a>. We're exhaustively checking all possible relationships, and the more comparisons we do, the more stringent we need to be about the p-value of any particular test.</p>
 <p>Therefore, an attractive alternative is to test a smaller number of targeted hypotheses formed <em>before</em> looking at the data, based on some prior knowledge of the domain. I looked at a few forum posts about draconian colours...</p>
 <ul>
@@ -524,7 +598,7 @@ Name: p-value, dtype: float64</pre>
 
 
 <div class="output_png output_subarea ">
-<img src="/assets/dcss_draconians/draconian_stats_17_0.png"
+<img src="/assets/dcss_draconians/draconian_stats_19_0.png"
 >
 </div>
 
