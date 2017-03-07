@@ -2,6 +2,7 @@
 layout: post
 title: "Dissecting Google's Billion Word Language Model Part 1: Character Embeddings"
 custom_css: "charemb"
+tags: [machine-learning, data-visualization]
 ---
 
 Earlier this year, some researchers from Google Brain published a paper called [Exploring the Limits of Language Modeling](http://arxiv.org/abs/1602.02410), in which they described a language model that improved perplexity on the [One Billion Word Benchmark](http://arxiv.org/abs/1312.3005) by a staggering margin (down from about 50 to 30). Last week, they [released that model](https://github.com/tensorflow/models/tree/master/lm_1b). 

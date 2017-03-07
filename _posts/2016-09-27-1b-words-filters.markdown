@@ -2,6 +2,7 @@
 layout: post
 title: "Dissecting Google's Billion Word Language Model Part 2: Convolutional Filters"
 custom_css: "charemb"
+tags: [machine-learning, data-visualization]
 ---
 
 [Last week](/blog/1b-words-char-embeddings) I showed some visualizations of character embeddings in Google's recently released neural language model. This post will be about the next stage in the pipeline - convolutional filters. 

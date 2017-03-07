@@ -1,0 +1,4 @@
+---
+slug: stats
+name: Statistics
+---
