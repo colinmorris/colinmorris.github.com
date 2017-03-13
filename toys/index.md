@@ -7,6 +7,10 @@ quick_css: >
   }
 ---
 
+### SongSim
+
+[Visualize the lyrical structure of pop songs using self-similarity matrices](/SongSim). (Best experienced on a screen bigger than a phone.)
+
 ### RBMs
 
 I trained some restricted Boltzmann machines on short texts and got them to generate new ones. Here are some web apps that let you sample outputs from models trained on a few different domains:
