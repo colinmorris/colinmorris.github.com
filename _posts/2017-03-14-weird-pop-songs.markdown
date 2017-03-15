@@ -32,9 +32,9 @@ The song starts from the top-left corner with the first
 verse<a id="cite2" href="#footnote2">**</a>. 
 Reading across the rows (or down the columns), there are no matching phrases. That's how it usually goes with a verse.
 
-The long green-ish diagonals represent some long section that's repeated 3 times - sounds like a chorus. (The smaller diagonals on either side of each chorus mean that it's internally repetitive. In this case, it splits cleanly down the middle, consisting of the same 28 word sequence sung twice in a row.)
+The long green-ish diagonals represent some long section that's repeated 3 times - looks like a chorus! (The smaller diagonals on either side of each chorus mean that it's internally repetitive. In this case, it splits cleanly down the middle, consisting of the same 28 word sequence sung twice in a row.)
 
-We can guess that the reddish thing is a bridge, because it doesn't match any other parts of the song and, unlike the verses, it has some distinct internal structure. Also, it occrurs about 3/4s of the way through. Very bridge-like.
+We can guess that the reddish thing is a bridge, because it doesn't match any other parts of the song and, unlike the verses, it has some distinct internal structure. Also, it occurs about 3/4s of the way through. Very bridge-like.
 
 The only other notable feature is the small fuchsia pattern before the second chorus. That's just some very brief, local repetition at the end of the verse: "Or the police shut us down, down / Police shut us down, down").
 
@@ -155,7 +155,7 @@ But rather than interleaving the repeated and non-repeated parts, this song segr
 
     verse verse chorus bridge chorus
 
-The song is only 3 minutes 21 seconds<a id="cite3" href="#footnote3">***</a>, but Girls Aloud make us wait a minute and 10 seconds before they get to the chorus. For comparison, I measured the time of chorus onset for a few randomly chosen pop songs of about the same length:
+The song is only 3 minutes 21 seconds<a id="cite3" href="#footnote3">***</a>, but Girls Aloud make us wait a minute and 10 seconds before they introduce the chorus. For comparison, I measured the time of chorus onset for a few randomly chosen pop songs of about the same length:
 
 - Ke$ha - Tik Tok: 0:33/3:19
 - Sia - Chandelier: 0:35/3:36
@@ -217,7 +217,7 @@ The longish diagonals containing the filled-in green blocks are the #3 hook abov
 > I want your drama, the touch of your hand  
 > I want your leather studded kiss in the sand... [#3]
 
-This pattern of starting each line with the same phrase is called [anaphora](https://en.wikipedia.org/wiki/Anaphora_(rhetoric)). This is very similar to what we saw in the Robyn song, though in that case the repeated phrase was at the end of the pattern ("X is killing me"). (The name for that is Epistrophe, in case it comes up on Jeopardy.)
+This pattern of starting each line with the same phrase is called [anaphora](https://en.wikipedia.org/wiki/Anaphora_(rhetoric)). This is very similar to what we saw in the Robyn song, though in that case the repeated phrase was at the end of the pattern ("X is killing me"). (The name for that is "epistrophe", in case it comes up on Jeopardy.)
 
 ### IV. Nifty bridge
 
@@ -231,7 +231,7 @@ The very last line, "Work it, I'm a free bitch, baby", further breaks from the p
 
 I'm not an expert on music theory, songwriting, or pop music (except insofar as eating a lot makes you an expert chef). If you are, feel free to correct my amateurish mistakes.
 
-This work is generally inspired by anyone who loves/respects pop music enough to subject it to earnest inquiry and analysis. e.g.
+Examples of earnest treatments of pop music that inspired this work include:
 - [Owen Pallett's series](http://www.slate.com/articles/arts/culturebox/2014/03/katy_perry_s_teenage_dream_explaining_the_hit_using_music_theory.html) deconstructing pop songs with music theory.
 - The [Song Exploder](https://en.wikipedia.org/wiki/Song_Exploder) podcast
 - [Popjustice](https://www.popjustice.com/), the gold standard for smart, reverent writing on pop. 💖
