@@ -20,7 +20,7 @@ Number 0 isn't actually part of the list proper. I wanted to start with an extre
   </figcaption>
 </figure>
 
-If you're not familiar with how to interpret these matrices, I recommend taking look at SongSim's [About](https://colinmorris.github.io/SongSim/#/about) section, which explains how they're constructed, and describes some common matrix patterns and their meaning.
+If you're not familiar with how to interpret these matrices, I recommend taking look at SongSim's [About](https://colinmorris.github.io/SongSim/#/about) section, which explains how they're constructed, and describes some [common matrix patterns](https://colinmorris.github.io/SongSim/#/about/advanced) and their meaning.
 
 But to briefly recap: a dot off the main diagonal means a word is used in more than one place in the song. If multiple dots line up diagonally, it means a sequence of words is repeated. 
 

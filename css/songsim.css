@@ -7,6 +7,8 @@ img {
 
 figcaption {
     font-size: small;
+    padding-left: 1em;
+    font-style: italic;
 }
 
 figure {
