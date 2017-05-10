@@ -20,3 +20,28 @@ github_username: colinmorris
 markdown: kramdown
 
 highlighter: rouge
+
+collections:
+    my_tags:
+        output: true
+        permalink: /blog/tagged/:name/
+
+defaults:
+  -
+    scope:
+      path: ""
+      type: pages
+    values:
+      layout: page
+  -
+    scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+  -
+    scope:
+      path: ""
+      type: my_tags
+    values:
+      layout: blog_by_tag

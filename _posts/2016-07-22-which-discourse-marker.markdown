@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Conjunctive 'which' - a discourse marker on the rise?"
+tags: [linguistics]
 ---
 
 While grammarians have been retreading fuddy-duddy debates about *which* vs. *that* and restrictive clauses, *which* has been living a secret life. Which, how crazy is that?

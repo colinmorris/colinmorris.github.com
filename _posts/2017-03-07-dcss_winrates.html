@@ -1,0 +1,627 @@
+---
+layout: dcss-post
+title: "Estimating Player Skill in DCSS"
+tags: [dcss, statistics]
+---
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+  });
+  </script>
+  <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
+  </script>
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display_javascript</span>
+
+<span class="kn">from</span> <span class="nn">vis_common</span> <span class="kn">import</span> <span class="n">load_store</span><span class="p">,</span> <span class="n">load_games</span>
+
+<span class="n">FS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="c1"># Reasonable default figsize</span>
+<span class="n">DECILES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))</span>
+
+<span class="n">store</span> <span class="o">=</span> <span class="n">load_store</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">games</span> <span class="o">=</span> <span class="n">load_games</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It sure would be useful to be able to assign to each DCSS player a measure of their skill.</p>
+<p>Why? Let's say we have some hypothesis about some gameplay decision, like...</p>
+<ul>
+<li>Abyssal is usually a safer third rune than Silver</li>
+<li>Maces are the best weapon type for Gargoyle Fighters</li>
+<li>The best use of scrolls of acquirement is to acquire food</li>
+</ul>
+<p>One simple way to evaluate these kinds of claims is by looking at the games where $choice occurred (e.g. the games where the player went for abyssal as their third rune, or GrFi games where the player focused on maces), and seeing how many of them ended in victory, compared to games where the alternative occurred.</p>
+<p>The problem with this approach is that it uses a signal (wins) which is sparse and noisy. <strong>Sparse</strong> because DCSS is a hard game. On the whole, less than 1 in 100 games results in a win. <strong>Noisy</strong> because games involve a lot of decisions (and randomness). The effect of any one decision on whether that game is won is going to be pretty small.</p>
+<p>In some cases, we might find it easier to <strong>just ask what skilled players do</strong>. "How often do strong players take the Abyssal rune as their third?" "Do strong players specialize in maces more often when playing GrFis?"</p>
+<p>By assigning a varied range of 'skill' scores to players, we no longer have the problem of sparsity. Even if games A and B were both lost, we can say that A was 'better' if it was played by a player with a 5% win rate, and B was played by someone with a 0.5% win rate.</p>
+<p>(Also, knowing whether a particular behaviour is strongly associated with experienced/inexperienced players is interesting in its own right, even if we're not trying to make any claims about a causal effect on winning.)</p>
+<h2 id="Skill-&#8776;-Win-rate?">Skill &#8776; Win rate?<a class="anchor-link" href="#Skill-&#8776;-Win-rate?">&#182;</a></h2><p>The most obvious measure of player skill would just be their raw win rate: <code>n_wins / n_games</code>.</p>
+<p>However, as I showed in my post on <a href="/blog/dcss_players#Winrates">Players of DCSS</a>, the distribution of winrates is spiky.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="s2">&quot;Distribution of win rates (as %) across players...</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="n">wrpp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;winrate&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">wrpp</span><span class="p">)</span><span class="o">.</span><span class="n">describe</span><span class="p">([</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="o">.</span><span class="mi">925</span><span class="p">,</span> <span class="o">.</span><span class="mi">95</span><span class="p">,</span> <span class="o">.</span><span class="mi">975</span><span class="p">,</span> <span class="o">.</span><span class="mi">99</span><span class="p">,</span> <span class="o">.</span><span class="mi">995</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Distribution of win rates (as %) across players...
+
+count    26004.000000
+mean         0.605308
+std          5.030780
+min          0.000000
+50%          0.000000
+90%          0.000000
+92.5%        0.236466
+95%          1.265480
+97.5%        4.166125
+99%         14.574405
+99.5%       31.988750
+max        100.000000
+Name: winrate, dtype: float64
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>On the low end, it's concerning that we're assigning the same score of 0 to over 90% of players. Intuitively, it seems like there should be room for differentiation among those who have never won a game. Player A, with 0 wins out of 300 games should probably be ranked lower than B with 0 wins out of 2 games. We have pretty strong evidence that A has a low winrate. But B's record is not at all inconsistent with them having, say, a 10% winrate.</p>
+<p>On the high end, there's reason to be concerned about artificially high win rates. We have 37 players with a 1 win 0 losses record - if we made them play 10 more games each, do we really expect they would win them all?</p>
+<p>This is basically the same problem as <a href="http://www.evanmiller.org/how-not-to-sort-by-average-rating.html">sorting starred product reviews</a>. The bread machine with a single 5-star review should probably not be ranked higher than the one with 100 reviews averaging 4.9 stars.</p>
+<h2 id="Solution:-Bayesian-estimate-of-win-rate">Solution: Bayesian estimate of win rate<a class="anchor-link" href="#Solution:-Bayesian-estimate-of-win-rate">&#182;</a></h2><p>I'm going to try to estimate each player's 'true' win rate - i.e. the proportion of games they would win if we sat them down to play DCSS for eternity.</p>
+<h2 id="Assumptions">Assumptions<a class="anchor-link" href="#Assumptions">&#182;</a></h2><p>Before I get into the math, it's worth pointing out a few (shaky) assumptions I'm relying on.</p>
+<h3 id="Assumption-1:-Static-win-rate-per-player">Assumption 1: Static win rate per player<a class="anchor-link" href="#Assumption-1:-Static-win-rate-per-player">&#182;</a></h3><p>My model assumes that each player has a fixed 'true' win rate, and that each game played is an independent Bernoulli trial. Baloney!</p>
+<p>Players probably tend to improve with experience. (We could try to account for this by assigning players a series of win rates, by applying a moving window to their game history, with the contribution of a game decaying with its distance from the focal game.)</p>
+<h3 id="Assumption-2:-Winning-is-everything">Assumption 2: Winning is everything<a class="anchor-link" href="#Assumption-2:-Winning-is-everything">&#182;</a></h3><p>In the abstract, the goal of DCSS is to win. Therefore, by definition, player A is better than player B if and only if they are more able to win the game.</p>
+<p>Where does this fall apart? The Crawl community values versatility. The prized titles of <a href="https://crawl.develz.org/tavern/viewtopic.php?f=5&amp;t=20762">"great/greater player"</a> have nothing to do with winrate - they're earned by winning a game with each species/background.</p>
+<p>We could try to make our definition of DCSS skill better match the community's, by defining it as a player's ability to win the game, averaged over all species/bg combinations. But this would make things a lot more complicated - now we're estimating ~26<sup>2</sup> parameters per player, rather than 1.</p>
+<p>A simpler way to account for this would be to assign a different prior to each game according to the chosen species and background (e.g. the win rate over all games is 0.74%, but for just Minotaur Fighter games, it's 1.17%). This could even take into account the game version. The effect of a given game on a player's score would scale with how surprised we are at the outcome. A MuWn win might be worth more points than a MiFi win. And a MuWn loss might have a less negative effect on a player's score than a MiFi loss. This wouldn't explicitly reward versatility, but it would at least avoid punishing it.</p>
+<p>Many would also agree that, all else being equal, a win is more impressive that...</p>
+<ul>
+<li>earns more runes</li>
+<li>takes fewer turns</li>
+<li>takes less wall-clock time</li>
+</ul>
+<h3 id="Assumption-3:-Players-are-trying-to-win">Assumption 3: Players are trying to win<a class="anchor-link" href="#Assumption-3:-Players-are-trying-to-win">&#182;</a></h3><p>Above, we said that a player's skill at DCSS corresponds to their "ability to win". Assumption 3 is what lets us equate "probability of winning a given game" with "ability to win a given game".</p>
+<p>The fact that players ever choose challenging starting conditions (e.g. Mummy Wanderer) already shows they're not simply trying to maximize their chances of winning. Also...</p>
+<ul>
+<li>Players may incur a high risk of losing to get 15 runes, even though they could easily win from their present position.</li>
+<li>Some players may adopt faster, riskier playstyles early in the game, because they don't mind losing a character they haven't invested much time in.</li>
+<li>Players may just quit a character out of boredom.</li>
+<li>Players might make throwaway characters to test something, then splat them when they're done. (My analysis excludes games that were quit at level 1, but a test character might die after that, or the player might just let themselves get clubbed to death by a kobold rather than quitting with ctrl+Q).</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Estimating-win-rate">Estimating win rate<a class="anchor-link" href="#Estimating-win-rate">&#182;</a></h2><h3 id="What's-wrong-with-raw-win-rate?">What's wrong with raw win rate?<a class="anchor-link" href="#What's-wrong-with-raw-win-rate?">&#182;</a></h3><p>We rejected raw win rate because it gives some dumb estimates to players with a small number of games played, such as giving a 100% win rate to players with a record of 1 win 0 losses. What allows us to call that dumb? We have some <strong>prior knowledge</strong> of win rates. We know that DCSS is a hard game, and that a win rate over 90% is <em>very</em> unlikely - much less likely than the player having a 1% win rate and getting lucky on their one game.</p>
+<p>An alien observing a coin coming up heads 4 times out of 5 flips might guess that the coin has $P(heads) = .8$. This is the parameterization that maximimizes the likelihood of that observation, so it's a good guess if you have no idea how coins work. On the other hand, someone who's flipped a lot of coins might guess that $P(heads) = .5$, based on a strong prior belief that coins are usually fair.</p>
+<p>Let's try to come up with a concrete representation of our prior belief about DCSS win rates.</p>
+<h3 id="Defining-a-prior">Defining a prior<a class="anchor-link" href="#Defining-a-prior">&#182;</a></h3><p>By a prior distribution on win rates, we mean some function that, given a win rate, tells us how likely it is.</p>
+<p>A <a href="https://en.wikipedia.org/wiki/Beta_distribution">Beta distribution</a> turns out to be a good choice for this kind of thing. The Beta distribution assigns probabilities to values in the range [0, 1], which can themselves be thought of as probabilities. It's like a distribution over (Bernoulli) distributions (a <a href="https://en.wikipedia.org/wiki/Conjugate_prior_distribution">conjugate prior</a> if you want to get fancy). In this case, the probabilities we're assigning probabilities to are <em>win rates</em>.</p>
+<p>Beta distributions are defined by two parameters, $\alpha$ and $\beta$. The mean is given by</p>
+$$\frac {\alpha} {\alpha + \beta}$$<p>Let's call the mean of our prior distribution $\pi$. We can equivalently define a unique Beta distribution by choosing a value for $\pi$, and for a 'concentration parameter' $C = \alpha + \beta$.</p>
+<p>$C$ controls the strength of our prior belief. The higher $C$ is, the more tightly our distribution will concentrate around $\pi$.</p>
+<p>(This reparameterization will turn out to be useful in a moment.)</p>
+<h3 id="Calculating-smoothed-win-rate">Calculating smoothed win rate<a class="anchor-link" href="#Calculating-smoothed-win-rate">&#182;</a></h3><p>After observing a player play $n$ games and win $w$ times, we'll get a <strong>posterior distribution</strong> over that player's win rate, which combines our prior belief about win rates in general with the new evidence we've seen about this specific player's ability.</p>
+<p>I won't go through the derivation here (check out <a href="https://en.wikipedia.org/wiki/Conjugate_prior#Example">this wiki article</a> if you're interested), but it turns out that the posterior we get is just another Beta distribution, with $\alpha = \alpha_{prior} + w$ and $\beta = \beta_{prior} + n - w$.</p>
+<p>The mean of this posterior distribution, our win rate estimate for this player, is</p>
+$$wr = \frac {\alpha_{prior} + w} {\alpha_{prior} + \beta_{prior} + n}$$<p>Which can be rewritten as...</p>
+$$\frac {C \pi + w} {C + n}$$<p>A simple way to think about this is that, when calculating this player's (smoothed) win rate, we're padding our calculation with $C$ additional games ("pseudo-events") having win rate $\pi$.</p>
+<h3 id="Choosing-prior-distribution-parameters">Choosing prior distribution parameters<a class="anchor-link" href="#Choosing-prior-distribution-parameters">&#182;</a></h3><p>For $\pi$, I'll just use the win rate over all games in the dataset (0.74%). I could also have gone with the "macro-averaged" win rate (the average win rate across players - an average of averages), which is about .1% lower. If number of games played is independent of win rate, these should both be unbiased estimates, but the former should have less variance. (Unfortunately, we have pretty strong evidence that there is a positive correlation between winrate and number of games played, so our estimate is probably too optimistic.)</p>
+<p>$C$ is a bit more subtle. Let's just start it out at 10, and see what that looks like for some examples.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">wr_prior</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="c1"># Controls the strength of the smoothing</span>
+<span class="n">C</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="k">def</span> <span class="nf">smooth</span><span class="p">(</span><span class="n">wins</span><span class="p">,</span> <span class="n">games</span><span class="p">):</span>
+    <span class="k">return</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">wins</span> <span class="o">+</span> <span class="p">(</span><span class="n">C</span> <span class="o">*</span> <span class="n">wr_prior</span><span class="p">))</span>
+        <span class="o">/</span>
+        <span class="p">(</span><span class="n">C</span> <span class="o">+</span> <span class="n">games</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="n">wg</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+<span class="p">]</span>
+<span class="k">print</span> <span class="s2">&quot;Smoothed winrate examples (C={}, pi={:.2f}%)...</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">wr_prior</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">wi</span><span class="p">,</span> <span class="n">ga</span><span class="p">)</span> <span class="ow">in</span> <span class="n">wg</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s2">&quot;{} wins / {} games:</span><span class="se">\t</span><span class="s2">wr = {:.2f}%&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">wi</span><span class="p">,</span> <span class="n">ga</span><span class="p">,</span> <span class="n">smooth</span><span class="p">(</span><span class="n">wi</span><span class="p">,</span> <span class="n">ga</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Smoothed winrate examples (C=10, pi=0.74%)...
+
+0 wins / 1 games:	wr = 0.67%
+1 wins / 1 games:	wr = 9.76%
+0 wins / 10 games:	wr = 0.37%
+0 wins / 50 games:	wr = 0.12%
+0 wins / 500 games:	wr = 0.01%
+1 wins / 500 games:	wr = 0.21%
+1 wins / 10 games:	wr = 5.37%
+5 wins / 50 games:	wr = 8.46%
+20 wins / 200 games:	wr = 9.56%
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>C=10 basically means that a player with 10 games will be assigned a score halfway between their raw winrate and the overall average. If you have 90 games, 90% of your score will come from your actual winrate, and 10% from our padding. With just 1 game, your score will be much closer to the overall average than to your raw win rate of 0% or 100%.</p>
+<p>This looks pretty reasonable. We can sort of justify C=10 on the basis that 10 games feels like a reasonable amount of padding, but 5 or 50 don't necessarily seem unreasonable either.</p>
+<p>One way we can empirically evaluate a prior is just graphing it against our observed win rates. What we're trying to model is the distribution of "true" win rates across players, and unfortunately we can't sample a single value from that distribution. But, we can treat our observed win rates as noisy samples from that distribution - and by only drawing from players with at least, say, 100 games, we can limit their noisiness.</p>
+<p>Let's start by plotting a Beta distribution with $C=1$ - i.e. just a single pseudo-event.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">winrate</span>
+<span class="n">g</span><span class="p">[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">g</span><span class="p">[</span><span class="s1">&#39;wr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">winrate</span><span class="o">.</span><span class="n">smoothed_winrate</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="c1">#print &quot;Distribution of raw/smoothed winrates over players...\n&quot;</span>
+<span class="c1">#print (100*g.groupby(&#39;pid&#39;)[[&#39;raw winrate&#39;, &#39;wr&#39;]].mean()).rename(columns={&#39;wr&#39;: &#39;smoothed winrate&#39;})\</span>
+<span class="c1">#    .describe([.1, .25, .5, .75, .9, .95, .975, .99, .995])</span>
+<span class="n">rwrpp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="n">wrpp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;wr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">beta</span>
+<span class="n">gpp</span> <span class="o">=</span> <span class="n">games_per_pid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">wpp</span> <span class="o">=</span> <span class="n">wins_per_pid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">thresh</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">pids</span> <span class="o">=</span> <span class="n">gpp</span><span class="p">[</span><span class="n">gpp</span> <span class="o">&gt;=</span> <span class="n">thresh</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">pids</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">C</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">a</span><span class="o">=</span><span class="n">wr_prior</span><span class="o">*</span><span class="n">C</span>
+<span class="n">b</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">wr_prior</span><span class="p">)</span><span class="o">*</span><span class="n">C</span>
+<span class="n">mult</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span><span class="o">*</span><span class="n">mult</span><span class="p">)</span>
+<span class="k">print</span> <span class="p">(</span><span class="s2">&quot;Plotting cumulative density of Beta distribution with a={:.3f} b={:.2f} vs. &quot;</span>
+       <span class="s2">&quot;raw win rates for {} players having at least {} games&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">),</span> <span class="n">thresh</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Plotting cumulative density of Beta distribution with a=0.007 b=0.99 vs. raw win rates for 2644 players having at least 100 games
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">def</span> <span class="nf">plot_winrates</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">prior</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">ax</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">a</span><span class="o">=</span><span class="n">wr_prior</span><span class="o">*</span><span class="n">C</span> <span class="o">+</span> <span class="n">prior</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">wr_prior</span><span class="p">)</span><span class="o">*</span><span class="n">C</span> <span class="o">+</span> <span class="n">prior</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">mult</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">beta</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span><span class="o">*</span><span class="n">mult</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FS</span><span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">))</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span><span class="o">*</span><span class="n">mult</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">foo</span><span class="p">)</span><span class="o">*</span><span class="n">mult</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">foo</span><span class="o">.</span><span class="n">values</span><span class="p">)[::</span><span class="n">order</span><span class="p">],</span> <span class="n">y1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;actual&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">B</span><span class="p">)[::</span><span class="n">order</span><span class="p">],</span> <span class="n">y2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;theoretical&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="n">wr_prior</span><span class="p">,</span> <span class="o">*</span><span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;prior winrate&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">*</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;cumulative density&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_winrates</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;winrate&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_winrates/player_winrates_11_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>It's a bit hard to tell what's going on here because so much of the action is happening at the far left (as it should - we know that win rates over 10% are exceedingly rare).</p>
+<p>Here's the same thing with a log x scale.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_winrates</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">xlin</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">3</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span><span class="p">,</span> <span class="n">linthreshx</span><span class="o">=</span><span class="n">xlin</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=-</span><span class="mf">10e-5</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;winrate&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_winrates/player_winrates_13_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Well that's not very good at all.</p>
+<p>To understand what's going on here, it helps to understand the limiting behaviour of the Beta distribution. Small parameter values favour extreme probabilities. As $\alpha$ goes to 0, the density function shoots up around 0. As $\beta$ goes to 0, the density pools around 1. (When both are 0, you get <a href="https://en.wikipedia.org/wiki/Beta_distribution#Haldane.27s_prior_probability_.28Beta.280.2C0.29.29">Haldane's prior</a> which looks like a goalpost, with $P(0) = P(1) = .5$, and all other values assigned 0 probability.)</p>
+<p>In this case, $\alpha$ is very small, leading to a huge spike around 0. Interestingly, in addition to assigning too much probability to very small win rates, this distribution also assigns more density to win rates near 1 than seems to be appropriate.</p>
+<p>Increasing $C$ should generally make our density function less U-shaped.</p>
+<p>What if we set a very large value of C, like 1000?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">plot_winrates</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">1000</span><span class="p">);</span>
+<span class="n">xlin</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">3</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span><span class="p">,</span> <span class="n">linthreshx</span><span class="o">=</span><span class="n">xlin</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=-</span><span class="mf">10e-5</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;winrate&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_winrates/player_winrates_15_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This porridge is too cold!</p>
+<p>We're very confident in our 0.74% win rate this time, so we rarely pick any probabilities that stray too far from it. Unlike the previous sample (and the observed data), the sample from this Beta distribution has a median very close to our prior winrate.</p>
+<p>(Why is the observed median so low? Because of how it is. It's just a fact that lots of players have never won a game, or rarely win. The overall winrate of 0.74% is misleading, as means often are. The top 1% of players, with winrates over 12%, do a lot to bring up the average (just as the very wealthy may bring up the mean household income well above the median).)</p>
+<p>Let's try a few values of C in between.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">Cs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">]</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span><span class="mi">14</span><span class="p">))</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">Cs</span><span class="p">,</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">plot_winrates</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="n">C</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+    <span class="n">xlin</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">3</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span><span class="p">,</span> <span class="n">linthreshx</span><span class="o">=</span><span class="n">xlin</span><span class="p">);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">left</span><span class="o">=-</span><span class="mf">10e-5</span><span class="p">);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;C = {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">C</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_winrates/player_winrates_17_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>C=30 certainly looks like the winner. And that is in fact the value I ended up using.</p>
+<p>The only problem is that it seems to assign too much weight to small non-zero probabilities, and slightly too little weight to high probabilities.</p>
+<p>Or does it? Remember that the observed win rates are <em>not</em> actual samples from the distribution we're trying to model (the true win rates of DCSS players). They're noisy samples. The noisiness is mostly not a big deal, since we're only looking at players with at least 100 games.</p>
+<p><em>However</em>, if your true win rate is 1 in 1,000, or 1 in 10,000, then your win rate over 100 games will be a <em>very</em> noisy estimate of your true win rate. Our sample has a lot of players with 0% win rates. Lots of those players must have a small but non-zero chance of winning (a monkey randomly mashing the keyboard for eternity would probably win eventually), but those win rates are very hard to measure. (The lowest observed win rate in the data is 1.2e-4, or about 1 in 10,000).</p>
+<p>As for underestimating high win rates, I'm not too worried. It could be a real problem. It could be that sampling effects are also causing an overrepresentation of high win rates. It could be that high win rates are overrepresented among players with at least 100 games. But the discrepancy is not huge, and I'd rather be conservative about guessing a high win rate given a small number of games.</p>
+<p>"Try a bunch of different parameter settings, graph some samples from the distribution under those parameters, and choose the one that looks the best" doesn't quite have the ring of scientific rigour to it, but it at least feels better than picking a number out of a hat. The more principled thing to do would be to do gradient descent to approximate the maximum likelihood estimate for C. But that sounds like an ordeal.</p>
+<p>Here's the distribution of smoothed winrates across games (assigning to each game the winrate of the corresponding player), compared to raw win rate.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">order</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">plot_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">1337</span>
+<span class="k">if</span> <span class="n">n</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;wr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">))[::</span><span class="n">order</span><span class="p">],</span> 
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;smoothed&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">plot_kwargs</span>
+           <span class="p">);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">))[::</span><span class="n">order</span><span class="p">],</span> 
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">plot_kwargs</span>
+           <span class="p">);</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;wr&#39;</span><span class="p">])[::</span><span class="n">order</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;smoothed&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">plot_kwargs</span>
+           <span class="p">);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">])[::</span><span class="n">order</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">plot_kwargs</span>
+           <span class="p">);</span>
+<span class="n">xlin</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;wr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="c1">#xlin = rwrpp[rwrpp &gt; 0].min()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span><span class="p">,</span> <span class="n">linthreshx</span><span class="o">=</span><span class="n">xlin</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;win rate&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;num games with win rate &gt;= x&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+<span class="c1">#ax.set_ylim(bottom=-10000);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_winrates/player_winrates_19_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Smooth!</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="c1"># Overall win rates conditioned on number of games played. </span>
+<span class="k">if</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">gpp</span> <span class="o">=</span> <span class="n">games_per_pid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+    <span class="n">wr_per_gp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">gpp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)[</span><span class="s1">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">wr_per_gp</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FS</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+ 
+

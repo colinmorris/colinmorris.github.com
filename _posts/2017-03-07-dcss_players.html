@@ -1,0 +1,809 @@
+---
+layout: dcss-post
+title: "Analyzing the Players of DCSS"
+tags: [dcss, data-visualization]
+---
+
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display_javascript</span>
+
+<span class="kn">from</span> <span class="nn">vis_common</span> <span class="kn">import</span> <span class="n">load_store</span><span class="p">,</span> <span class="n">load_games</span>
+
+<span class="n">FS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span> <span class="c1"># Reasonable default figsize</span>
+<span class="n">DECILES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))</span>
+
+<span class="n">store</span> <span class="o">=</span> <span class="n">load_store</span><span class="p">()</span>
+<span class="n">g</span> <span class="o">=</span> <span class="n">games</span> <span class="o">=</span> <span class="n">load_games</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this post, I'll be taking a step back and doing some analysis at the level of players of DCSS, rather than individual games. How many players do we have?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="s2">&quot;{:,} distinct players among {:,} games&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">print</span>
+<span class="k">print</span> <span class="s2">&quot;Distribution of games played per player...&quot;</span>
+<span class="k">print</span>
+<span class="k">print</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>26,004 distinct players among 1,326,162 games
+
+Distribution of games played per player...
+
+count    26004.000000
+mean        50.998385
+std        201.641369
+min          1.000000
+25%          1.000000
+50%          3.000000
+75%         20.000000
+max       8170.000000
+dtype: float64
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The "average" player has 50 games, though this statistic is pretty misleading. A majority of players can count their games on one hand.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">count_counts</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;nplayers&#39;</span><span class="p">)</span>
+<span class="n">count_counts</span><span class="p">[</span><span class="s1">&#39;ngames&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count_counts</span><span class="o">.</span><span class="n">index</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FS</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">count_counts</span><span class="p">[</span><span class="s1">&#39;ngames&#39;</span><span class="p">],</span> <span class="n">count_counts</span><span class="p">[</span><span class="s1">&#39;nplayers&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">onegame</span> <span class="o">=</span> <span class="n">count_counts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;nplayers&#39;</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s2">&quot;1 game: {} players&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">onegame</span><span class="p">),</span> 
+            <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span> <span class="n">onegame</span><span class="o">*.</span><span class="mi">98</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">onegame</span><span class="o">*.</span><span class="mi">75</span><span class="p">),</span>
+            <span class="n">bbox</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">boxstyle</span><span class="o">=</span><span class="s1">&#39;round,pad=0.5&#39;</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s1">&#39;yellow&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span> <span class="o">=</span> <span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">connectionstyle</span><span class="o">=</span><span class="s1">&#39;arc3,rad=0&#39;</span><span class="p">)</span>
+           <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;ngames&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;nplayers&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Games played per player&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">loglog</span><span class="p">();</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_players/players_bp_4_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A straight line on a log-log plot. Looks like a pretty heavy-tailed distribution.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FS</span><span class="p">)</span>
+<span class="n">counts</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+<span class="n">n</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> 
+                           <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">4</span><span class="p">),</span>
+                           <span class="c1">#np.logspace(0, 4, 150),</span>
+       <span class="n">normed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span> <span class="n">cumulative</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+<span class="n">midpoint</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;=</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+<span class="n">midpct</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">n</span><span class="p">[</span><span class="n">midpoint</span><span class="p">]</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=.</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;n games&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;P(games played &lt;= n)&#39;</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_players/players_bp_6_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="s1">&#39;{:.1f}</span><span class="si">% o</span><span class="s1">f players have &lt;= {} games&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">midpct</span><span class="p">,</span> <span class="n">midpoint</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>51.4% of players have &lt;= 3 games
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>What about the distribution of wins across players?</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">gpp</span> <span class="o">=</span> <span class="n">games_per_pid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<span class="n">wpp</span> <span class="o">=</span> <span class="n">wins_per_pid</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="n">wpp</span> <span class="o">=</span> <span class="n">wins_per_pid</span>
+<span class="k">print</span> <span class="s2">&quot;{:,} / {:,} players have won at least one game&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">wpp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="nb">len</span><span class="p">(</span><span class="n">wpp</span><span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>2,111 / 26,004 players have won at least one game
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That statistic certainly speaks to DCSS's difficulty. <strong>&gt;90%</strong> of players have never won a game.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="k">print</span> <span class="s2">&quot;Do winners account for more games?&quot;</span>
+<span class="n">winpids</span> <span class="o">=</span> <span class="n">wpp</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="k">lambda</span> <span class="n">wins</span><span class="p">:</span> <span class="n">wins</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">index</span>
+<span class="k">print</span> <span class="s2">&quot;Avg. number of games played by...</span><span class="se">\n\t</span><span class="s2">winners: {:.1f}</span><span class="se">\n\t</span><span class="s2">non-winners: {:.1f}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">g</span><span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">winpids</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+    <span class="n">g</span><span class="p">[</span><span class="o">~</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">winpids</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+<span class="p">)</span>
+<span class="n">winnergames</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">winpids</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<span class="k">print</span> <span class="s2">&quot;{:,} out of {:,} games ({:.1f}%) were played by players who have won a game&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">winnergames</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">),</span> <span class="mi">100</span><span class="o">*</span><span class="n">winnergames</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Do winners account for more games?
+Avg. number of games played by...
+	winners: 305.3
+	non-winners: 28.5
+644,434 out of 1,326,162 games (48.6%) were played by players who have won a game
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">gameticks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> 
+                          <span class="mi">500</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">4000</span><span class="p">,</span>
+                          <span class="mi">10000</span><span class="p">]</span>
+<span class="n">winticks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">scatter_games_v_wins</span><span class="p">(</span><span class="n">minwins</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FS</span><span class="p">)</span>
+    <span class="n">wins</span> <span class="o">=</span> <span class="n">wpp</span><span class="p">[</span><span class="n">wpp</span> <span class="o">&gt;=</span> <span class="n">minwins</span><span class="p">]</span>
+    <span class="n">winjitter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">jitter</span><span class="p">:</span>
+        <span class="n">winjitter</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wins</span><span class="p">))</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="o">.</span><span class="mi">55</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">gpp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">wins</span><span class="o">.</span><span class="n">index</span><span class="p">],</span> <span class="n">wins</span><span class="o">.</span><span class="n">values</span> <span class="o">+</span> <span class="n">winjitter</span><span class="p">,</span>
+              <span class="n">alpha</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+              <span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span> <span class="k">if</span> <span class="n">minwins</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">gameticks</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">(</span><span class="n">winticks</span><span class="p">);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">gameticks</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">winticks</span><span class="p">]);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Games&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Wins&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Games vs. wins per player&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ax</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">scatter_games_v_wins</span><span class="p">();</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_players/players_bp_13_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here I'm placing a dot for each player, according to their number of games played and number of wins (still on a log-log scale). It's hard to get a sense of what's going on in those stripes that form at 0/1/2 wins. We can maybe get a better sense of the density by randomly jittering each point in the y direction:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">scatter_games_v_wins</span><span class="p">(</span><span class="n">jitter</span><span class="o">=</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_players/players_bp_15_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We already knew there were a <em>lot</em> of players with 0 wins (more than 90% of all players). But it's interesting to see that this isn't just a result of having lots of players who have played a tiny number of games. There are many people who have played 100+ games without a win.</p>
+<p>Let's turn our attention to just the players with at least 1 win.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">scatter_games_v_wins</span><span class="p">(</span><span class="n">minwins</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=.</span><span class="mi">5</span><span class="p">);</span>
+<span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+<span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
+<span class="n">ymin</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;gist_heat&#39;</span><span class="p">)</span>
+<span class="n">winrate_lines</span> <span class="o">=</span> <span class="p">[</span><span class="o">.</span><span class="mo">001</span><span class="p">,</span> <span class="o">.</span><span class="mo">01</span><span class="p">,</span> <span class="o">.</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">wr</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">reversed</span><span class="p">(</span><span class="n">winrate_lines</span><span class="p">)):</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="p">[</span><span class="n">ymin</span><span class="o">/</span><span class="n">wr</span><span class="p">,</span> <span class="n">ymin</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">xmax</span><span class="o">*</span><span class="n">wr</span> <span class="o">&lt;=</span> <span class="n">ymax</span><span class="p">:</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="p">[</span><span class="n">xmax</span><span class="p">,</span> <span class="n">xmax</span><span class="o">*</span><span class="n">wr</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">p2</span> <span class="o">=</span> <span class="p">[</span><span class="n">ymax</span><span class="o">/</span><span class="n">wr</span><span class="p">,</span> <span class="n">ymax</span><span class="p">]</span>
+    <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span>
+            <span class="n">ys</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;{}% win rate&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">wr</span><span class="o">*</span><span class="mi">100</span><span class="p">))</span> <span class="k">if</span> <span class="n">wr</span> <span class="o">&gt;=</span> <span class="o">.</span><span class="mo">01</span>
+                   <span class="k">else</span> <span class="s1">&#39;{:.1f}% win rate&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">wr</span><span class="o">*</span><span class="mi">100</span><span class="p">)),</span>
+            <span class="n">color</span><span class="o">=</span><span class="n">cmap</span><span class="p">(</span><span class="n">i</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">winrate_lines</span><span class="p">)),</span>
+            <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_players/players_bp_17_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Eyeballing the diagonal guides, it seems like the greatest density is around the 1% win rate, with the vast majority falling somewhere between 0.1 and 10%.</p>
+<p>There appear to be a fair number of players with a 100% win rate over 1 game.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">perfect</span> <span class="o">=</span> <span class="n">gpp</span> <span class="o">==</span> <span class="n">wpp</span>
+<span class="k">print</span> <span class="s2">&quot;{} players have a perfect record (avg. number of games played = {})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">perfect</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="n">gpp</span><span class="p">[</span><span class="n">perfect</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span>
+<span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>37 players have a perfect record (avg. number of games played = 1.0)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Far more impressive are those few dots with a &gt;50% win rate over 50+ games.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">wrpp</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">gpp</span><span class="p">[</span><span class="n">gpp</span> <span class="o">&gt;=</span> <span class="mi">50</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;winrate&#39;</span><span class="p">)</span>
+<span class="n">tops</span> <span class="o">=</span> <span class="n">wrpp</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">players</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s1">&#39;players&#39;</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
+    <span class="n">players</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tops</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span>
+    <span class="n">wpp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tops</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;wins&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span>
+    <span class="n">gpp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">tops</span><span class="o">.</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="s1">&#39;games&#39;</span><span class="p">),</span>
+    <span class="n">tops</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>     
+<span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>                  name  wins  games  winrate
+pid                                         
+17003       jumbajumba    60     83     0.72
+6203   makemeasandwich    75    115     0.65
+8250          hellmonk    30     52     0.58
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>You go, <a href="http://crawl.akrasiac.org/scoring/players/jumbajumba.html">jumbajumba</a>!</p>
+<h2 id="Winrates">Winrates<a class="anchor-link" href="#Winrates">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="kn">import</span> <span class="nn">winrate</span>
+<span class="n">g</span><span class="p">[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;won&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;pid&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="n">g</span><span class="p">[</span><span class="s1">&#39;wr&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">winrate</span><span class="o">.</span><span class="n">smoothed_winrate</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+<span class="c1">#print &quot;Distribution of raw/smoothed winrates over players...\n&quot;</span>
+<span class="c1">#print (100*g.groupby(&#39;pid&#39;)[[&#39;raw winrate&#39;, &#39;wr&#39;]].mean()).rename(columns={&#39;wr&#39;: &#39;smoothed winrate&#39;})\</span>
+<span class="c1">#    .describe([.1, .25, .5, .75, .9, .95, .975, .99, .995])</span>
+<span class="n">rwrpp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+<span class="n">wrpp</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">)[</span><span class="s1">&#39;wr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FS</span><span class="p">)</span>
+<span class="n">order</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="c1">#ax.step(np.sort(wrpp.values)[::order], np.arange(len(wrpp))+1, label=&#39;smoothed&#39;, alpha=.7, lw=0, marker=&#39;.&#39;);</span>
+<span class="c1">#ax.step(np.sort(rwrpp.values)[::order], np.arange(len(rwrpp))+1, label=&#39;raw&#39;);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">rwrpp</span><span class="o">.</span><span class="n">values</span><span class="p">)[::</span><span class="n">order</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rwrpp</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">7</span><span class="p">,</span>
+        <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+       <span class="p">);</span>
+<span class="n">xlin</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">2</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span><span class="p">,</span> <span class="n">linthreshx</span><span class="o">=</span><span class="n">xlin</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;win rate&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;num players with win rate &gt;= x&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=</span><span class="mi">0</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_players/players_bp_24_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We already know &gt;90% of players have a 0% winrate. We might get a less L-shaped curve if we map each game to the winrate of the corresponding player, and look at the distribution of win rates across games.</p>
+<p>(This is motivated by questions we may want to ask like "Are deep dwarves favoured by skilled players?", or "Do good players clear the Elven Halls more often than newbs?". A natural way to answer these kinds of questions is to select the games where foo happened, and look at the posterior distribution of winrates over those games.)</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">FS</span><span class="p">)</span>
+<span class="n">order</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="c1">#ax.step(np.sort(g[&#39;wr&#39;])[::order], np.arange(len(g))+1, label=&#39;smoothed&#39;, alpha=.7);</span>
+<span class="c1">#ax.step(np.sort(g[&#39;raw winrate&#39;])[::order], np.arange(len(g))+1, label=&#39;raw&#39;, alpha=.7);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">])[::</span><span class="n">order</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">7</span><span class="p">,</span>
+        <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+       <span class="p">);</span>
+<span class="n">xlin</span> <span class="o">=</span> <span class="n">rwrpp</span><span class="p">[</span><span class="n">rwrpp</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="n">xlin</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">2</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span><span class="p">,</span> <span class="n">linthreshx</span><span class="o">=</span><span class="n">xlin</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;win rate&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;num games with win rate &gt;= x&#39;</span><span class="p">)</span>
+<span class="c1">#ax.legend()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">bottom</span><span class="o">=-</span><span class="mi">10000</span><span class="p">);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_players/players_bp_26_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is definitely smoother than the previous curve, but using raw winrate to measure skill leads to some silly outcomes, particularly at the extremes:</p>
+<ul>
+<li>The curve extends all the way to 100%, because of those 37 players with records of 1 win 0 losses. We shouldn't be so naive as to believe that if we had them play another 10 games each, they'd win them all.</li>
+<li>We still map about half of all games to the same win rate of 0%. It'd be nice to be able to differentiate among them. Intuitively, it seems like a player with 0 wins 1 loss should be ranked ahead of one with 0 wins 300 losses.</li>
+</ul>
+<p>This problem is involved enough that I devoted a whole separate post to it: <a href="/blog/dcss_winrates">Estimating player skill in DCSS</a>. Here's a sneak peek of the smoothed estimate of win rate I came up with, compared to raw win rate.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython2"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">order</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+<span class="n">plot_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">seed</span> <span class="o">=</span> <span class="mi">1337</span>
+<span class="k">if</span> <span class="n">n</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;wr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">))[::</span><span class="n">order</span><span class="p">],</span> 
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;smoothed&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">plot_kwargs</span>
+           <span class="p">);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">seed</span><span class="p">))[::</span><span class="n">order</span><span class="p">],</span> 
+            <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">plot_kwargs</span>
+           <span class="p">);</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;wr&#39;</span><span class="p">])[::</span><span class="n">order</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;smoothed&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">plot_kwargs</span>
+           <span class="p">);</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">g</span><span class="p">[</span><span class="s1">&#39;raw winrate&#39;</span><span class="p">])[::</span><span class="n">order</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">plot_kwargs</span>
+           <span class="p">);</span>
+<span class="n">xlin</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s1">&#39;wr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<span class="c1">#xlin = rwrpp[rwrpp &gt; 0].min()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;symlog&#39;</span><span class="p">,</span> <span class="n">linthreshx</span><span class="o">=</span><span class="n">xlin</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;win rate&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;num games with win rate &gt;= x&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+<span class="c1">#ax.set_ylim(bottom=-10000);</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+<div class="prompt"></div>
+
+
+
+<div class="output_png output_subarea ">
+<img src="/assets/dcss_players/players_bp_28_0.png"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The most drastic effect is that all the zeroes are gone. Even if a player has lost 500 games in a row, we're going to optimistically guess that, if they played another 9500, they would probably win one. Being able to distinguish the mediocre from the truly abysmal will turn out to be useful - in a future post, I'll be using these smoothed winrates to mythbust some Crawl newbie traps.</p>
+
+</div>
+</div>
+</div>
+ 
+
