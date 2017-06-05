@@ -1,0 +1,85 @@
+figcaption {
+    text-align: center;
+    font-size: small;
+    color: #555;
+}
+
+figure {
+    margin: 1em 0 !important;
+    background-color: #f7f7f0;
+}
+
+figure img {
+    margin: 0 auto;
+}
+
+.gallery .cell {
+}
+
+div.audubon-comparison {
+}
+
+img.lookalike {
+}
+img.audubon {
+}
+.audubon-comparison img {
+    max-height: 250px;
+}
+
+svg.scribbles {
+    display: block;
+    margin: 0 auto;
+}
+
+
+svg.scribbles path {
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: forwards;
+    animation-duration: 10s;
+}
+
+svg.scribbles path.one {
+    animation-name: dashone;
+    stroke-dasharray: 141;
+}
+
+svg.scribbles path.two {
+    animation-name: dashtwo;
+    stroke-dasharray: 11;
+}
+
+svg.scribbles path.three {
+    animation-name: dashthree;
+    stroke-dasharray: 737;
+}
+
+svg.scribbles path.four {
+    animation-name: dashfour;
+    stroke-dasharray: 3;
+}
+
+@keyframes dashone {
+    0% { stroke-dashoffset: 141; }
+    31% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 0; }
+}
+@keyframes dashtwo {
+    0% { stroke-dashoffset: 11; }
+    31% { stroke-dashoffset: 11; }
+    34% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 0; }
+}
+@keyframes dashthree {
+    0% { stroke-dashoffset: 737; }
+    34% { stroke-dashoffset: 737; }
+    79% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 0; }
+}
+@keyframes dashfour {
+    0% { stroke-dashoffset: 3; }
+    79% { stroke-dashoffset: 3; }
+    80% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: 0; }
+}
