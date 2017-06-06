@@ -1,61 +1,53 @@
-<!DOCTYPE html>
-<html>
+---
+layout: raw
+---
+{% include header.html %}
 
-  {% include head.html %}
+{% if page.header-img %}
+<style type="text/css">
+    .intro-header {
+        background-image: url('{{page.header-img}}');
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: cover;
+        background-attachment: scroll;
+        border-bottom: 1px solid #e8e8e8;
 
-  <body>
-
-    {% include header.html %}
-
-    {% if page.header-img %}
-    <style type="text/css">
-        .intro-header {
-            background-image: url('{{page.header-img}}');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            background-attachment: scroll;
-            border-bottom: 1px solid #e8e8e8;
-
-        }
-        {% comment %}experiment with a fading gradient background. Didn't work out great. 
-        .post-heading {
-            background-image: radial-gradient(ellipse farthest-corner,
-                rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.3));
-        } 
-        {% endcomment %}
-        .post-title {
-            font-weight: 900;
-            font-family: SimSun, sans-serif;
-            color: white !important;
-            background: seagreen;
-            padding: .2em;
-            margin-top: 2em;
-            margin-bottom: 2em;
-        }
-        header div.container {
-            max-height: 100vh;
-        }
-    </style>
-    <header class="intro-header jumbotron">
-        <div class="container">
-            <div class="col-lg-5 col-lg-offset-3 col-md-6 col-md-offset-3 ">
-                <div class="post-heading">
-                    <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
-                </div>
+    }
+    {% comment %}experiment with a fading gradient background. Didn't work out great. 
+    .post-heading {
+        background-image: radial-gradient(ellipse farthest-corner,
+            rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.3));
+    } 
+    {% endcomment %}
+    .post-title {
+        font-weight: 900;
+        font-family: SimSun, sans-serif;
+        color: white !important;
+        background: seagreen;
+        padding: .2em;
+        margin-top: 2em;
+        margin-bottom: 2em;
+    }
+    header div.container {
+        max-height: 100vh;
+    }
+</style>
+<header class="intro-header jumbotron">
+    <div class="container">
+        <div class="col-lg-5 col-lg-offset-3 col-md-6 col-md-offset-3 ">
+            <div class="post-heading">
+                <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
             </div>
         </div>
-    </header>
-    {% endif %}
-
-    <div class="page-content">
-      <div class="wrapper">
-        {{ content }}
-      </div>
     </div>
+</header>
+{% endif %}
 
-    {% include footer.html %}
+<div class="page-content">
+  <div class="wrapper">
+    {{ content }}
+  </div>
+</div>
 
-  </body>
-
-</html>
+{% include footer.html %}

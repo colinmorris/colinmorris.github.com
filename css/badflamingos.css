@@ -1,0 +1,19 @@
+div.gallery {
+    margin-left: 15%;
+    margin-right: 15%;
+}
+
+.gallery div {
+    border-style: solid;
+    border-width: 1px;
+    border-color: gainsboro;
+}
+
+
+@media (max-width: 768px) {
+    div.gallery {
+        margin-left: 5%;
+        margin-right: 5%;
+    }
+}
+
