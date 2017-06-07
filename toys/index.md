@@ -3,7 +3,10 @@ layout: page
 title: "Toys"
 quick_css: >
   .post-content h3 {
-    margin-top: 28px;
+    margin-top: 2.5rem;
+  }
+  h1.other {
+    margin-top: 5rem;
   }
 ---
 
@@ -36,3 +39,11 @@ See how a language model (the same one as above) assigns probabilities to each w
 ### Tour of Heroes
 
 [Tour of Heroes](/tour-of-heroes/) is an incremental game implemented using Angular2. It's in a rough beta-ish state. I'll get around to finishing it eventually, maybe.
+
+<h1 class="other">Other Links</h1>
+
+### [Are Pop Lyrics Getting More Repetitive?](https://pudding.cool/2017/05/song-repetition)
+
+A visual essay commissioned by [The Pudding](https://pudding.cool/), exploring repetition in song lyrics with the help of a lossless compression algorithm.
+
+Also, check out [this](http://colinmorris.github.io/pop-compression/) standalone demo of applying the Lempel-Ziv compression algorithm to the lyrics of some pop songs.
