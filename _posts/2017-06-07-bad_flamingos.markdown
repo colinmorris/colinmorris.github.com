@@ -3,7 +3,7 @@ layout: post
 title: "Finding bad flamingo drawings with recurrent neural networks"
 tags: [machine-learning]
 custom_css: quickdraw
-thumbnail: "/assets/quickdraw/svgs/special_fellas.svg"
+thumbnail: "/assets/quickdraw/svgs/special_fellas.png"
 excerpt: "Performing anomaly detection using a recurrent neural network to find the ugliest flamingos in a dataset of sketches."
 ---
 
