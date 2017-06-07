@@ -6,6 +6,8 @@ figcaption {
 
 figure {
     margin: 1em 0 !important;
+}
+figure, div.gallery {
     background-color: #f7f7f0;
 }
 
@@ -13,18 +15,17 @@ figure img {
     margin: 0 auto;
 }
 
-.gallery .cell {
-}
-
-div.audubon-comparison {
-}
-
-img.lookalike {
-}
-img.audubon {
-}
 .audubon-comparison img {
     max-height: 250px;
+}
+
+.badflamingos-pointer {
+    margin: 2em 1.5em 1em 1em;
+}
+
+.biglink {
+    font-size: 130%;
+    font-weight: bold;
 }
 
 svg.scribbles {

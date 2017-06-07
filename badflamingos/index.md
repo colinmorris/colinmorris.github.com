@@ -1,5 +1,6 @@
 ---
 layout: blank
+title: "Bad Flamingos"
 custom_css: badflamingos
 ---
 
@@ -13,3 +14,4 @@ custom_css: badflamingos
         </div>
     {% endfor %}
 </div>
+<hr />
