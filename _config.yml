@@ -13,7 +13,7 @@ description: >
 baseurl: ""
 url: "http://colinmorris.github.io"
 permalink: /blog/:title
-twitter_username: 
+twitter_username: HalfEatenScone
 github_username: colinmorris
 
 # Build settings
