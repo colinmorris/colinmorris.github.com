@@ -2,7 +2,7 @@
 layout: post
 title: "Breaking down the gender composition of SNL sketches"
 tags: [data-visualization]
-excerpt: ""
+thumbnail: "/assets/snl-sketch-gender/output_11_0.png"
 ---
 
 It's a great time for women on SNL. Since the early 2000's, the majority of the show's breakout stars have been women. Of the 18 Emmy nominations for acting the show has received since 2000, 14 went to women.
