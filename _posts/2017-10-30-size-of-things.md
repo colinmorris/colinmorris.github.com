@@ -692,9 +692,7 @@ Of course, their story doesn't have a happy ending. As a result of overhunting a
 
 This one is pretty baffling.
 
-<!--<iframe class="ngramchart" name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?content=size+of+a+nutmeg&year_start=1800&year_end=2008&corpus=15&smoothing=5&share=&direct_url=t1%3B%2Csize%20of%20a%20nutmeg%3B%2Cc0" width=900 height=500 marginwidth=0 marginheight=0 hspace=0 vspace=0 frameborder=0 scrolling=no></iframe>-->
-
-<iframe class="ngramchart" name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?content=%28size+of+a+nutmeg+*+1000000%29&year_start=1800&year_end=2008&corpus=15&smoothing=5&share=&direct_url=t1%3B%2C%28size%20of%20a%20nutmeg%20%2A%201000000%29%3B%2Cc0"   marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
+<iframe class="ngramchart" name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?content=size+of+a+nutmeg&year_start=1800&year_end=2008&corpus=15&smoothing=5&share=&direct_url=t1%3B%2Csize%20of%20a%20nutmeg%3B%2Cc0"   marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
 
 This is consistent with the general observation that terms from nature have declined over time. We generally spend less time making food than our ancestors did, so nuts and spices are less likely to be at the forefront of our minds than golf balls and quarters. But this dramatic, steep decline isn't experienced by walnuts or hazelnuts or even the relatively obscure millet seed.
 
