@@ -1,9 +1,11 @@
 ---
 layout: post
-title: "The size of things: analogies in the Google Books ngram dataset"
+title: "The size of things: an ngram experiment"
 tags: [linguistics]
 date: 2017-10-30
 custom_css: pd
+thumbnail: "/assets/sizeof/sizeofthings.png"
+excerpt: 'Investigating the changing popularity of size analogies in English books. Why was "the size of a pigeon\'s egg" a common phrase until the late 1800s?'
 draft: 1
 ---
 
@@ -664,7 +666,7 @@ Pigeon eggs were an astonishingly common benchmark for comparisons in the 19th c
 
 <img src="/assets/sizeof/pigeonsegg.png" />
 
-Why was everyone familiar with the size of pigeon eggs in the 1800's? I've lived in cities with lots of pigeons and never seen one of their eggs. 
+Why was everyone familiar with the size of pigeon eggs in the 1800s? I've lived in cities with lots of pigeons and never seen one of their eggs. 
 
 If you're skeptical, you can browse some examples from Google Books [here](https://www.google.ca/search?q=%22size+of+a+pigeon%27s%22&tbm=bks&lr=lang_en&gws_rd=cr&dcr=0&ei=ACLyWZqTNMbejwTiqaEQ). It's not that this time period has an extraordinary number of books on ornithology. The comparison occurs frequently in technical texts on areas like medicine, botany and geology. But it also occurs in books aimed at non-technical audiences (e.g. [a Jules Verne novel](https://books.google.ca/books?id=TMqzAwAAQBAJ&pg=PT101&dq=%22size+of+a+pigeon%27s%22&hl=en&sa=X&ved=0ahUKEwi5tfql7o7XAhUK6IMKHfIuCqg4ggEQ6AEITjAH#v=onepage&q=%22size%20of%20a%20pigeon's%22&f=false), or [The Practice of Cookery: Adapted to the Business of Every Day Life](https://books.google.ca/books?id=y6N2cnCzajUC&pg=PA477&dq=%22size+of+a+pigeon%27s%22&hl=en&sa=X&ved=0ahUKEwiw_buR7o7XAhUl3YMKHdpsCJ84WhDoAQgsMAE#v=onepage&q=%22size%20of%20a%20pigeon's%22&f=false) by one "Mrs. Dalgairns").
 
@@ -845,7 +847,7 @@ In addition to overcounting, this phenomenon leads to another problem:
 
 <iframe class="ngramchart" name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?content=size+of+a+fine+cauliflower&year_start=1800&year_end=2008&corpus=15&smoothing=3&share=&direct_url=t1%3B%2Csize%20of%20a%20fine%20cauliflower%3B%2Cc0"   marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
 
-Fine cauliflowers peaked in the mid-1800's when *Pictures From Italy* was first published, but they pop up all through the 20th century and beyond. Books are associated with their year of publication, but a story written in 1846 reprinted in 2008 is not at all reflective of language use in the 2000's.
+Fine cauliflowers peaked in the mid-1800s when *Pictures From Italy* was first published, but they pop up all through the 20th century and beyond. Books are associated with their year of publication, but a story written in 1846 reprinted in 2008 is not at all reflective of language use in the 2000s.
 
 I haven't made any attempt to estimate the size of these effects (but it'd be an interesting experiment to try!).
 
