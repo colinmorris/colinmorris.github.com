@@ -10,11 +10,12 @@
   {% if page.layout == 'post' %}
     <meta property="og:type" content="article">
   {% endif %}
-  <meta name="twitter:creator" content="@{{site.twitter_username}}">
+  <meta name="twitter:site" content="@{{site.twitter_username}}">
 
   {% if page.excerpt %}
     <meta name="twitter:card" content="summary">
     <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}">
+    <meta property="og:description" content="{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}">
   {% endif %}"
 
   <link rel="stylesheet" href="{{ "/css/main.css" | prepend: site.baseurl }}">
