@@ -14,9 +14,9 @@
 
   {% if page.excerpt %}
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}">
-    <meta property="og:description" content="{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}">
-  {% endif %}"
+    <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | xml_escape | truncate: 160 }}">
+    <meta property="og:description" content="{{ page.excerpt | strip_html | strip_newlines | xml_escape | truncate: 160 }}">
+  {% endif %}
 
   <link rel="stylesheet" href="{{ "/css/main.css" | prepend: site.baseurl }}">
   {% if page.custom_css %}
