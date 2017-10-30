@@ -5,7 +5,7 @@ tags: [linguistics]
 date: 2017-10-30
 custom_css: pd
 thumbnail: "/assets/sizeof/sizeofthings.png"
-excerpt: 'Investigating the changing popularity of size analogies in English books. Why was "the size of a pigeon\'s egg" a common phrase until the late 1800s?'
+excerpt: Investigating the changing popularity of size analogies in English books. Why was "the size of a pigeon's egg" a common phrase until the late 1800s?
 draft: 1
 ---
 
