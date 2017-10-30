@@ -3,6 +3,8 @@ layout: post
 title: "6 Weird Pop Songs, Visualized"
 tags: [data-visualization]
 custom_css: songsim
+thumbnail: "/assets/songsim/badromance.png"
+excerpt: "Using SongSim matrices to visualize pop songs with unusual structures."
 ---
 
 I recently made [SongSim](https://colinmorris.github.io/SongSim/#/), a little web app that creates interactive visualizations from song lyrics. One nice property of its visualizations is that they often make it apparent when something weird is going on.
