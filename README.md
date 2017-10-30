@@ -39,3 +39,4 @@ footer
 - excerpt: Some short text description of content. Used in previews on twitter, fb. If not specified, falls back to something like the first 160 characters of the post.
 - tags: array of tags. must be specified in `_my_tags` directory. e.g. `[data-visualization, linguistics]`
 - custom_css: base name of a css file in the `css/` directory (e.g. `recep`)
+- large_img: if truthy, use `summary_large_image` twitter card metadata instead of just `summary`

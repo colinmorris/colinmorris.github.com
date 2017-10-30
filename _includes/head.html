@@ -13,7 +13,7 @@
   <meta name="twitter:site" content="@{{site.twitter_username}}">
 
   {% if page.excerpt %}
-    <meta name="twitter:card" content="summary">
+  <meta name="twitter:card" content="summary{% if page.large_img %}_large_image{% endif %}">
     <meta name="description" content="{{ page.excerpt | strip_html | strip_newlines | xml_escape | truncate: 160 }}">
     <meta property="og:description" content="{{ page.excerpt | strip_html | strip_newlines | xml_escape | truncate: 160 }}">
   {% endif %}
