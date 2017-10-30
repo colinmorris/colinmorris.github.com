@@ -2,8 +2,9 @@
 layout: post
 title: "The size of things: analogies in the Google Books ngram dataset"
 tags: [linguistics]
-date: 2017-10-28
+date: 2017-10-30
 custom_css: pd
+draft: 1
 ---
 
 
@@ -26,7 +27,7 @@ I used [Google Books' Ngram dataset](https://books.google.com/ngrams) to find th
 So what do authors most frequently reach for when describing the size of things? Here are the overall top 20, ranked by total number of occurences in books between 1800 and 2008.
 
 
-![png](writeup_files/writeup_21_0.png)
+![png](/assets/sizeof/writeup_21_0.png)
 
 
 
@@ -661,7 +662,7 @@ This provides circumstantial evidence that people in the English-speaking world 
 
 Pigeon eggs were an astonishingly common benchmark for comparisons in the 19th century, ranking 8th (with "size of a pigeon" at number 15). But they experienced a sharp drop in the late 19th century and a gradual decline thereafter.
 
-<img src="pigeonsegg.png" />
+<img src="/assets/sizeof/pigeonsegg.png" />
 
 Why was everyone familiar with the size of pigeon eggs in the 1800's? I've lived in cities with lots of pigeons and never seen one of their eggs. 
 
@@ -669,7 +670,7 @@ If you're skeptical, you can browse some examples from Google Books [here](https
 
 This was hugely baffling to me, until I remembered [that *other* pigeon](https://en.wikipedia.org/wiki/Passenger_pigeon).
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Passenger_pigeon_shoot.jpg/640px-Passenger_pigeon_shoot.jpg" />
+<img src="/assets/sizeof/passenger_pigeon_shoot.jpg" />
 
 Passenger pigeons were once the most abundant bird in North America - flocks (like the one illustrated above) were described as blocking out the sun. The [wiki article](https://en.wikipedia.org/wiki/Passenger_pigeon) is full of vivid descriptions of their abundance and the extravagance with which they were hunted:
 
@@ -787,7 +788,7 @@ In a few rare cases, the completion was ambiguous. The two most common bigrams w
 
 I merged together the counts for minor orthographic variations of the same phrase. For example, "a pin's head", "a pin head", and "a pinhead". Though not the focus of my analysis, the changes in spelling of a term over time can occasionally be quite dramatic:
 
-<img src="/pinheads.png" />
+<img src="/assets/sizeof/pinheads.png" />
 
 I didn't merge significantly different surface realizations of the same object, e.g. {"an egg", "a hen's egg"}, or {"a hazelnut", "a filbert"}.
 
@@ -803,7 +804,7 @@ The most obvious solution (and the one used in the [Ngram Viewer](https://books.
 
 Here are the most common analogies from the 19th and 21st centuries, with their relative frequency plotted on the same scale:
 
-<img src="/sizeofthings_labeled_toscale.png" />
+<img src="/assets/sizeof/sizeofthings_labeled_toscale.png" />
 
 The most common analogies in the 19th century are far more frequent than those in the 21st century. It's not that the latter has a flatter distribution - i.e. a greater diversity of analogies. As a whole, there are far fewer "size of a" analogies per page in the 21st century than in the 19th.
 
@@ -822,7 +823,7 @@ Whereas the default corpus of all books gives the impression that walnut analogi
 Unfortunately, while fiction is about 25% of the dataset in recent years, until the late 20th century, it comprises quite a small proportion of books scanned per year.
 
 
-![png](writeup_files/writeup_42_0.png)
+![png](/assets/sizeof/writeup_42_0.png)
 
 
 For most of the 19th century, there are just a few hundred books per year. Which is nothing to sneeze at, but insufficient to statistically analyse these kinds of linguistic needles in a haystack.

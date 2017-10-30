@@ -6,3 +6,20 @@ table.dataframe {
 
 table.dataframe td {
 }
+
+@media (max-width: 500px) {
+iframe.ngramchart { 
+  width: 650px;
+  margin-left: -110px;
+  height: 240px;
+}
+}
+
+
+
+@media (min-width: 500px) {
+iframe.ngramchart { 
+  width: 900px;
+  height: 340px;
+}
+}
