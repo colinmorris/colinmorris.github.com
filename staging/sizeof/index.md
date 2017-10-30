@@ -1,41 +1,41 @@
 ---
 layout: post
-title: "Title-tk"
+title: "The size of things: analogies in the Google Books ngram dataset"
 tags: [linguistics]
 date: 2017-10-28
-custom_css: pd
 ---
 
 
-# Top
+As an author, how do you communicate the size of an object? You probably compare it to some other thing the reader is likely to be familiar with. Take these descriptions of objects from Charles Dickens:
 
-# Title tk
+> a cauliflower somewhat larger than a chaise-umbrella
 
-<blockquote>
-<p>The rotifer *Keratella quadrata*, a common zooplankter, has a body about 125 μm long (about half the size of a full stop on this page) with spines, half as long, held out behind. If the body of <i>Keratella</i> is scaled to the size of a tall man then the rest of the community ranges from flour grains (for viruses) to peanuts, horses and large houses, and for fish, to leviathans, 50km long!</p>
-<footer><cite><a href="https://books.google.ca/books?id=uOhSa1X9UcgC&lpg=PA267&dq=%22the%20size%20of%20a%22&pg=PA267#v=onepage&q&f=false">Ecology of Fresh Waters: A View for the Twenty-First Century</a></cite></footer>
-</blockquote>
+> a bit about the size of a walnut put upon the plate
 
-Analogies like these are useful because they describe the unfamiliar (in this case, zooplankton and other freshwater organisms) in terms of familiar objects (a period, a tall man, a horse...). 
+> a bouquet, the size of a prize cauliflower in his buttonhole
 
+> his potter's wheel - a disc about the size of a dinner-plate
 
-The benchmarks people used for comparisons during a given period of time provide an interesting window into what sorts of objects were on their minds, and what they treated as common knowledge.
+> a massive cameo, in size and shape like the raspberry tart which is ordinarily sold for a penny
 
-For example, a manual from 1810 gives the instruction to ["take a plate of copper, about the size of a trencher"](https://books.google.ca/books?id=FdovAAAAYAAJ&dq=%22size%20of%20a%20trencher%22&pg=PT908#v=onepage&q&f=false). (A trencher is <a href="https://en.wikipedia.org/wiki/Trencher_(tableware)">a wooden plate or platter for food</a>). This would be utterly unhelpful to a modern reader, but the fact that it was used here tells us it was probably a common piece of tableware in the early 19th century.
+The objects that people formed comparisons with during a given time period provide an interesting window into what everyday objects they had on their minds, and what they treated as common knowledge. "the raspberry tart which is ordinarily sold for a penny" would be a pretty unhelpful reference for a modern reader, just as comparisons to credit cards or phone booths would be useless to a reader from 1844.
 
-With the help of [Google Books' Ngram data](https://books.google.com/ngrams), I analysed the changing frequencies in English books of analogies - specifically size comparisons like the ones above, having the form: `the size of a ____`.
+I used [Google Books' Ngram dataset](https://books.google.com/ngrams) to find the most popular size analogies in English books, and how they've changed from 1800 to today. In this post, I'll explore a few interesting examples of analogies that have gone in or out of fashion, and what kinds of cultural, historical, or linguistic changes they might reveal.
 
-So what do authors most frequently reach for when describing the size of things? Here are the top 20, ranked by total number of occurences in books between 1800 and 2008.
+So what do authors most frequently reach for when describing the size of things? Here are the overall top 20, ranked by total number of occurences in books between 1800 and 2008.
 
 
 ![png](writeup_files/writeup_21_0.png)
 
 
+
+(As noted in the heading, I restricted my analysis to comparisons taking the form `"the size of a _____"`. For all the gory technical details, check out the appendix at the end.)
+
 Peas seem to be the undisputed champion of size analogies.
 
-"the size of a pinhead" is pretty hoary, but other than that, the list is actually pretty short on clichés. The ultimate groaner, the breadbox, doesn't even quite make the top 1000.
+<!-- "the size of a pinhead" is pretty hoary, but other than that, the list is actually pretty short on clichés. The ultimate groaner, the breadbox, doesn't even quite make the top 1000. -->
 
-Because the number of books published per year has increased over time, this ranking will tend to favour terms that have been popular in recent years, but we can still see a few archaic-looking phrases, such as "hen's egg".
+Because the number of books published per year has increased over time, this ranking will tend to favour terms that have been popular in recent years. So for the rest of this post, I'll be normalizing by the amount of text scanned in each year.
 
 Let's look at the top terms for the 19th, 20th, and 21st centuries to get a sense of what's changed over time.
 
@@ -43,140 +43,140 @@ Let's look at the top terms for the 19th, 20th, and 21st centuries to get a sens
 
 
 <style  type="text/css" >
-    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row0_col0 {
+    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row0_col0 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row0_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row0_col1 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row0_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row0_col2 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row1_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row1_col0 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row1_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row1_col1 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row1_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row1_col2 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row2_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row2_col0 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row2_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row2_col1 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row2_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row2_col2 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row3_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row3_col0 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row3_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row3_col1 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row3_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row3_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row4_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row4_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row4_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row4_col1 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row4_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row4_col2 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row5_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row5_col0 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row5_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row5_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row5_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row5_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row6_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row6_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row6_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row6_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row6_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row6_col2 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row7_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row7_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row7_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row7_col1 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row7_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row7_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row8_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row8_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row8_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row8_col1 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row8_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row8_col2 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row9_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row9_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row9_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row9_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row9_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row9_col2 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row10_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row10_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row10_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row10_col1 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row10_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row10_col2 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row11_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row11_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row11_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row11_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row11_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row11_col2 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row12_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row12_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row12_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row12_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row12_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row12_col2 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row13_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row13_col0 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row13_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row13_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row13_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row13_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row14_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row14_col0 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row14_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row14_col1 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row14_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row14_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row15_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row15_col0 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row15_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row15_col1 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row15_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row15_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row16_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row16_col0 {
             background-color:  #bebada;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row16_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row16_col1 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row16_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row16_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row17_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row17_col0 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row17_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row17_col1 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row17_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row17_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row18_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row18_col0 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row18_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row18_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row18_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row18_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row19_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row19_col0 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row19_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row19_col1 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row19_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row19_col2 {
             background-color:  #ffffb3;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row20_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row20_col0 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row20_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row20_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row20_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row20_col2 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row21_col0 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row21_col0 {
             background-color:  #f2f2f2;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row21_col1 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row21_col1 {
             background-color:  #8dd3c7;
-        }    #T_f9fce854_bc03_11e7_a483_889ffafd94e7row21_col2 {
+        }    #T_74b59c8e_bce1_11e7_a483_889ffafd94e7row21_col2 {
             background-color:  #f2f2f2;
         }</style>  
-<table id="T_f9fce854_bc03_11e7_a483_889ffafd94e7"  class="table table-condensed dataframe">
+<table id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7"  class="table table-condensed dataframe">
 <thead>    <tr> 
         <th class="blank level0" ></th> 
         <th class="col_heading level0 col0" >1800s</th> 
@@ -184,115 +184,115 @@ Let's look at the top terms for the 19th, 20th, and 21st centuries to get a sens
         <th class="col_heading level0 col2" >2000s</th> 
     </tr></thead> 
 <tbody>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row0" class="row_heading level0 row0" >1</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row0_col0" class="data row0 col0" >pea</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row0_col1" class="data row0 col1" >pea</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row0_col2" class="data row0 col2" >pea</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row0" class="row_heading level0 row0" >1</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row0_col0" class="data row0 col0" >pea</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row0_col1" class="data row0 col1" >pea</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row0_col2" class="data row0 col2" >pea</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row1" class="row_heading level0 row1" >2</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row1_col0" class="data row1 col0" >walnut</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row1_col1" class="data row1 col1" >walnut</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row1_col2" class="data row1 col2" >walnut</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row1" class="row_heading level0 row1" >2</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row1_col0" class="data row1 col0" >walnut</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row1_col1" class="data row1 col1" >walnut</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row1_col2" class="data row1 col2" >walnut</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row2" class="row_heading level0 row2" >3</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row2_col0" class="data row2 col0" >pinhead</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row2_col1" class="data row2 col1" >pinhead</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row2_col2" class="data row2 col2" >quarter</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row2" class="row_heading level0 row2" >3</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row2_col0" class="data row2 col0" >pinhead</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row2_col1" class="data row2 col1" >pinhead</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row2_col2" class="data row2 col2" >quarter</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row3" class="row_heading level0 row3" >4</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row3_col0" class="data row3 col0" >egg</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row3_col1" class="data row3 col1" >egg</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row3_col2" class="data row3 col2" >football field</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row3" class="row_heading level0 row3" >4</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row3_col0" class="data row3 col0" >egg</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row3_col1" class="data row3 col1" >egg</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row3_col2" class="data row3 col2" >football field</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row4" class="row_heading level0 row4" >5</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row4_col0" class="data row4 col0" >hen's egg</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row4_col1" class="data row4 col1" >orange</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row4_col2" class="data row4 col2" >egg</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row4" class="row_heading level0 row4" >5</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row4_col0" class="data row4 col0" >hen's egg</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row4_col1" class="data row4 col1" >orange</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row4_col2" class="data row4 col2" >egg</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row5" class="row_heading level0 row5" >6</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row5_col0" class="data row5 col0" >orange</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row5_col1" class="data row5 col1" >hen's egg</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row5_col2" class="data row5 col2" >grapefruit</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row5" class="row_heading level0 row5" >6</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row5_col0" class="data row5 col0" >orange</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row5_col1" class="data row5 col1" >hen's egg</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row5_col2" class="data row5 col2" >grapefruit</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row6" class="row_heading level0 row6" >7</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row6_col0" class="data row6 col0" >hazelnut</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row6_col1" class="data row6 col1" >hazelnut</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row6_col2" class="data row6 col2" >house</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row6" class="row_heading level0 row6" >7</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row6_col0" class="data row6 col0" >hazelnut</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row6_col1" class="data row6 col1" >hazelnut</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row6_col2" class="data row6 col2" >house</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row7" class="row_heading level0 row7" >8</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row7_col0" class="data row7 col0" >pigeon's egg</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row7_col1" class="data row7 col1" >man</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row7_col2" class="data row7 col2" >golf ball</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row7" class="row_heading level0 row7" >8</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row7_col0" class="data row7 col0" >pigeon's egg</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row7_col1" class="data row7 col1" >man</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row7_col2" class="data row7 col2" >golf ball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row8" class="row_heading level0 row8" >9</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row8_col0" class="data row8 col0" >shilling</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row8_col1" class="data row8 col1" >fist</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row8_col2" class="data row8 col2" >man</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row8" class="row_heading level0 row8" >9</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row8_col0" class="data row8 col0" >shilling</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row8_col1" class="data row8 col1" >fist</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row8_col2" class="data row8 col2" >man</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row9" class="row_heading level0 row9" >10</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row9_col0" class="data row9 col0" >nut</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row9_col1" class="data row9 col1" >bean</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row9_col2" class="data row9 col2" >fist</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row9" class="row_heading level0 row9" >10</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row9_col0" class="data row9 col0" >nut</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row9_col1" class="data row9 col1" >bean</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row9_col2" class="data row9 col2" >fist</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row10" class="row_heading level0 row10" >11</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row10_col0" class="data row10 col0" >cherry</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row10_col1" class="data row10 col1" >dime</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row10_col2" class="data row10 col2" >pinhead</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row10" class="row_heading level0 row10" >11</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row10_col0" class="data row10 col0" >cherry</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row10_col1" class="data row10 col1" >dime</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row10_col2" class="data row10 col2" >pinhead</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row11" class="row_heading level0 row11" >12</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row11_col0" class="data row11 col0" >bean</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row11_col1" class="data row11 col1" >apple</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row11_col2" class="data row11 col2" >dime</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row11" class="row_heading level0 row11" >12</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row11_col0" class="data row11 col0" >bean</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row11_col1" class="data row11 col1" >apple</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row11_col2" class="data row11 col2" >dime</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row12" class="row_heading level0 row12" >13</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row12_col0" class="data row12 col0" >apple</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row12_col1" class="data row12 col1" >cherry</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row12_col2" class="data row12 col2" >orange</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row12" class="row_heading level0 row12" >13</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row12_col0" class="data row12 col0" >apple</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row12_col1" class="data row12 col1" >cherry</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row12_col2" class="data row12 col2" >orange</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row13" class="row_heading level0 row13" >14</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row13_col0" class="data row13 col0" >sixpence</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row13_col1" class="data row13 col1" >pigeon's egg</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row13_col2" class="data row13 col2" >baseball</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row13" class="row_heading level0 row13" >14</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row13_col0" class="data row13 col0" >sixpence</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row13_col1" class="data row13 col1" >pigeon's egg</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row13_col2" class="data row13 col2" >baseball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row14" class="row_heading level0 row14" >15</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row14_col0" class="data row14 col0" >pigeon</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row14_col1" class="data row14 col1" >quarter</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row14_col2" class="data row14 col2" >postage stamp</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row14" class="row_heading level0 row14" >15</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row14_col0" class="data row14 col0" >pigeon</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row14_col1" class="data row14 col1" >quarter</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row14_col2" class="data row14 col2" >postage stamp</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row15" class="row_heading level0 row15" >16</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row15_col0" class="data row15 col0" >goose</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row15_col1" class="data row15 col1" >silver dollar</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row15_col2" class="data row15 col2" >basketball</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row15" class="row_heading level0 row15" >16</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row15_col0" class="data row15 col0" >goose</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row15_col1" class="data row15 col1" >silver dollar</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row15_col2" class="data row15 col2" >basketball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row16" class="row_heading level0 row16" >17</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row16_col0" class="data row16 col0" >man</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row16_col1" class="data row16 col1" >marble</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row16_col2" class="data row16 col2" >football</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row16" class="row_heading level0 row16" >17</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row16_col0" class="data row16 col0" >man</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row16_col1" class="data row16 col1" >marble</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row16_col2" class="data row16 col2" >football</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row17" class="row_heading level0 row17" >18</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row17_col0" class="data row17 col0" >nutmeg</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row17_col1" class="data row17 col1" >house</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row17_col2" class="data row17 col2" >deck of cards</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row17" class="row_heading level0 row17" >18</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row17_col0" class="data row17 col0" >nutmeg</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row17_col1" class="data row17 col1" >house</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row17_col2" class="data row17 col2" >deck of cards</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row18" class="row_heading level0 row18" >19</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row18_col0" class="data row18 col0" >pin</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row18_col1" class="data row18 col1" >pin</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row18_col2" class="data row18 col2" >tennis ball</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row18" class="row_heading level0 row18" >19</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row18_col0" class="data row18 col0" >pin</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row18_col1" class="data row18 col1" >pin</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row18_col2" class="data row18 col2" >tennis ball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row19" class="row_heading level0 row19" >20</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row19_col0" class="data row19 col0" >millet seed</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row19_col1" class="data row19 col1" >lead pencil</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row19_col2" class="data row19 col2" >silver dollar</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row19" class="row_heading level0 row19" >20</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row19_col0" class="data row19 col0" >millet seed</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row19_col1" class="data row19 col1" >lead pencil</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row19_col2" class="data row19 col2" >silver dollar</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row20" class="row_heading level0 row20" >21</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row20_col0" class="data row20 col0" >cat</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row20_col1" class="data row20 col1" >nut</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row20_col2" class="data row20 col2" >pencil</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row20" class="row_heading level0 row20" >21</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row20_col0" class="data row20 col0" >cat</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row20_col1" class="data row20 col1" >nut</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row20_col2" class="data row20 col2" >pencil</td> 
     </tr>    <tr> 
-        <th id="T_f9fce854_bc03_11e7_a483_889ffafd94e7level0_row21" class="row_heading level0 row21" >22</th> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row21_col0" class="data row21 col0" >crown piece</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row21_col1" class="data row21 col1" >shilling</td> 
-        <td id="T_f9fce854_bc03_11e7_a483_889ffafd94e7row21_col2" class="data row21 col2" >credit card</td> 
+        <th id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7level0_row21" class="row_heading level0 row21" >22</th> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row21_col0" class="data row21 col0" >crown piece</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row21_col1" class="data row21 col1" >shilling</td> 
+        <td id="T_74b59c8e_bce1_11e7_a483_889ffafd94e7row21_col2" class="data row21 col2" >credit card</td> 
     </tr></tbody> 
 </table> 
 
@@ -302,11 +302,11 @@ Let's look at the top terms for the 19th, 20th, and 21st centuries to get a sens
 
 "the size of a pea" is consistently the number 1 size comparison from 1800 to present day. Eggs and walnuts also remain consistently popular, but beyond those examples, there's a lot of change from century to century.
 
-Some differences have obvious historical reasons. For example, the shilling was out of circulation by the dawn of the millenium, and credit cards didn't exist in the 19th century. But most are less obvious. Why have we gradually forgetten how big pigeon eggs are? Why is 'a deck of cards' such a distinctly modern point of reference?
+Some differences have obvious historical reasons. For example, the shilling was out of circulation by the dawn of the millenium, and credit cards didn't exist in the 19th century. But most are less obvious. Why have we gradually forgetten how big pigeon eggs are? Why is a deck of cards such a distinctly modern point of reference?
 
-Let's dig into a few specific curiosities.
+Let's dig into some trends and a few specific curiosities.
 
-### The decline of pigeon eggs
+### Down with nature
 
 One general trend that stands out is a drop over time in references to 'natural' objects.
 
@@ -314,72 +314,72 @@ One general trend that stands out is a drop over time in references to 'natural'
 
 
 <style  type="text/css" >
-    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row0_col0 {
+    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row0_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row0_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row0_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row0_col2 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row0_col2 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row1_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row1_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row1_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row1_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row1_col2 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row1_col2 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row3_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row3_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row3_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row3_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row4_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row4_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row4_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row4_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row4_col2 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row4_col2 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row5_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row5_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row5_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row5_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row5_col2 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row5_col2 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row6_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row6_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row6_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row6_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row7_col0 {
-            background-color:  #6cb28e;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row9_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row7_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row9_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row9_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row10_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row9_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row11_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row10_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row11_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row11_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row12_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row11_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row12_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row12_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row12_col2 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row12_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row13_col1 {
-            background-color:  #6cb28e;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row14_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row12_col2 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row15_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row13_col1 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row17_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row14_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row19_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row15_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row20_col0 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row17_col0 {
             background-color:  #9fe0be;
-        }    #T_f9fce855_bc03_11e7_a483_889ffafd94e7row20_col1 {
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row19_col0 {
+            background-color:  #9fe0be;
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row20_col0 {
+            background-color:  #9fe0be;
+        }    #T_74b59c8f_bce1_11e7_a483_889ffafd94e7row20_col1 {
             background-color:  #9fe0be;
         }</style>  
-<table id="T_f9fce855_bc03_11e7_a483_889ffafd94e7"  class="table table-condensed dataframe">
+<table id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7"  class="table table-condensed dataframe">
 <thead>    <tr> 
         <th class="blank level0" ></th> 
         <th class="col_heading level0 col0" >1800s</th> 
@@ -387,115 +387,115 @@ One general trend that stands out is a drop over time in references to 'natural'
         <th class="col_heading level0 col2" >2000s</th> 
     </tr></thead> 
 <tbody>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row0" class="row_heading level0 row0" >1</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row0_col0" class="data row0 col0" >pea</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row0_col1" class="data row0 col1" >pea</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row0_col2" class="data row0 col2" >pea</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row0" class="row_heading level0 row0" >1</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row0_col0" class="data row0 col0" >pea</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row0_col1" class="data row0 col1" >pea</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row0_col2" class="data row0 col2" >pea</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row1" class="row_heading level0 row1" >2</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row1_col0" class="data row1 col0" >walnut</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row1_col1" class="data row1 col1" >walnut</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row1_col2" class="data row1 col2" >walnut</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row1" class="row_heading level0 row1" >2</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row1_col0" class="data row1 col0" >walnut</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row1_col1" class="data row1 col1" >walnut</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row1_col2" class="data row1 col2" >walnut</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row2" class="row_heading level0 row2" >3</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row2_col0" class="data row2 col0" >pinhead</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row2_col1" class="data row2 col1" >pinhead</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row2_col2" class="data row2 col2" >quarter</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row2" class="row_heading level0 row2" >3</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row2_col0" class="data row2 col0" >pinhead</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row2_col1" class="data row2 col1" >pinhead</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row2_col2" class="data row2 col2" >quarter</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row3" class="row_heading level0 row3" >4</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row3_col0" class="data row3 col0" >egg</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row3_col1" class="data row3 col1" >egg</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row3_col2" class="data row3 col2" >football field</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row3" class="row_heading level0 row3" >4</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row3_col0" class="data row3 col0" >egg</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row3_col1" class="data row3 col1" >egg</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row3_col2" class="data row3 col2" >football field</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row4" class="row_heading level0 row4" >5</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row4_col0" class="data row4 col0" >hen's egg</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row4_col1" class="data row4 col1" >orange</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row4_col2" class="data row4 col2" >egg</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row4" class="row_heading level0 row4" >5</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row4_col0" class="data row4 col0" >hen's egg</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row4_col1" class="data row4 col1" >orange</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row4_col2" class="data row4 col2" >egg</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row5" class="row_heading level0 row5" >6</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row5_col0" class="data row5 col0" >orange</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row5_col1" class="data row5 col1" >hen's egg</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row5_col2" class="data row5 col2" >grapefruit</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row5" class="row_heading level0 row5" >6</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row5_col0" class="data row5 col0" >orange</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row5_col1" class="data row5 col1" >hen's egg</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row5_col2" class="data row5 col2" >grapefruit</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row6" class="row_heading level0 row6" >7</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row6_col0" class="data row6 col0" >hazelnut</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row6_col1" class="data row6 col1" >hazelnut</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row6_col2" class="data row6 col2" >house</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row6" class="row_heading level0 row6" >7</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row6_col0" class="data row6 col0" >hazelnut</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row6_col1" class="data row6 col1" >hazelnut</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row6_col2" class="data row6 col2" >house</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row7" class="row_heading level0 row7" >8</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row7_col0" class="data row7 col0" >pigeon's egg</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row7_col1" class="data row7 col1" >man</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row7_col2" class="data row7 col2" >golf ball</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row7" class="row_heading level0 row7" >8</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row7_col0" class="data row7 col0" >pigeon's egg</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row7_col1" class="data row7 col1" >man</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row7_col2" class="data row7 col2" >golf ball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row8" class="row_heading level0 row8" >9</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row8_col0" class="data row8 col0" >shilling</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row8_col1" class="data row8 col1" >fist</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row8_col2" class="data row8 col2" >man</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row8" class="row_heading level0 row8" >9</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row8_col0" class="data row8 col0" >shilling</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row8_col1" class="data row8 col1" >fist</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row8_col2" class="data row8 col2" >man</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row9" class="row_heading level0 row9" >10</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row9_col0" class="data row9 col0" >nut</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row9_col1" class="data row9 col1" >bean</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row9_col2" class="data row9 col2" >fist</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row9" class="row_heading level0 row9" >10</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row9_col0" class="data row9 col0" >nut</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row9_col1" class="data row9 col1" >bean</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row9_col2" class="data row9 col2" >fist</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row10" class="row_heading level0 row10" >11</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row10_col0" class="data row10 col0" >cherry</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row10_col1" class="data row10 col1" >dime</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row10_col2" class="data row10 col2" >pinhead</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row10" class="row_heading level0 row10" >11</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row10_col0" class="data row10 col0" >cherry</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row10_col1" class="data row10 col1" >dime</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row10_col2" class="data row10 col2" >pinhead</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row11" class="row_heading level0 row11" >12</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row11_col0" class="data row11 col0" >bean</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row11_col1" class="data row11 col1" >apple</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row11_col2" class="data row11 col2" >dime</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row11" class="row_heading level0 row11" >12</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row11_col0" class="data row11 col0" >bean</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row11_col1" class="data row11 col1" >apple</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row11_col2" class="data row11 col2" >dime</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row12" class="row_heading level0 row12" >13</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row12_col0" class="data row12 col0" >apple</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row12_col1" class="data row12 col1" >cherry</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row12_col2" class="data row12 col2" >orange</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row12" class="row_heading level0 row12" >13</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row12_col0" class="data row12 col0" >apple</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row12_col1" class="data row12 col1" >cherry</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row12_col2" class="data row12 col2" >orange</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row13" class="row_heading level0 row13" >14</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row13_col0" class="data row13 col0" >sixpence</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row13_col1" class="data row13 col1" >pigeon's egg</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row13_col2" class="data row13 col2" >baseball</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row13" class="row_heading level0 row13" >14</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row13_col0" class="data row13 col0" >sixpence</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row13_col1" class="data row13 col1" >pigeon's egg</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row13_col2" class="data row13 col2" >baseball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row14" class="row_heading level0 row14" >15</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row14_col0" class="data row14 col0" >pigeon</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row14_col1" class="data row14 col1" >quarter</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row14_col2" class="data row14 col2" >postage stamp</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row14" class="row_heading level0 row14" >15</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row14_col0" class="data row14 col0" >pigeon</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row14_col1" class="data row14 col1" >quarter</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row14_col2" class="data row14 col2" >postage stamp</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row15" class="row_heading level0 row15" >16</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row15_col0" class="data row15 col0" >goose</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row15_col1" class="data row15 col1" >silver dollar</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row15_col2" class="data row15 col2" >basketball</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row15" class="row_heading level0 row15" >16</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row15_col0" class="data row15 col0" >goose</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row15_col1" class="data row15 col1" >silver dollar</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row15_col2" class="data row15 col2" >basketball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row16" class="row_heading level0 row16" >17</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row16_col0" class="data row16 col0" >man</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row16_col1" class="data row16 col1" >marble</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row16_col2" class="data row16 col2" >football</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row16" class="row_heading level0 row16" >17</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row16_col0" class="data row16 col0" >man</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row16_col1" class="data row16 col1" >marble</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row16_col2" class="data row16 col2" >football</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row17" class="row_heading level0 row17" >18</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row17_col0" class="data row17 col0" >nutmeg</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row17_col1" class="data row17 col1" >house</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row17_col2" class="data row17 col2" >deck of cards</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row17" class="row_heading level0 row17" >18</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row17_col0" class="data row17 col0" >nutmeg</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row17_col1" class="data row17 col1" >house</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row17_col2" class="data row17 col2" >deck of cards</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row18" class="row_heading level0 row18" >19</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row18_col0" class="data row18 col0" >pin</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row18_col1" class="data row18 col1" >pin</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row18_col2" class="data row18 col2" >tennis ball</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row18" class="row_heading level0 row18" >19</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row18_col0" class="data row18 col0" >pin</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row18_col1" class="data row18 col1" >pin</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row18_col2" class="data row18 col2" >tennis ball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row19" class="row_heading level0 row19" >20</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row19_col0" class="data row19 col0" >millet seed</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row19_col1" class="data row19 col1" >lead pencil</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row19_col2" class="data row19 col2" >silver dollar</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row19" class="row_heading level0 row19" >20</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row19_col0" class="data row19 col0" >millet seed</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row19_col1" class="data row19 col1" >lead pencil</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row19_col2" class="data row19 col2" >silver dollar</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row20" class="row_heading level0 row20" >21</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row20_col0" class="data row20 col0" >cat</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row20_col1" class="data row20 col1" >nut</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row20_col2" class="data row20 col2" >pencil</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row20" class="row_heading level0 row20" >21</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row20_col0" class="data row20 col0" >cat</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row20_col1" class="data row20 col1" >nut</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row20_col2" class="data row20 col2" >pencil</td> 
     </tr>    <tr> 
-        <th id="T_f9fce855_bc03_11e7_a483_889ffafd94e7level0_row21" class="row_heading level0 row21" >22</th> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row21_col0" class="data row21 col0" >crown piece</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row21_col1" class="data row21 col1" >shilling</td> 
-        <td id="T_f9fce855_bc03_11e7_a483_889ffafd94e7row21_col2" class="data row21 col2" >credit card</td> 
+        <th id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7level0_row21" class="row_heading level0 row21" >22</th> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row21_col0" class="data row21 col0" >crown piece</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row21_col1" class="data row21 col1" >shilling</td> 
+        <td id="T_74b59c8f_bce1_11e7_a483_889ffafd94e7row21_col2" class="data row21 col2" >credit card</td> 
     </tr></tbody> 
 </table> 
 
@@ -503,14 +503,7 @@ One general trend that stands out is a drop over time in references to 'natural'
 
 16 of the top 22 terms in the 19th century refer to objects from nature (seeds, fruits, animals, nuts, eggs...), but by the 21st century there are only 5.
 
-The story of eggs is an interesting example of this trend. Until the mid-to-late 20th century, "the size of a hen's egg" was about as common as "the size of an egg". Perhaps "an egg" left open too much ambiguity. A reader might think you were referring to a pigeon's egg - an astonishingly common reference until its popularity began to drop in the late 19th century.
-
-<!-- ngram search query: size of an egg,size of a pigeon egg + size of a pigeon's,size of a hen egg + size of a hen's -->
-<img src="eggs_eggs_eggs.png" />
-
-The sheer popularity of pigeon egg analogies was pretty surprising to me. If you're skeptical, you can browse some examples from Google Books [here](https://www.google.ca/search?q=%22size+of+a+pigeon%27s%22&tbm=bks&lr=lang_en&gws_rd=cr&dcr=0&ei=ACLyWZqTNMbejwTiqaEQ). It's not that this time period has an extraordinary number of books on ornithology. The comparison occurs frequently in technical texts on areas like medicine, botany and geology. But it also occurs in books aimed at non-technical audiences (e.g. [a Jules Verne novel](https://books.google.ca/books?id=TMqzAwAAQBAJ&pg=PT101&dq=%22size+of+a+pigeon%27s%22&hl=en&sa=X&ved=0ahUKEwi5tfql7o7XAhUK6IMKHfIuCqg4ggEQ6AEITjAH#v=onepage&q=%22size%20of%20a%20pigeon's%22&f=false), or [The Practice of Cookery: Adapted to the Business of Every Day Life](https://books.google.ca/books?id=y6N2cnCzajUC&pg=PA477&dq=%22size+of+a+pigeon%27s%22&hl=en&sa=X&ved=0ahUKEwiw_buR7o7XAhUl3YMKHdpsCJ84WhDoAQgsMAE#v=onepage&q=%22size%20of%20a%20pigeon's%22&f=false) by one "Mrs. Dalgairns").
-
-### The rise of sports
+### Up with sports
 
 Not a single sports analogy makes the list in the 19th and 20th centuries, but they explode onto the scene in the 21st century: 
 
@@ -518,20 +511,20 @@ Not a single sports analogy makes the list in the 19th and 20th centuries, but t
 
 
 <style  type="text/css" >
-    #T_f9fce856_bc03_11e7_a483_889ffafd94e7row3_col2 {
+    #T_74b59c90_bce1_11e7_a483_889ffafd94e7row3_col2 {
             background-color:  #e5dea5;
-        }    #T_f9fce856_bc03_11e7_a483_889ffafd94e7row7_col2 {
+        }    #T_74b59c90_bce1_11e7_a483_889ffafd94e7row7_col2 {
             background-color:  #e5dea5;
-        }    #T_f9fce856_bc03_11e7_a483_889ffafd94e7row13_col2 {
+        }    #T_74b59c90_bce1_11e7_a483_889ffafd94e7row13_col2 {
             background-color:  #e5dea5;
-        }    #T_f9fce856_bc03_11e7_a483_889ffafd94e7row15_col2 {
+        }    #T_74b59c90_bce1_11e7_a483_889ffafd94e7row15_col2 {
             background-color:  #e5dea5;
-        }    #T_f9fce856_bc03_11e7_a483_889ffafd94e7row16_col2 {
+        }    #T_74b59c90_bce1_11e7_a483_889ffafd94e7row16_col2 {
             background-color:  #e5dea5;
-        }    #T_f9fce856_bc03_11e7_a483_889ffafd94e7row18_col2 {
+        }    #T_74b59c90_bce1_11e7_a483_889ffafd94e7row18_col2 {
             background-color:  #e5dea5;
         }</style>  
-<table id="T_f9fce856_bc03_11e7_a483_889ffafd94e7"  class="table table-condensed dataframe">
+<table id="T_74b59c90_bce1_11e7_a483_889ffafd94e7"  class="table table-condensed dataframe">
 <thead>    <tr> 
         <th class="blank level0" ></th> 
         <th class="col_heading level0 col0" >1800s</th> 
@@ -539,121 +532,121 @@ Not a single sports analogy makes the list in the 19th and 20th centuries, but t
         <th class="col_heading level0 col2" >2000s</th> 
     </tr></thead> 
 <tbody>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row0" class="row_heading level0 row0" >1</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row0_col0" class="data row0 col0" >pea</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row0_col1" class="data row0 col1" >pea</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row0_col2" class="data row0 col2" >pea</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row0" class="row_heading level0 row0" >1</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row0_col0" class="data row0 col0" >pea</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row0_col1" class="data row0 col1" >pea</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row0_col2" class="data row0 col2" >pea</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row1" class="row_heading level0 row1" >2</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row1_col0" class="data row1 col0" >walnut</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row1_col1" class="data row1 col1" >walnut</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row1_col2" class="data row1 col2" >walnut</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row1" class="row_heading level0 row1" >2</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row1_col0" class="data row1 col0" >walnut</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row1_col1" class="data row1 col1" >walnut</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row1_col2" class="data row1 col2" >walnut</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row2" class="row_heading level0 row2" >3</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row2_col0" class="data row2 col0" >pinhead</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row2_col1" class="data row2 col1" >pinhead</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row2_col2" class="data row2 col2" >quarter</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row2" class="row_heading level0 row2" >3</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row2_col0" class="data row2 col0" >pinhead</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row2_col1" class="data row2 col1" >pinhead</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row2_col2" class="data row2 col2" >quarter</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row3" class="row_heading level0 row3" >4</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row3_col0" class="data row3 col0" >egg</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row3_col1" class="data row3 col1" >egg</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row3_col2" class="data row3 col2" >football field</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row3" class="row_heading level0 row3" >4</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row3_col0" class="data row3 col0" >egg</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row3_col1" class="data row3 col1" >egg</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row3_col2" class="data row3 col2" >football field</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row4" class="row_heading level0 row4" >5</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row4_col0" class="data row4 col0" >hen's egg</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row4_col1" class="data row4 col1" >orange</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row4_col2" class="data row4 col2" >egg</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row4" class="row_heading level0 row4" >5</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row4_col0" class="data row4 col0" >hen's egg</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row4_col1" class="data row4 col1" >orange</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row4_col2" class="data row4 col2" >egg</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row5" class="row_heading level0 row5" >6</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row5_col0" class="data row5 col0" >orange</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row5_col1" class="data row5 col1" >hen's egg</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row5_col2" class="data row5 col2" >grapefruit</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row5" class="row_heading level0 row5" >6</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row5_col0" class="data row5 col0" >orange</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row5_col1" class="data row5 col1" >hen's egg</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row5_col2" class="data row5 col2" >grapefruit</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row6" class="row_heading level0 row6" >7</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row6_col0" class="data row6 col0" >hazelnut</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row6_col1" class="data row6 col1" >hazelnut</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row6_col2" class="data row6 col2" >house</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row6" class="row_heading level0 row6" >7</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row6_col0" class="data row6 col0" >hazelnut</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row6_col1" class="data row6 col1" >hazelnut</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row6_col2" class="data row6 col2" >house</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row7" class="row_heading level0 row7" >8</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row7_col0" class="data row7 col0" >pigeon's egg</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row7_col1" class="data row7 col1" >man</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row7_col2" class="data row7 col2" >golf ball</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row7" class="row_heading level0 row7" >8</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row7_col0" class="data row7 col0" >pigeon's egg</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row7_col1" class="data row7 col1" >man</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row7_col2" class="data row7 col2" >golf ball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row8" class="row_heading level0 row8" >9</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row8_col0" class="data row8 col0" >shilling</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row8_col1" class="data row8 col1" >fist</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row8_col2" class="data row8 col2" >man</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row8" class="row_heading level0 row8" >9</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row8_col0" class="data row8 col0" >shilling</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row8_col1" class="data row8 col1" >fist</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row8_col2" class="data row8 col2" >man</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row9" class="row_heading level0 row9" >10</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row9_col0" class="data row9 col0" >nut</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row9_col1" class="data row9 col1" >bean</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row9_col2" class="data row9 col2" >fist</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row9" class="row_heading level0 row9" >10</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row9_col0" class="data row9 col0" >nut</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row9_col1" class="data row9 col1" >bean</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row9_col2" class="data row9 col2" >fist</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row10" class="row_heading level0 row10" >11</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row10_col0" class="data row10 col0" >cherry</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row10_col1" class="data row10 col1" >dime</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row10_col2" class="data row10 col2" >pinhead</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row10" class="row_heading level0 row10" >11</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row10_col0" class="data row10 col0" >cherry</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row10_col1" class="data row10 col1" >dime</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row10_col2" class="data row10 col2" >pinhead</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row11" class="row_heading level0 row11" >12</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row11_col0" class="data row11 col0" >bean</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row11_col1" class="data row11 col1" >apple</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row11_col2" class="data row11 col2" >dime</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row11" class="row_heading level0 row11" >12</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row11_col0" class="data row11 col0" >bean</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row11_col1" class="data row11 col1" >apple</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row11_col2" class="data row11 col2" >dime</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row12" class="row_heading level0 row12" >13</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row12_col0" class="data row12 col0" >apple</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row12_col1" class="data row12 col1" >cherry</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row12_col2" class="data row12 col2" >orange</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row12" class="row_heading level0 row12" >13</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row12_col0" class="data row12 col0" >apple</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row12_col1" class="data row12 col1" >cherry</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row12_col2" class="data row12 col2" >orange</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row13" class="row_heading level0 row13" >14</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row13_col0" class="data row13 col0" >sixpence</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row13_col1" class="data row13 col1" >pigeon's egg</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row13_col2" class="data row13 col2" >baseball</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row13" class="row_heading level0 row13" >14</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row13_col0" class="data row13 col0" >sixpence</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row13_col1" class="data row13 col1" >pigeon's egg</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row13_col2" class="data row13 col2" >baseball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row14" class="row_heading level0 row14" >15</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row14_col0" class="data row14 col0" >pigeon</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row14_col1" class="data row14 col1" >quarter</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row14_col2" class="data row14 col2" >postage stamp</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row14" class="row_heading level0 row14" >15</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row14_col0" class="data row14 col0" >pigeon</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row14_col1" class="data row14 col1" >quarter</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row14_col2" class="data row14 col2" >postage stamp</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row15" class="row_heading level0 row15" >16</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row15_col0" class="data row15 col0" >goose</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row15_col1" class="data row15 col1" >silver dollar</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row15_col2" class="data row15 col2" >basketball</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row15" class="row_heading level0 row15" >16</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row15_col0" class="data row15 col0" >goose</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row15_col1" class="data row15 col1" >silver dollar</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row15_col2" class="data row15 col2" >basketball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row16" class="row_heading level0 row16" >17</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row16_col0" class="data row16 col0" >man</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row16_col1" class="data row16 col1" >marble</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row16_col2" class="data row16 col2" >football</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row16" class="row_heading level0 row16" >17</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row16_col0" class="data row16 col0" >man</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row16_col1" class="data row16 col1" >marble</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row16_col2" class="data row16 col2" >football</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row17" class="row_heading level0 row17" >18</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row17_col0" class="data row17 col0" >nutmeg</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row17_col1" class="data row17 col1" >house</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row17_col2" class="data row17 col2" >deck of cards</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row17" class="row_heading level0 row17" >18</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row17_col0" class="data row17 col0" >nutmeg</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row17_col1" class="data row17 col1" >house</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row17_col2" class="data row17 col2" >deck of cards</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row18" class="row_heading level0 row18" >19</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row18_col0" class="data row18 col0" >pin</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row18_col1" class="data row18 col1" >pin</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row18_col2" class="data row18 col2" >tennis ball</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row18" class="row_heading level0 row18" >19</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row18_col0" class="data row18 col0" >pin</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row18_col1" class="data row18 col1" >pin</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row18_col2" class="data row18 col2" >tennis ball</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row19" class="row_heading level0 row19" >20</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row19_col0" class="data row19 col0" >millet seed</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row19_col1" class="data row19 col1" >lead pencil</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row19_col2" class="data row19 col2" >silver dollar</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row19" class="row_heading level0 row19" >20</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row19_col0" class="data row19 col0" >millet seed</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row19_col1" class="data row19 col1" >lead pencil</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row19_col2" class="data row19 col2" >silver dollar</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row20" class="row_heading level0 row20" >21</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row20_col0" class="data row20 col0" >cat</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row20_col1" class="data row20 col1" >nut</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row20_col2" class="data row20 col2" >pencil</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row20" class="row_heading level0 row20" >21</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row20_col0" class="data row20 col0" >cat</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row20_col1" class="data row20 col1" >nut</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row20_col2" class="data row20 col2" >pencil</td> 
     </tr>    <tr> 
-        <th id="T_f9fce856_bc03_11e7_a483_889ffafd94e7level0_row21" class="row_heading level0 row21" >22</th> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row21_col0" class="data row21 col0" >crown piece</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row21_col1" class="data row21 col1" >shilling</td> 
-        <td id="T_f9fce856_bc03_11e7_a483_889ffafd94e7row21_col2" class="data row21 col2" >credit card</td> 
+        <th id="T_74b59c90_bce1_11e7_a483_889ffafd94e7level0_row21" class="row_heading level0 row21" >22</th> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row21_col0" class="data row21 col0" >crown piece</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row21_col1" class="data row21 col1" >shilling</td> 
+        <td id="T_74b59c90_bce1_11e7_a483_889ffafd94e7row21_col2" class="data row21 col2" >credit card</td> 
     </tr></tbody> 
 </table> 
 
 
 
-Most of the referenced sports weren't invented until around the turn of the century, so it isn't surprising they didn't make the pre-1900 list. But it's not like they didn't have any sports in the 19th century. Why weren't analogies to golf balls or cricket pitches popular back then?
+Most of the referenced sports weren't invented until around the turn of the century, so it isn't surprising they didn't make the pre-1900 list. But it's not like they didn't have any sports in the 19th century. Why weren't analogies to golf balls or cricket balls popular back then?
 
 <!-- It's tempting to connect this to the decline in plants and animals. Blah blah. -->
 
@@ -663,6 +656,34 @@ Most of the referenced sports weren't invented until around the turn of the cent
 
 This provides circumstantial evidence that people in the English-speaking world are at least thinking about sports a lot more than they did 1 or 2 generations ago. If that's true, is it being driven by increases in leisure time allowing more people to play? Or advances in mass media that have made it easier to watch professional sports? That sounds like a question for a sociologist.
 
+### The decline of pigeon eggs
+
+Pigeon eggs were an astonishingly common benchmark for comparisons in the 19th century, ranking 8th (with "size of a pigeon" at number 15). But they experienced a sharp drop in the late 19th century and a gradual decline thereafter.
+
+<img src="pigeonsegg.png" />
+
+Why was everyone familiar with the size of pigeon eggs in the 1800's? I've lived in cities with lots of pigeons and never seen one of their eggs. 
+
+If you're skeptical, you can browse some examples from Google Books [here](https://www.google.ca/search?q=%22size+of+a+pigeon%27s%22&tbm=bks&lr=lang_en&gws_rd=cr&dcr=0&ei=ACLyWZqTNMbejwTiqaEQ). It's not that this time period has an extraordinary number of books on ornithology. The comparison occurs frequently in technical texts on areas like medicine, botany and geology. But it also occurs in books aimed at non-technical audiences (e.g. [a Jules Verne novel](https://books.google.ca/books?id=TMqzAwAAQBAJ&pg=PT101&dq=%22size+of+a+pigeon%27s%22&hl=en&sa=X&ved=0ahUKEwi5tfql7o7XAhUK6IMKHfIuCqg4ggEQ6AEITjAH#v=onepage&q=%22size%20of%20a%20pigeon's%22&f=false), or [The Practice of Cookery: Adapted to the Business of Every Day Life](https://books.google.ca/books?id=y6N2cnCzajUC&pg=PA477&dq=%22size+of+a+pigeon%27s%22&hl=en&sa=X&ved=0ahUKEwiw_buR7o7XAhUl3YMKHdpsCJ84WhDoAQgsMAE#v=onepage&q=%22size%20of%20a%20pigeon's%22&f=false) by one "Mrs. Dalgairns").
+
+This was hugely baffling to me, until I remembered [that *other* pigeon](https://en.wikipedia.org/wiki/Passenger_pigeon).
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Passenger_pigeon_shoot.jpg/640px-Passenger_pigeon_shoot.jpg" />
+
+Passenger pigeons were once the most abundant bird in North America - flocks (like the one illustrated above) were described as blocking out the sun. The [wiki article](https://en.wikipedia.org/wiki/Passenger_pigeon) is full of vivid descriptions of their abundance and the extravagance with which they were hunted:
+
+> Passenger pigeons were shot with such ease that many did not consider them to be a game bird, as an amateur hunter could easily bring down six with one shotgun blast; a particularly good shot with both barrels of a shotgun at a roost could kill 61 birds.
+
+> The pigeon was considered so numerous that 30,000 birds had to be killed to claim the prize in one competition.
+
+And this particularly relevant one regarding nesting sites:
+
+> Nearly every tree capable of supporting nests had them, often more than 50 per tree; one hemlock was recorded as holding 317 nests.
+
+Of course, their story doesn't have a happy ending. As a result of overhunting and deforestation, by the 1870's their numbers had noticeably declined, and they were virtually extinct in the wild by the 1890's. Concurrently, "size of a pigeon's egg" analogies began their own slow march toward extinction.
+
+<!-- size of a hen's egg -->
+
 ### The size of a nutmeg?
 
 This one is pretty baffling.
@@ -671,9 +692,7 @@ This one is pretty baffling.
 
 This is consistent with the general observation that terms from nature have declined over time. We generally spend less time making food than our ancestors did, so nuts and spices are less likely to be at the forefront of our minds than golf balls and quarters. But this dramatic, steep decline isn't experienced by walnuts or hazelnuts or even the relatively obscure millet seed.
 
-Another curious aspect here is that nutmeg is treated as a count noun ("a nutmeg") rather than a mass noun ("some nutmeg", "a teaspoon of nutmeg"). To my ear, this sounds utterly bizarre, though it seems like it's not entirely archaic. When referring to the hard spherical things you grate to get nutmeg, the [Wikipedia article](https://en.wikipedia.org/wiki/Nutmeg) alternates between "nutmegs" and "nutmeg seeds". <!--("size of a nutmeg seed" doesn't even appear in the Google ngram data, meaning it hasn't reached the threshold of 40 occurences. "size of a nutmeg" appears 4,500 times) -->
-
-The [Corpus of Contemporary American English](https://corpus.byu.edu/coca/) turns up 8 hits each for "a nutmeg" and "nutmegs". For example, this passage from a [2012 Washington Post article](https://www.washingtonpost.com/lifestyle/food/pie-a-la-mcdermott-mode-or-how-to-know-when-dessert-is-done/2012/07/09/gJQAZnp9aW_story.html):
+Another curious aspect here is that nutmeg is treated as a count noun ("a nutmeg") rather than a mass noun ("some nutmeg", "a teaspoon of nutmeg"). To my ear, this sounds utterly bizarre, though it seems like it's not entirely archaic. <!-- When referring to the hard spherical things you grate to get nutmeg, the [Wikipedia article](https://en.wikipedia.org/wiki/Nutmeg) alternates between "nutmegs" and "nutmeg seeds".--><!--("size of a nutmeg seed" doesn't even appear in the Google ngram data, meaning it hasn't reached the threshold of 40 occurences. "size of a nutmeg" appears 4,500 times) --> The [Corpus of Contemporary American English](https://corpus.byu.edu/coca/) turns up 8 hits each for "a nutmeg" and "nutmegs" (vs. 1700 for "nutmeg"). For example, this passage from a [2012 Washington Post article](https://www.washingtonpost.com/lifestyle/food/pie-a-la-mcdermott-mode-or-how-to-know-when-dessert-is-done/2012/07/09/gJQAZnp9aW_story.html):
 
 > Important additions: a squeeze of lemon juice and two — no more — Microplaned swipes of a nutmeg. Those go into every fruit pie, she says.
 
@@ -685,7 +704,7 @@ Or this exchange from a 2001 episode of the Oprah Winfrey Show (condensed to rem
 > Ms-KOSTYRA: Well, it's fresh.  
 > WINFREY: You can buy fresh nutmeg?  
 
-This certainly speaks to how unhelpful "it was the size of a nutmeg" would be today. Oprah is used to buying jars of grated nutmeg. She, and many others, might not even know what a whole nutmeg seed looks like. Maybe the sale of grated nutmeg killed "size of a nutmeg" analogies?
+This actually speaks to how unhelpful "it was the size of a nutmeg" might be today. Oprah is used to buying jars of grated nutmeg. She, and many others, might not even know what a whole nutmeg seed looks like. Maybe the sale of grated nutmeg killed "size of a nutmeg" analogies? (Though I suspect the reality is more complicated.)
 
 (An unrelated but delightful discovery: the Oxford English Dictionary lists "nutmegs" as obsolete slang for testicles and offers this as the origin of the slang "nuts". The earliest quotation it offers, "I'll immediately whip out your nutmegs, he cry'd" comes from a bawdy 1690 song, [The Lancashire Cuckold: OR, THE Country Parish-Clark betrayd by a Conjurers Inchanted Chamber-pot.](https://ebba.english.ucsb.edu/ballad/31958/xml))
 
@@ -696,11 +715,10 @@ This certainly speaks to how unhelpful "it was the size of a nutmeg" would be to
 <!-- size of a pencil,size of a lead pencil -->
 <iframe name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?content=size+of+a+pencil%2Csize+of+a+lead+pencil&year_start=1800&year_end=2008&corpus=15&smoothing=3&share=&direct_url=t1%3B%2Csize%20of%20a%20pencil%3B%2Cc0%3B.t1%3B%2Csize%20of%20a%20lead%20pencil%3B%2Cc0" width="900" height="340" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
 
-What gives? It turns out that ["pencil"](https://en.wiktionary.org/wiki/pencil#Noun) used to refer to a small, fine paintbrush used for writing. "Lead pencils" were so-named because of their similar appearance and purpose. As this new tool gained popularity, the name was shortened and the original pencil faded from memory.
+What gives? It turns out that ["pencil"](https://en.wiktionary.org/wiki/pencil#Noun) used to refer to a small, fine paintbrush used for writing. The writing tool we're familiar with today was originally termed a "lead pencil" because of its similar appearance and purpose. As this new tool gained popularity, the name was shortened and the original pencil faded from memory.
 
-This is similar to the shift from "hen's egg" to just "egg". As other kinds of eggs/pencils became less relevant, the qualifier was no longer needed.
 
-Interestingly, before the popularization of lead pencils, *goose quills* seemed to fill a similar niche (in reality and in analogies).
+Before the popularization of lead pencils, goose quills may have filled a similar niche (in analogies as in reality).
 
 <iframe name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?content=size+of+a+pencil%2Csize+of+a+lead+pencil%2Csize+of+a+goose+quill&year_start=1800&year_end=2008&corpus=15&smoothing=3&share=&direct_url=t1%3B%2Csize%20of%20a%20pencil%3B%2Cc0%3B.t1%3B%2Csize%20of%20a%20lead%20pencil%3B%2Cc0%3B.t1%3B%2Csize%20of%20a%20goose%20quill%3B%2Cc0" width="900" height="340" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
 
@@ -710,7 +728,7 @@ Here's a graph that I found pretty surprising:
 
 <iframe name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?content=deck+of+cards&year_start=1800&year_end=2008&corpus=15&smoothing=5&share=&direct_url=t1%3B%2Cdeck%20of%20cards%3B%2Cc0" width="900" height="340" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
 
-Playing cards have been around for ages, but referring to collections of them as 'decks' seems to be a distinctly 20th century (late 20th-century, even) habit. Before that 'pack' was the standard nomenclature:
+Playing cards have been around for ages, but referring to collections of them as 'decks' seems to be a distinctly 20th century (late 20th-century, even) habit. Before that, 'pack' was the standard nomenclature:
 
 <iframe name="ngram_chart" src="https://books.google.com/ngrams/interactive_chart?content=deck+of+cards%2Cpack+of+cards&year_start=1800&year_end=2008&corpus=15&smoothing=5&share=&direct_url=t1%3B%2Cdeck%20of%20cards%3B%2Cc0%3B.t1%3B%2Cpack%20of%20cards%3B%2Cc0" width="900" height="340" marginwidth="0" marginheight="0" hspace="0" vspace="0" frameborder="0" scrolling="no"></iframe>
 
@@ -726,12 +744,11 @@ But at some point this usage fell out of favour and drifted into obscurity. An [
 
 A similar explanation is given in 1886's [A Glossary of Obscure Words and Phrases in the Writings of Shakspeare and His Contemporaries ...](https://archive.org/details/aglossaryobscur00mackgoog), so the phrase must have remained obscure to a common audience until at least the late 19th century.
 
-(And yes, you read that footnote right. At some time, in some place, people once thought it was a fine idea to call a collection of 52 cards "a pair of cards". According to the OED, this usage still exists today "Now chiefly Brit. regional and Irish English (north.)")
+(And yes, you read that footnote right. At some time, in some place, people thought it was a fine idea to call a collection of 52 cards "a pair of cards". According to the OED, this usage still exists today "Now chiefly Brit. regional and Irish English (north.)")
 
 <br/>
-I hope this writeup has increased your appreciation of quirky linguistic changes to the [size of a fine cauliflower](https://archive.org/stream/picturesfromital00dickrich#page/220/mode/2up/search/a+fine+cauliflower).
 
-If you're interested in some of the technical details of how I performed this analysis, feel free to read on.
+That concludes our survey of weird trends in size analogies. I hope you enjoyed it. If you're interested in some of the technical details of how I performed this analysis, feel free to read on. The code used for this analysis is available on GitHub [here](https://github.com/colinmorris/size-of-an-x). That repo includes a [csv file](https://github.com/colinmorris/size-of-an-x/blob/master/sizeofthings.csv) with stats on around 4,000 "size of a..." phrases, if you're interested in investigating some more obscure size analogies.
 
 ## Appendix: Methodology
 
@@ -802,7 +819,7 @@ Whereas the default corpus of all books gives the impression that walnut analogi
 Unfortunately, while fiction is about 25% of the dataset in recent years, until the late 20th century, it comprises quite a small proportion of books scanned per year.
 
 
-![png](writeup_files/writeup_41_0.png)
+![png](writeup_files/writeup_42_0.png)
 
 
 For most of the 19th century, there are just a few hundred books per year. Which is nothing to sneeze at, but insufficient to statistically analyse these kinds of linguistic needles in a haystack.
@@ -829,5 +846,3 @@ Fine cauliflowers peaked in the mid-1800's when *Pictures From Italy* was first 
 I haven't made any attempt to estimate the size of these effects (but it'd be an interesting experiment to try!).
 
 <br/>
-
-The code used for this analysis is available on GitHub [here](https://github.com/colinmorris/size-of-an-x).
