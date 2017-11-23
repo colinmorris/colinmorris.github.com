@@ -5,7 +5,7 @@ custom_css: "charemb"
 tags: [machine-learning, data-visualization]
 ---
 
-Earlier this year, some researchers from Google Brain published a paper called [Exploring the Limits of Language Modeling](http://arxiv.org/abs/1602.02410), in which they described a language model that improved perplexity on the [One Billion Word Benchmark](http://arxiv.org/abs/1312.3005) by a staggering margin (down from about 50 to 30). Last week, they [released that model](https://github.com/tensorflow/models/tree/master/lm_1b). 
+Earlier this year, some researchers from Google Brain published a paper called [Exploring the Limits of Language Modeling](http://arxiv.org/abs/1602.02410), in which they described a language model that improved perplexity on the [One Billion Word Benchmark](http://arxiv.org/abs/1312.3005) by a staggering margin (down from about 50 to 30). Last week, they [released that model](https://github.com/tensorflow/models/tree/master/research/lm_1b). 
 
 As someone with an [interest in character-aware language models](http://colinmorris.github.io/blog/dreaming-rbms), I've been looking forward to sniffing around this thing.
 
@@ -206,6 +206,6 @@ This would seem to support our hypothesis! As before, our letters (green markers
 
 My (handwavey) best guess: alphabetical characters get distinct, widely-separated embeddings, but characters that occur infrequently (the pinks) and/or characters with a high degree of substitutability (digits, terminal punctuation), will tend to be placed together.
 
-That's it for now. Thanks to the Google Brain team for releasing the `lm_1b` model. If you want to do your own experiments on it, be sure to check out their instructions [here](https://github.com/tensorflow/models/tree/master/lm_1b). I've made the scripts I used to generate the visualizations in this post available [here](https://github.com/colinmorris/lm1b-notebook) - feel free to re-use/modify them, though they're messy as hell.
+That's it for now. Thanks to the Google Brain team for releasing the `lm_1b` model. If you want to do your own experiments on it, be sure to check out their instructions [here](https://github.com/tensorflow/models/tree/master/research/lm_1b). I've made the scripts I used to generate the visualizations in this post available [here](https://github.com/colinmorris/lm1b-notebook) - feel free to re-use/modify them, though they're messy as hell.
 
 Tune in next time, when we'll look at the next stage of the Char CNN pipeline - convolutional filters!
