@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "\"It's a thing\": anachronism spotting in <i>I, Tonya</i>"
+title: "\"It's a thing\": anachronism spotting in I, Tonya"
 tags: [linguistics]
 draft: true
 ---
