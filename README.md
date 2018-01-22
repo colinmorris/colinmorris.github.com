@@ -40,3 +40,4 @@ footer
 - tags: array of tags. must be specified in `_my_tags` directory. e.g. `[data-visualization, linguistics]`
 - custom_css: base name of a css file in the `css/` directory (e.g. `recep`)
 - large_img: if truthy, use `summary_large_image` twitter card metadata instead of just `summary`
+- headtitle: if present, used for the \<title\> element in the head in place of the regular title value. (e.g. if the regular title has some html tags, put a stripped down version here)

@@ -1,8 +1,8 @@
 ---
 layout: post
-title: "\"It's a thing\": anachronism spotting in I, Tonya"
+title: "\"It's a thing\": anachronism spotting in <i>I, Tonya</i>"
+headtitle: "\"It's a thing\": anachronism spotting in I, Tonya"
 tags: [linguistics]
-draft: true
 ---
 
 I love the versatility of the word "thing" in colloquial English:
@@ -15,11 +15,11 @@ I love the versatility of the word "thing" in colloquial English:
 
 > <small>It’s kinda like in the movies where one person leaves right as the other person walks in like 2 minutes later kinda thing.</small>
 
-> <small>She got a cough. She got it from Jean. And now [it's a whole thing with Jean](https://www.youtube.com/watch?v=6-QG-rFf4po).</small>
+> <small>She got a cough. She got it from Jean. And now [it's a whole thing with Jean](https://www.facebook.com/snl/videos/10154783838006303/).</small>
 
 These usages all strike me as being pretty recent innovations.
 
-Watching the film <i>I, Tonya</i>, a particular piece of *thing*-related dialogue stuck out to me as sounding a little too fresh for 1993:
+Watching the film <i>I, Tonya</i>, I heard another *thing* idiom that stuck out to me as sounding a little too fresh for 1993:
 
 > JEFF: I mean, girl skaters at this level. They're always messing with each other's skate blades. With each other's costumes.<br/>
 > SHERIFF: I never knew that.<br/>
@@ -56,6 +56,6 @@ But I think I have them all beat. Turning to the [Corpus of Contemporary America
 
 > LIMBAUGH: (Voiceover) Well, I was perplexed by this because as you people know, as a powerful influential member of the media, I fly quite a bit. And I've been on airplanes, especially American flights, and I've seen male flight attendants. Now I don't know how many of those male flight attendants are male lesbians -- you know... (Laughter) **Well, it's a thing.** I mean, there's a -- it's a -- there's a feminist professor down in Tampa who's discovered a male lesbian -- it's ra -- it's a woman victimized by creation trapped in the body of a man and she's trying to -- so you never know how many males are male lesbians. But we found at American Airlines, 15 to 20 percent of those flight attendants are men. 
 
-However, of the 22 instances I was able to find in COCA, all but 2 occurred after 2010, and half occurred in the last 2 years. Some Language Log commenters pointed out that this usage was common on 30 Rock (indeed, I was able to find [two](https://getyarn.io/yarn-clip/49a35a99-1636-4cb9-abda-8872f987026e) different [instances](https://getyarn.io/yarn-clip/3ff4a4ff-8732-4fa5-875e-8ecf2d786df1) of it in a single episode from 2012), which seems like a plausible vector for its entry into the mainstream.
+However, of the 22 instances of predicative *a thing* I was able to find in COCA, all but 2 occurred after 2010, and half occurred in the last 2 years. Some Language Log commenters pointed out that this usage was common on *30 Rock* (indeed, I was able to find [two](https://getyarn.io/yarn-clip/49a35a99-1636-4cb9-abda-8872f987026e) different [instances](https://getyarn.io/yarn-clip/3ff4a4ff-8732-4fa5-875e-8ecf2d786df1) of it in a single episode from 2012), which seems like a plausible vector for its entry into the mainstream.
 
 So sure, Tonya Harding's ex-husband *might* have used this idiom in 1993, but it would have put him on the bleeding edge of linguistic trends (along with Rush Limbaugh).
