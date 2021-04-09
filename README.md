@@ -4,7 +4,7 @@ This readme is mostly just notes to myself of things I keep forgetting/losing ti
 
 ## Things to remember
 
-To preview the site locally run `bundle exec jekyll serve`.
+To preview the site locally run `bundle exec jekyll serve`. (As a prereq, [install jekyll](https://jekyllrb.com/docs/installation/) and its dependencies.)
 
 Sometimes you will paste in some HTML having attribute values not enclosed in quotation marks. This will cause Jekyll to shit its pants in extremely subtle and unhelpful ways. Try not to lose too much time to this.
 
