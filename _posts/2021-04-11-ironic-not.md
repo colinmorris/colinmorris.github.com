@@ -5,6 +5,7 @@ headtitle: 'The rise of ironic "not"'
 tags: [linguistics]
 custom_css: "not"
 excerpt: 'Analysing the origins and meaning of an increasingly popular slang construction involving "not".'
+thumbnail: "/assets/not/not_you_should_have_been_healed.png"
 ---
 
 Here's the top comment on [a recent Instagram post](https://www.instagram.com/p/CLX1sI5ALi8/) by Britney Spears:
