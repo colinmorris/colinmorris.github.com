@@ -43,7 +43,7 @@ In general, this "Not X" communicates a judgement that X is amusing and surprisi
 
 When X is *intended* to be humourous, this can carry an approving tone ("Haha, good one"), as in this banter between Bob the Drag Queen and Aja:
 
-<video controls width="480">
+<video controls width="480" style="max-width: 100%">
     <source src="/assets/not/not_blac_chyna.mp4"
         type="video/mp4"
     >

@@ -33,3 +33,10 @@ figure {
 figure img {
     margin: 0 auto;
 }
+
+iframe[src*=youtube] {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    padding-bottom: 10px;
+}
