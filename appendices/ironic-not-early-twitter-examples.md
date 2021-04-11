@@ -4,15 +4,9 @@ title: "Ironic expressive not: Twitter antedating"
 custom_css: badflamingos
 ---
 
-These are some early (2007-2010) examples of "Not X" used to express amusement or mock horror on Twitter. Many cases are ambiguous, especially tweets which are replies to other tweets which are no longer available. I tried to include only fairly high-confidence examples. These were found using the basic Twitter web search UI with patterns like "Not `[PRONOUN]` `[GERUND]`" and "lmao not".
+These are some early (2008-2010) examples of "Not X" used to express amusement or mock horror on Twitter. Many cases are ambiguous, especially tweets which are replies to other tweets which are no longer available. I tried to include only fairly high-confidence examples. These were found using the basic Twitter web search UI with patterns like "Not `[PRONOUN]` `[GERUND]`" and "lmao not".
 
 These examples are an appendix to [this blog post](TODO).
-
-## 2007
-
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">OMG not 36 or 37!!! http://tinyurl.com/yoksrd</p>&mdash; Formerly David Holmes F5 (@dholmesf5) <a href="https://twitter.com/dholmesf5/status/357818422?ref_src=twsrc%5Etfw">October 23, 2007</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-(This is likely a subtly different - and less conventionalized - form of mock horror with the intended meaning of "X is not a big deal" / "X is being overreacted to". i.e. sarcastic rather than ironic.)
 
 ## 2008
 
@@ -53,5 +47,11 @@ These examples are an appendix to [this blog post](TODO).
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/esmeraldasg?ref_src=twsrc%5Etfw">@EsmeraldaSG</a> That picture is to cute and not you doing the standard Esme pose, it&#39;s a twofer.</p>&mdash; Nerd, Est. 1975! (@TAYREL713) <a href="https://twitter.com/TAYREL713/status/24890746334?ref_src=twsrc%5Etfw">September 19, 2010</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OlgaKay?ref_src=twsrc%5Etfw">@OlgaKay</a> OLGA not you doing the screen thing soo people accidently click and then they go back to watch the video and you get one extra view</p>&mdash; Oidoy (@Oidoy) <a href="https://twitter.com/Oidoy/status/25888428076?ref_src=twsrc%5Etfw">September 29, 2010</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+## Bonus: 2007?
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">OMG not 36 or 37!!! http://tinyurl.com/yoksrd</p>&mdash; Formerly David Holmes F5 (@dholmesf5) <a href="https://twitter.com/dholmesf5/status/357818422?ref_src=twsrc%5Etfw">October 23, 2007</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+(This is likely a subtly different - and less conventionalized - form of mock horror with the intended meaning of "X is not a big deal" / "X is being overreacted to". i.e. *sarcastic* rather than ironic. The link the author is responding to is to [this article](https://techcrunch.com/2007/10/23/has-americas-first-friend-been-lying-about-his-age/) about how Tom from MySpace might actually be 36 or 37 years old, rather than the age of 32 listed on his MySpace profile.)
 
 <hr/>
