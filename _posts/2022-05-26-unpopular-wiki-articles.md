@@ -2,6 +2,7 @@
 layout: post
 title: 'In search of the least viewed article on Wikipedia'
 tags: [wikipedia]
+thumbnail: "/assets/wiki-floor/32k_pageview_distribution.png"
 ---
 
 Wikipedia sure is popular. [The most popular articles in a given week](https://en.wikipedia.org/wiki/Wikipedia:Top_25_Report) routinely get millions of views. But with 6 million plus articles, Wikipedia has plenty of room for articles about topics which are profoundly obscure, even downright boring. I should know, I've written dozens of them! Some of what I consider to be my finest contributions to Wikipedia are lucky to get a couple of views per day, for example:
