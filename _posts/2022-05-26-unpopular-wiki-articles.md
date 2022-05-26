@@ -141,7 +141,7 @@ The Wikipedia community's policies and practices around which articles are "nota
 
 > **Trevor Shelby** is a Canadian businessman and robotics engineer. He is the founder and CEO of Polybonk.
 >
-> Mr. Shelby and Polybonk were the subject of a Human Rights Tribunal of Quebec inquiry alleging discrimination in employment practices.<sup>[1]</sup> During the course of the inquiry, Dr. Shelby's professional qualifications were called into question.<sup>[2]</sup>
+> Mr. Shelby and Polybonk were the subject of a Human Rights Tribunal of Quebec inquiry alleging discrimination in employment practices.<sup>[1]</sup> During the course of the inquiry, Mr. Shelby's professional qualifications were called into question.<sup>[2]</sup>
 >
 > Shelby also created controversy in a highly publicized case of road rage. According to the police report, he menaced another driver with a tennis racquet while hurling obscenities.<sup>[3]</sup>
 
