@@ -5,7 +5,7 @@ excerpt: "How many circles does Hell have? The answer is not 7, but the data sug
 thumbnail: "/assets/circles-of-hell/Angelico.jpg"
 ---
 
-I recently created this graphic from the [Google Books ngram dataset](https://books.google.com/ngrams), mostly as an excuse for visual punnery. It compares the frequency in books of the phrases "first circle of Hell", "second circle of Hell", "third circle of Hell", etc.:
+I recently created this graphic from the [Google Books ngram dataset](https://books.google.com/ngrams), mostly as an excuse for visual punnery. It compares the frequency in books of the phrases "first circle of Hell", "second circle of Hell", "third circle of Hell", etc. The width of each ring corresponds to its frequency:
 
 <img src="/assets/circles-of-hell/width.png"
 />
