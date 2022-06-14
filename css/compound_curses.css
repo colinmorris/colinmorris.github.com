@@ -1,0 +1,24 @@
+table {
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    margin-left: 5%;
+    margin-top: 15px;
+}
+
+th {
+    border-style: solid;
+    border-width: thin;
+}
+
+td {
+    border-style: solid;
+    border-width: thin;
+    text-align: center;
+}
+
+th, td {
+    padding-left: .3em !important;
+    padding-right: .5em !important;
+    padding-top: .1em !important;
+    padding-bottom: .05em !important;
+}
