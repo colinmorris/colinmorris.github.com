@@ -1,28 +1,29 @@
 ---
 layout: post
-title: "title tk"
-headtitle: "title tk"
+title: "Compound pejoratives on Reddit - from <i>buttface</i> to <i>wankpuffin</i>"
 custom_css: "compound_curses"
 tags: [linguistics]
+draft: true
 ---
 
 <!-- Notes from 06/10 rereading:
 Prose:
-- Intro may be a bit slow. Might lose people at "metonymically", or "euphony"
-    - some of this theorizing could be moved toward the end. Similar point to whence assheads.
-- Be consistent for formatting of words-as-words. (italics)
 - fill in final sections (not sure if appendix is needed - not sure what I was originally planning to put there. probably stuff about how affixes were chosen, filtering, caveats about confounders e.g. stinkweed)
-- explain gemination inline rather than just linking it.
 - Flexibility vignette doesn't have that much payoff. Can maybe cut, or shrink? (Esp. because these plots have the most offensive terms in the whole post - faggot/fag, cunt)
-- add comment after matrix commenting on (surprising?) density. Very few zeros.  
-- move flexibility stuff to just after matrix?
-- collision probability aka collision entropy: https://en.wikipedia.org/wiki/R%C3%A9nyi_entropy#Collision_entropy (aka Renyi entropy)
-- content warning, esp. if flexibility scatterplots are kept as is
 - link to code/repo at end
+- I wonder if Pudding might be interested? There are some places where scrollytelling and interactivity would really shine.
+ - are they even still around? check out their recent stuff
+- explain the term "affix" at first use
+- maybe also explain "productive" at first use?
+- check counts for some of the more orangey x-less cells in the wikt matrix. e.g.
+    - douchewaffle, douchenugget
+    - cockwaffle
+    - bumass
+    - fuckfuck
 
 Technical:
-- bitchass, lameass since added to wikt
 - create repo. Add readme.
+- propa dash in title
 
 -->
 
@@ -35,13 +36,15 @@ Hence, *dirtwad*, *scumbag*, *pissbucket*, *snotwagon*...
 
 <small>(In case it's not yet clear, this post will contain a *lot* of naughty words. Most are merely silly, crude, or scatalogical, but some visualizations will contain a few more seriously offensive terms, including slurs.)</small>
 
-Alternatively, *-head*, *-face*, and *-brain(s)* are incredibly versatile suffixes, which can be preceded by just about any taboo word. (It's curious that this doesn't work for other body parts. Why do *poopheart*, *scumeyes*, *dickhand*, or *farthair* just sound ridiculous rather than wounding? Perhaps head, face, and brains are uniquely suited to metonymically referring to a person as a whole.)
+Alternatively, *-head*, *-face*, and *-brain(s)* are incredibly versatile suffixes, which can be preceded by just about any taboo word. 
 
 The truly creative can go outside the boundaries of such recipes altogether to produce innovative terms like *fucktrumpet*, or [*wankpuffin*](https://en.wiktionary.org/wiki/wankpuffin), which perhaps succeed by virtue of euphony moreso than their ability to invoke any coherent image.
 
+If only we had some concrete data on how these pieces fit together...
+
 ## Introducing the Reddit compound pejorative dataset
 
-I manually curated lists of around 70 prefixes and suffixes that I judged to be productive, based on a scan of Wiktionary's [English derogatory terms](https://en.wiktionary.org/wiki/Category:English_derogatory_terms) category. The terms covered a wide range of domains, including:
+I manually curated lists of around 70 prefixes and suffixes that I judged to be productive for forming pejorative compounds, based on a scan of Wiktionary's [English derogatory terms](https://en.wiktionary.org/wiki/Category:English_derogatory_terms) category. The terms covered a wide range of domains, including:
 - scatology (*fart-*, *poop-*)
 - political epithets (*lib-*, *Trump-*)
 - food (*-waffle*, *-burger*)
@@ -49,37 +52,40 @@ I manually curated lists of around 70 prefixes and suffixes that I judged to be 
 - gendered epithets (*bitch-*, *-boy*)
 - animals (*dog-*, *-monkey*)
 
-Most terms were limited to appearing in one position. For example, while *-face* readily forms pejorative compounds as a suffix, it fails to produce extant compounds as a prefix (*facewad*? *faceclown*? *facefart*?). But a few terms, like *fuck*, *weasel*, and *ass*, made their way onto both lists.
+Most terms were limited to appearing in one position. For example, while *-face* readily forms pejorative compounds as a suffix, it fails to produce felicitous compounds as a prefix (*facewad*? *faceclown*? *facefart*?). But a few terms, like *fuck*, *weasel*, and *ass*, made their way onto both lists.
 
 Taking the product of these lists gives around 4,800 possible A+B combinations. I scraped all Reddit comments from 2006 to the end of 2020, and counted the number of comments containing each of these compounds. (See the appendix at the end of this post for some more technical details on the data collection process.)
 
 As a corpus, Reddit has the virtue of being uninhibited in its profanity, and on the cutting edge of new coinages. For example, Google Books Ngram Viewer, which indexes the majority of all books published in English up to 2019, [gives no results](https://books.google.com/ngrams/graph?content=fuckwaffle) for *fuckwaffle*, whereas the term has been used in 1,096 Reddit comments.
 
-The resulting matrix was fairly dense. More than half of the 4,800 combinations occurred at least once, including a substantial long tail of rare terms. Some examples with single digit counts include: *fartbucket*, *dorkdog*, and *poonuts*.
+The full "matrix" of epithets is surprisingly dense. Of the ~4,800 possible compounds, more than half occurred in at least one comment. The most frequent compound, *dumbass*, appears in 3.6 million comments, but there's also a long tail of many rare terms, including 444 [*hapax legomena*](https://en.wikipedia.org/wiki/Hapax_legomenon) (terms which appear only once in the dataset), such as *pukebird*, *fartrag*, *sleazenozzle*, and *bastardbucket*.
 
-I've reproduced a portion of the matrix below as a heatmap. For the sake of legibility, this includes only around a quarter of all compounds measured. You can find the full dataset [here](TODO).
-
-![png](/assets/compound_curses/plain_matrix.png)
-
-The rows and columns are sorted by total frequency.
-
-I mapped frequency to color using a logarithmic scale because the data had a heavy-tailed distribution. In fact, it approximately follows [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law), meaning that a log-log plot of term rank vs. frequency is close to a straight line:
+In fact, the dataset approximately follows [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law), meaning that a log-log plot of term rank vs. frequency is close to a straight line:
 
 ![png](/assets/compound_curses/zipf.png)
 
-In this post I'll talk about a few fun findings in the data.
+## The Matrix of Pejoration
 
-## xxx
+The full 66 x 73 matrix of all prefixes and suffixes is too big to grok in a single plot, so I've reproduced a 20 x 20 subset below, which includes many of the most productive affixes. Note that frequency is mapped to colour using a logarithmic scale, because it varies over several orders of magnitude.
+
+![png](/assets/compound_curses/plain_matrix.png)
+
+The rows and columns are sorted by total frequency. Of the 400 cells here, only 18 have a count of zero (examples: *dumbgoblin*, *dirthat*, *libsucker*).
+
+## Flexible and inflexible components
 
 One of the first things that sticks out from the above visualization is that some affixes are much more flexible than others. Some rows have most of their weight concentrated on a single cell -- for example, *scum-* mixes with *-bag* far more readily than any other suffix, and the *-wit* column is mostly dominated by *fuckwit*. But others have their weight more evenly spread out. Prefixes like *fuck-*, *shit-* and *dick-* are extraordinarily flexible, and have non-trivial co-occurrences with all 20 suffixes on display. Suffixes like *-bag*, *-face* and *-head* also seem to be extremely productive.
 
-We can operationalize this concept of an affix's "flexibility" using collision probability, which is simply the answer to the question: if I randomly pick two terms using this affix, what are the chances they will be the same? The higher the collision probability, the less flexible the affix.
+We can operationalize this concept of an affix's "flexibility" using the [collision probability](https://en.wikipedia.org/wiki/R%C3%A9nyi_entropy#Collision_entropy) metric (also known as "collision entropy", or "Rényi entropy"), which is simply the answer to the question: if I randomly pick two terms using this affix, what are the chances they will be the same? The higher the collision probability, the less flexible the affix.
 
-For example, the suffix *-hat* has a very high collision probability of 97.5%. *asshat* comprises 98.7% of the words that use that suffix, hence its collision probability is .987^2 plus change. On the other hand, *-fuck* has a probability of just 25.5%. 
+For example, the suffix *-hat* has a very high collision probability of 97.5%. *asshat* comprises 98.7% of the words that use that suffix, hence its collision probability is .987<sup>2</sup> plus change. On the other hand, *-fuck* has a probability of just 25.5%. 
 
-The scatterplots below show frequency vs. flexibility for all ~140 prefixes and suffixes. The most flexible affixes tend to be ones with relatively low total frequency (e.g. *monkey-*, *fart-*, *-boat*, *-brains*). Among high-frequency affixes, *fuck* is the top-ranking prefix *and* suffix.
+The scatterplot below shows frequency vs. flexibility for all 66 prefixes and suffixes. 
 
 ![png](/assets/compound_curses/prefix_collisions.png)
+
+Here's the same thing for suffixes. The most flexible affixes tend to be ones with relatively low total frequency (e.g. *monkey-*, *fart-*, *-boat*, *-brains*). Among high-frequency affixes, *fuck* is the top-ranking prefix *and* suffix.
+
 ![png](/assets/compound_curses/suffix_collisions.png)
 
 ## Are the dictionaries keeping apace?
@@ -91,20 +97,6 @@ Below is our matrix of profanity again, but this time I've added a glyph to mark
 The presence of a Wiktionary entry tracks pretty well with a term's popularity, with every term appearing in over 10,000 comments having an entry. But turning to the full list of compounds, a few apparent oversights emerge.
 
 ### Missing gems
-
-The most frequent term without a Wiktionary entry is *bitchass*, which appears in 36,000(!) comments. It turns out Wiktionary does have an entry for the hyphenated form, *[bitch-ass](https://en.wiktionary.org/wiki/bitch-ass)*, though it currently fails to reflect the term's breadth of meaning. The following example Reddit comments illustrate at least four distinct senses, of which Wiktionary records only the first two:
-
-Pejorative noun *bitchass*:
-> This **bitchass** never been to a crawfish boil
-
-Pejorative adjective *bitchass*:
-> Your little poll is so **bitchass**, I just can't even bring myself to vote.
-
-[Metonymic](https://en.wiktionary.org/wiki/Appendix:Glossary#metonymic) *bitchass*:
-> Shut your **bitchass** up.
-
-Approving adjective *bitchass* (compare *[bitching](https://en.wiktionary.org/wiki/bitching#English)*):
-> Now if it was a book of agriculture then it'd be one **bitchass** movie.
 
 Below are some more frequent compounds not in Wiktionary, sorted by count:
 
@@ -120,27 +112,11 @@ It's worth noting that Green's Dictionary of Slang, another excellent free onlin
 
 ### Words Wiktionary maybe *shouldn't* have
 
-On the other hand, there are a few words in Wiktionary which are vanishingly rare on Reddit, including 6 which appear less than 10 times each:
+On the other hand, there are a few words in Wiktionary which are vanishingly rare on Reddit, including 8 which appear less than 10 times each:
 
 {% include compound_curses/rare_wikt_terms_table.md %}
 
 Of course, just because they're rare on Reddit doesn't mean they weren't in common use at some time and place. (Though I'm skeptical of *homowhore*. A google books search finds only two results, one of which is a [scanno](https://en.wiktionary.org/wiki/scanno) for *somewhere*.)
-
-## The most versatile ingredients
-
-In the matrix visualization, you'll notice that some rows and columns have most of their weight concentrated on one or two specific compounds. For example, the suffix *-hat* has a strong tendency to combine with *ass-* over any other prefix. Others have their weight more evenly distributed, such as *-face* or *shit-*.
-
-We can operationalize this concept of an affix's "flexibility" using collision probability, which is simply the answer to the question: if I randomly pick two terms using this affix, what are the chances they will be the same? For *-hat*, this probability will be high, since 99% of all *-hat* compounds are *asshat*. But for something like *fuck-*, the chance of collision will be low, since there are many viable compounds to choose from (*fuckface*, *fuckwad*, *fuckknuckle*, *fuckboy*, etc.). This metric is closely related to [Shannon entropy](https://en.wikipedia.org/wiki/Shannon_entropy), and gives very similar results.
-
-Here's a scatterplot of total frequency vs. collision probability for all the prefixes measured:
-
-![png](/assets/compound_curses/prefix_collisions.png)
-
-*fuck-* and *shit-* are the clear standouts, in that they're used extremely frequently and in a wide variety of compounds.
-
-Here's the same for suffixes:
-
-![png](/assets/compound_curses/suffix_collisions.png)
 
 ## The politics of pejoration
 
@@ -160,17 +136,24 @@ The question of *why* certain terms combine more felicitously than others is fas
 
 (For ease of comparison, I linearly scaled each row so they summed to the same amount. Thus the colour of a cell reflects the prefix's affinity for that suffix relative to all the suffixes shown here.)
 
-Our synonyms seem to disagree more often than they agree. It's understandable that the [gemination](https://en.wikipedia.org/wiki/Gemination#English) of *assslut*, *butttard*, and *bummonkey* are avoided (the spellings *asslut* and *buttard* are slightly more common, but still very rare). But other lacunae are harder to account for. Butthead is common, so why are asshead and bumhead so rare? Why does buttclown fail where assclown succeeds?
+Our synonyms seem to disagree more often than they agree.
 
-I suspect that euphony is a prime consideration here. There's something deeply pleasing in the assonance of *spunktrumpet*, *douchecanoe*, and *wankstain*.
+The repetition of consonants in compounds like *bummonkey* or *butttard* (a phenomenon technically known as [gemination](https://en.wikipedia.org/wiki/Gemination#English)) is orthographically and phonetically awkward, and so it makes sense that these compounds would be avoided. (Alternative spellings like *buttard*, or *bum-monkey* are somewhat more common, but still rare.)
 
-### Visualizing attachment patterns
+But other lacunae are harder to account for. *Butthead* is common, so why are *asshead* and *bumhead* so rare? Why does *buttclown* fail where *assclown* succeeds?
+
+For that matter, why are some affixes so much more productive than other terms from the same semantic category? *-face*, *-head*, and *-brain* are extremely productive suffixes. Why not other body parts? Why do *poopheart*, *scumeyes*, *dickhand*, or *monkeyhair* just sound ridiculous rather than wounding? Perhaps head, face, and brains are uniquely suited to metonymically referring to a person as a whole.
+
+## Visualizing attachment patterns
 
 [TODO: link to James's work]
 
 ## Appendix: Technical details
 
+TODO: Link to repo with source code and data files.
+
 Stuff to talk about (maybe):
+- Selection criteria for affixes. (*Mostly* looking at noun-noun compounds, but includes a few bound morphemes like *-ster*, *-azoid*)
 - Filtering. Copypasta, urls, etc.
 - Sampling for frequent terms
-- Confounders (e.g. stinkweed is real, femboy is not pejorative)
+- Confounders. Terms which have a literal meaning, which may or may not overlap with pejorative usage (e.g. stinkweed is a real plant, dipstick, femboy, titfuck, etc.)
