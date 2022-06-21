@@ -10,17 +10,19 @@ excerpt: "What can Reddit comment data tell us about the rules governing the for
 
 <!-- Notes from 06/10 rereading:
 Prose:
+- James notes
+    - collision probability
 - Flexibility vignette doesn't have that much payoff. Can maybe cut, or shrink? (Esp. because these plots have the most offensive terms in the whole post - faggot/fag, cunt)
     - maybe think about a frequency threshold to exclude fag/faggot? Don't want it to become a distraction.
     - also, should scatterplots have titles or smth to make it clearer which is which?
-- I wonder if Pudding might be interested? There are some places where scrollytelling and interactivity would really shine.
-- hmmm, maybe drop/replace "stick" suffix from matrix? It mostly appears in confounders "dipstick" and "fuckstick". Actually, nvm, looks like both are mostly used pejoratively by a strong margin.
+    - "all 66"
 - draft text for reddit/twitter posts
 - tighten up ending?
+- gemination
 
 Technical:
-- add thumbnail, excerpt
 - generate a captioned version of matrix for twitter/reddit
+- test on mobile
 
 -->
 
@@ -41,7 +43,7 @@ If only we had some concrete data on how these pieces fit together...
 
 ## Introducing the Reddit compound pejorative dataset
 
-I curated lists of around 70 prefixes and 70 suffixes (collectively, "affixes") that can be flexibly combined to form insulting compounds, based on a scan of Wiktionary's [English derogatory terms](https://en.wiktionary.org/wiki/Category:English_derogatory_terms) category. The terms covered a wide range of domains, including:
+I collected lists of around 70 prefixes and 70 suffixes (collectively, "affixes") that can be flexibly combined to form insulting compounds, based on a scan of Wiktionary's [English derogatory terms](https://en.wiktionary.org/wiki/Category:English_derogatory_terms) category. The terms covered a wide range of domains, including:
 - scatology (*fart-*, *poop-*)
 - political epithets (*lib-*, *Trump-*)
 - food (*-waffle*, *-burger*)
@@ -51,7 +53,7 @@ I curated lists of around 70 prefixes and 70 suffixes (collectively, "affixes") 
 
 Most terms were limited to appearing in one position. For example, while *-face* readily forms pejorative compounds as a suffix, it fails to produce felicitous compounds as a prefix (*facewad*? *faceclown*? *facefart*?).
 
-Taking the product of these lists gives around 4,800 possible A+B combinations. I scraped all Reddit comments from 2006 to the end of 2020, and counted the number of comments containing each.
+Taking the product of these lists gives around 4,800 possible A+B combinations. Most are of a pejorative character, though some false positives slipped in (e.g. *dogpile*, *spitballs*). I scraped all Reddit comments from 2006 to the end of 2020, and counted the number of comments containing each.
 
 As a corpus, Reddit has the virtue of being uninhibited in its profanity, and on the cutting edge of new coinages. For example, Google Books Ngram Viewer, which indexes the majority of all books published in English up to 2019, [gives no results](https://books.google.com/ngrams/graph?content=fuckwaffle) for *fuckwaffle*, whereas the term has been used in 1,096 Reddit comments.
 
@@ -71,21 +73,31 @@ The rows and columns are sorted by total frequency. Of the 400 cells here, only 
 
 ## Flexible and inflexible components
 
-One of the first things that sticks out from the above visualization is that some affixes are much more flexible (or, to use a term of art from linguistics, ["productive"](https://en.wikipedia.org/wiki/Productivity_(linguistics))) than others. Some rows have most of their weight concentrated on a single cell -- for example, *scum-* mixes with *-bag* far more readily than any other suffix, and the *-wit* column is mostly dominated by *fuckwit*. But others have their weight more evenly spread out. Prefixes like *fuck-*, *shit-* and *dick-* are extraordinarily flexible, and have non-trivial co-occurrences with all 20 suffixes on display. Suffixes like *-bag*, *-face* and *-head* also seem to be extremely productive.
+One of the first things that sticks out from the above visualization is that some affixes are much more flexible (or, to use a term of art from linguistics, ["productive"](https://en.wikipedia.org/wiki/Productivity_(linguistics))) than others. Some rows have most of their weight concentrated on a single cell -- for example, *dirt-* strongly combines with *-bag*, but not much else. Others, like *fuck-* and *dick-*, have significant co-occurrences with almost all suffixes.
 
-We can operationalize this concept of an affix's "flexibility" using the [collision probability](https://en.wikipedia.org/wiki/R%C3%A9nyi_entropy#Collision_entropy) metric (also known as "collision entropy", or "Rényi entropy"), which is simply the answer to the question: if I randomly pick two terms using this affix, what are the chances they will be the same? The higher the collision probability, the less flexible the affix.
+I experimented with a few metrics for quantifying this notion of an affix's "flexibility" (including measures of statistical diversity like Shannon entropy). The one that I found best matched my intution was simply the sum of the logarithms of the counts. You can think of this as the total amount of "redness" of an affix's row or column in the above matrix visualization.
 
-For example, *asshat* comprises 98.7% of the occurrences of the suffix *-hat* in our dataset, so the collision probability for *-hat* is at least .987<sup>2</sup> = 97.4% (the probability that when we pick two *-hat* words, we get two *asshat*s).
 
-On the other hand, the much more flexible suffix *-fuck* has a much lower collision probability of 25.5% (with an 18.4% chance of colliding on *dumbfuck*, 4.8% on *bumfuck*, 1.3% on *buttfuck*, and smaller contributions from a variety of others).
+To take a toy example:
 
-The scatterplot below shows frequency vs. flexibility for all 66 prefixes.
+|           | fart | head | stick | breath |
+|:----------|:-----|:-----|:------|:-------|
+| **butt**  |  100 | 100,000 | 10 |  1,000 |
+| **dip**   |  1   |  10  | 1,000,000 | 1  |
+
+Here the total frequency of the prefix *dip* is far greater than that of *butt*, but its "log sum" is log(1) + log(10) + log(1,000,000) + log(1) = 0 + 1 + 6 + 0 = 7, which is less than *butt*'s, which is 2 + 5 + 1 + 3 = 11. The contribution to this score from any single high frequency compound is subject to greatly diminishing returns, so it pays to diversify.
+
+The scatter plot below shows total frequency vs. this log sum metric for most of the prefixes in the dataset (including many not included in the matrix above):
 
 ![png](/assets/compound_curses/prefix_collisions.png)
 
-Here's the same thing for suffixes. The most flexible affixes tend to be ones with relatively low total frequency (e.g. *monkey-*, *fart-*, *-boat*, *-brains*). Among high-frequency affixes, *fuck* is the top-ranking prefix *and* suffix.
+*shit-* and *fuck-* are clear standouts. But we should also give credit to prefixes like *turd-* and *poop-* which are punching far above their weight, outgunning prefixes which are orders of magnitude above them in total frequency, like *dumb-*, *scum-*, and *dip-*.
+
+Here's the same thing for suffixes:
 
 ![png](/assets/compound_curses/suffix_collisions.png)
+
+The dynamic duo of *shit* and *fuck* also put up a strong showing in their capacity as suffixes, though *-face* clearly takes the cake as the most prolifically diverse suffix.
 
 ## Are the dictionaries keeping up?
 
@@ -97,17 +109,17 @@ The presence of a Wiktionary entry tracks pretty well with a term's popularity, 
 
 ### Missing gems
 
-Below are some more frequent compounds not in Wiktionary, sorted by count:
+Below are some of the most frequent compounds *not* in Wiktionary, sorted by count:
 
 {% include compound_curses/missing_terms_table.md %}
 
-The term *gaybro* originates with [a Reddit community](https://www.reddit.com/r/gaybros/), so its frequency on Reddit is probably not representative of its wider usage. But it is [attested](https://www.theatlantic.com/entertainment/archive/2013/08/the-tv-show-thats-maybe-too-gay-for-australia-but-perfect-for-america/278255/) in [plenty](https://slate.com/news-and-politics/2015/05/can-you-be-homosexual-without-being-gay-the-future-of-cruising-drag-and-camp-in-a-post-closet-world.html) of [other](https://www.vice.com/en/article/ev55y4/when-toxic-masculinity-infects-our-queer-spaces-we-all-lose) places (in contexts that don't even refer to Reddit), and so definitely meets Wiktionary's [criteria for inclusion](https://en.wiktionary.org/wiki/Wiktionary:Criteria_for_inclusion) in the dictionary.
+There are a couple odd entries here. *femnazi* is likely just a misspelling of *[feminazi](https://en.wiktionary.org/wiki/feminazi)*. *dumbbitch* is on the list because it was actually a keyword on the [/r/fffffffuuuuuuuuuuuu/](https://www.reddit.com/r/fffffffuuuuuuuuuuuu/) subreddit, used to generate the [Yao Ming reaction face](https://knowyourmeme.com/memes/yao-ming-face-bitch-please#fn14) in comments, a stock rage comic element. (If none of that meant anything to you, maybe ask a millennial male relative when the narwhal bacons.)
 
-*dumbbitch* and *femnazi* strike me as a bit odd. It's possible they're largely just typos for *dumb bitch* and *[feminazi](https://en.wiktionary.org/wiki/feminazi)*, respectively, but it's hard to determine from context.
+But the others seem like genuine oversights -- words which ought to be included in a "complete" lexicon of the English language, and which are in sufficiently widespread use to satisfy Wiktionary's [criteria for inclusion](https://en.wiktionary.org/wiki/Wiktionary:Criteria_for_inclusion).
 
-The rest look like fairly straightforward oversights. Interestingly, Wiktionary did once have an entry for *[assbag](https://en.wiktionary.org/wiki/assbag)*, but it was deleted by an admin in 2009 with the reason "[Fatuous](https://en.wiktionary.org/wiki/fatuous) entry". (But we can't judge this too harshly without knowing what the entry looked like at the time. It might have just been some silly vandalism like "*(colloquial)* My math teacher, Mr. Lowell".)
+Interestingly, Wiktionary did once have an entry for *assbag*, but it was [deleted by an admin in 2009](https://en.wiktionary.org/w/index.php?title=Special:Log&logid=2917072) with the reason "Fatuous entry". (But we can't judge this too harshly without knowing what the entry looked like at the time. It might have just been some silly vandalism like "*(colloquial)* My math teacher, Mr. Lowell".)
 
-It's worth noting that Green's Dictionary of Slang, another excellent free online dictionary, has entries for *[dicknose](https://greensdictofslang.com/entry/7xn3mmi#3tbcbxi)*  and *[ass-bag](https://greensdictofslang.com/entry/ywlso5i#7wqdpoy)*, defining both as general terms of abuse.
+It's worth noting that Green's Dictionary of Slang, another excellent free online dictionary, does have entries for *[dicknose](https://greensdictofslang.com/entry/7xn3mmi#3tbcbxi)*  and *[ass-bag](https://greensdictofslang.com/entry/ywlso5i#7wqdpoy)*, defining both as general terms of abuse. It also defines *[shitrag](https://greensdictofslang.com/entry/2jwxjqa#4xls6aq)* as "a third-rate publication" (it also seems to be commonly used as a general term of abuse, on Reddit and elsewhere). But on the whole, Wiktionary's coverage seems to be stronger -- Green's is missing a number of high-frequency compounds which Wiktionary does include, such as *twatwaffle*, *libtard*, or *fucknugget*. Green's is even missing *shitlord*, which is one of the top 10 compounds in the dataset!
 
 ### Words Wiktionary maybe *shouldn't* have
 
@@ -115,7 +127,7 @@ On the other hand, there are a few words in Wiktionary which are vanishingly rar
 
 {% include compound_curses/rare_wikt_terms_table.md %}
 
-Of course, just because they're rare on Reddit doesn't mean they weren't in common use at some time and place. (Though I'm skeptical of *homowhore*. A google books search finds only two results, one of which is a [scanno](https://en.wiktionary.org/wiki/scanno) for *somewhere*.)
+Of course, just because they're rare on Reddit doesn't mean they weren't in common use at some time and place. (Though I'm skeptical of some of these. For example, a Google Books search for *homowhore* finds only two results, one of which is a [scanno](https://en.wiktionary.org/wiki/scanno) for *somewhere*.)
 
 ## The politics of pejoration
 

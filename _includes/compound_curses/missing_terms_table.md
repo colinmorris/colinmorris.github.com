@@ -1,6 +1,5 @@
 | term                                                  | count   |
 |:------------------------------------------------------|:--------|
-| [gaybro](https://en.wiktionary.org/wiki/gaybro)       | 12,267  |
 | [shitrag](https://en.wiktionary.org/wiki/shitrag)     | 7,295   |
 | [assbag](https://en.wiktionary.org/wiki/assbag)       | 6,883   |
 | [titfucker](https://en.wiktionary.org/wiki/titfucker) | 6,827   |
