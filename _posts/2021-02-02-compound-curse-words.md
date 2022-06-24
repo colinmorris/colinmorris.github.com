@@ -8,21 +8,19 @@ thumbnail: "/assets/compound_curses/wikt_matrix.png"
 excerpt: "What can Reddit comment data tell us about the rules governing the formation of insulting compound words like 'fartface', 'scumwad', or 'assgoblin'?"
 ---
 
-<!-- Notes from 06/10 rereading:
+<!-- TODO
 Prose:
-- James notes
-    - collision probability
-- Flexibility vignette doesn't have that much payoff. Can maybe cut, or shrink? (Esp. because these plots have the most offensive terms in the whole post - faggot/fag, cunt)
-    - maybe think about a frequency threshold to exclude fag/faggot? Don't want it to become a distraction.
-    - also, should scatterplots have titles or smth to make it clearer which is which?
-    - "all 66"
 - draft text for reddit/twitter posts
 - tighten up ending?
-- gemination
-
-Technical:
-- generate a captioned version of matrix for twitter/reddit
+    - link to James BP might be a good thing to wrap up with
 - test on mobile
+- latex?
+
+Matrix:
+- how grokkable is the matrix without context? Would it help to label the rows as prefixes? Add a dash after each to indicate that it's a prefix?
+    - or maybe just add another subtitle line like "Rows (prefixes) and columns (suffixes) sorted by total frequency"
+- generate a captioned version of matrix for twitter/reddit
+    - need to decide on title
 
 -->
 
@@ -65,17 +63,17 @@ In fact, the dataset approximately follows [Zipf's law](https://en.wikipedia.org
 
 ## The Matrix of Pejoration
 
-The full 66 x 73 matrix of all prefixes and suffixes is too big to fit readably in a single plot, so I've reproduced a 20 x 20 subset below, which includes many of the most productive affixes. Note that frequency is mapped to colour using a logarithmic scale, because it varies over several orders of magnitude.
+The full 66 x 73 matrix of all prefixes and suffixes is too big to fit readably in a single plot, so I've shown a 20 x 20 subset below, which includes many of the most productive affixes. Note that frequency is mapped to colour using a logarithmic scale, because it varies over several orders of magnitude.
 
 ![png](/assets/compound_curses/plain_matrix.png)
 
-The rows and columns are sorted by total frequency. Of the 400 cells here, only 18 have a count of zero (examples: *dumbgoblin*, *dirthat*, *libsucker*).
+The rows and columns are sorted by total frequency. Of the 400 cells here, only 13 have a count of zero (examples: *dumbgoblin*, *dirthat*, *libsucker*).
 
-## Flexible and inflexible components
+## Flexible and inflexible affixes
 
 One of the first things that sticks out from the above visualization is that some affixes are much more flexible (or, to use a term of art from linguistics, ["productive"](https://en.wikipedia.org/wiki/Productivity_(linguistics))) than others. Some rows have most of their weight concentrated on a single cell -- for example, *dirt-* strongly combines with *-bag*, but not much else. Others, like *fuck-* and *dick-*, have significant co-occurrences with almost all suffixes.
 
-I experimented with a few metrics for quantifying this notion of an affix's "flexibility" (including measures of statistical diversity like Shannon entropy). The one that I found best matched my intution was simply the sum of the logarithms of the counts. You can think of this as the total amount of "redness" of an affix's row or column in the above matrix visualization.
+I experimented with a few metrics for quantifying this notion of an affix's "flexibility" (including measures of statistical diversity like [Shannon entropy](https://en.wikipedia.org/wiki/Shannon_entropy)). The one that I found best matched my intution was simply the sum of the logarithms of the counts. You can think of this as the total amount of "redness" of an affix's row or column in the above matrix visualization.
 
 
 To take a toy example:
@@ -113,7 +111,7 @@ Below are some of the most frequent compounds *not* in Wiktionary, sorted by cou
 
 {% include compound_curses/missing_terms_table.md %}
 
-There are a couple odd entries here. *femnazi* is likely just a misspelling of *[feminazi](https://en.wiktionary.org/wiki/feminazi)*. *dumbbitch* is on the list because it was actually a keyword on the [/r/fffffffuuuuuuuuuuuu/](https://www.reddit.com/r/fffffffuuuuuuuuuuuu/) subreddit, used to generate the [Yao Ming reaction face](https://knowyourmeme.com/memes/yao-ming-face-bitch-please#fn14) in comments, a stock rage comic element. (If none of that meant anything to you, maybe ask a millennial male relative when the narwhal bacons.)
+There are a couple odd entries here. *femnazi* is likely just a misspelling of *[feminazi](https://en.wiktionary.org/wiki/feminazi)*. *dumbbitch* is on the list because it was actually a keyword on the [/r/fffffffuuuuuuuuuuuu/](https://www.reddit.com/r/fffffffuuuuuuuuuuuu/) subreddit more than a decade ago, used to generate the [Yao Ming reaction face](https://knowyourmeme.com/memes/yao-ming-face-bitch-please#fn14) in comments, a stock rage comic element. (The foregoing sentence will probably be meaningless to you unless you were part of the mostly male, millennial userbase of primeval Reddit. Don't worry -- you didn't miss much.)
 
 But the others seem like genuine oversights -- words which ought to be included in a "complete" lexicon of the English language, and which are in sufficiently widespread use to satisfy Wiktionary's [criteria for inclusion](https://en.wiktionary.org/wiki/Wiktionary:Criteria_for_inclusion).
 
@@ -151,7 +149,7 @@ The question of *why* certain terms combine more felicitously than others is fas
 
 Our synonyms seem to disagree more often than they agree.
 
-The repetition of consonants in compounds like *bummonkey* or *assslut* (a phenomenon technically known as [gemination](https://en.wikipedia.org/wiki/Gemination#English)) is orthographically and phonetically awkward, and so it makes sense that these compounds would be avoided. (Alternative spellings like *asslut*, or *bum-monkey* are somewhat more common, but still rare.)
+The repetition of consonants in compounds like *bummonkey* or *assslut* is orthographically and phonetically awkward, so it makes sense that these compounds would be avoided. (Alternative spellings like *asslut*, or *bum-monkey* are somewhat more common, but still rare.)
 
 But other lacunae are harder to account for. *Butthead* is common, so why are *asshead* and *bumhead* so rare? Why does *buttclown* fail where *assclown* succeeds?
 
