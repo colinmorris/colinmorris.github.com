@@ -3,7 +3,6 @@ layout: post
 title: "Compound pejoratives on Reddit – from <i>buttface</i> to <i>wankpuffin</i>"
 custom_css: "compound_curses"
 tags: [linguistics]
-draft: true
 thumbnail: "/assets/compound_curses/wikt_matrix.png"
 excerpt: "What can Reddit comment data tell us about the rules governing the formation of insulting compound words like 'fartface', 'scumwad', or 'assgoblin'?"
 ---
