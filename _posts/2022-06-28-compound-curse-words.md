@@ -47,7 +47,7 @@ In fact, the dataset approximately follows [Zipf's law](https://en.wikipedia.org
 
 ## The Matrix of Pejoration
 
-The full 66 x 73 matrix of all prefixes and suffixes is too big to fit readably in a single plot, so I've shown a 20 x 20 subset below, which includes many of the most productive affixes. Note that frequency is mapped to colour using a logarithmic scale, because it varies over several orders of magnitude.
+The full 66 x 73 matrix of all prefixes and suffixes is too big to fit readably in a single plot, so I've shown a 20 x 20 subset below, which includes many of the most frequent affixes. Note that frequency is mapped to colour using a logarithmic scale, because it varies over several orders of magnitude.
 
 ![png](/assets/compound_curses/plain_matrix.png)
 
