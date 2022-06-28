@@ -43,13 +43,13 @@ The full "matrix" of combinations is surprisingly dense. Of the ~4,800 possible 
 
 In fact, the dataset approximately follows [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law), meaning that a log-log plot of term rank vs. frequency is close to a straight line:
 
-![png](/assets/compound_curses/zipf.png)
+![Log-log scatterplot of compound rank vs. frequency, showing a linear relationship](/assets/compound_curses/zipf.png)
 
 ## The Matrix of Pejoration
 
 The full 66 x 73 matrix of all prefixes and suffixes is too big to fit readably in a single plot, so I've shown a 20 x 20 subset below, which includes many of the most frequent affixes. Note that frequency is mapped to colour using a logarithmic scale, because it varies over several orders of magnitude.
 
-![png](/assets/compound_curses/plain_matrix.png)
+![20x20 heatmap matrix showing the frequency of different combinations of prefixes and suffixes](/assets/compound_curses/plain_matrix.png)
 
 The rows and columns are sorted by total frequency. Of the 400 cells here, only 13 have a count of zero (examples: *dumbgoblin*, *dirthat*, *libsucker*).
 
@@ -70,13 +70,13 @@ Here the total frequency of the prefix *dip* is far greater than that of *butt*,
 
 The scatter plot below shows total frequency vs. this log sum metric for most of the prefixes in the dataset (including many not present in the matrix above):
 
-![png](/assets/compound_curses/prefix_collisions.png)
+![Scatterplot of prefixes showing total frequency vs. "flexibility"](/assets/compound_curses/prefix_collisions.png)
 
 *shit-* and *fuck-* are clear standouts. But we should also give credit to prefixes like *turd-* and *poop-* which are punching far above their weight, outgunning prefixes which are orders of magnitude above them in total frequency, like *dumb-*, *scum-*, and *dip-*.
 
 Here's the same thing for suffixes:
 
-![png](/assets/compound_curses/suffix_collisions.png)
+![Scatterplot of suffix flexibility](/assets/compound_curses/suffix_collisions.png)
 
 The dynamic duo of *shit* and *fuck* also put up a strong showing in their capacity as suffixes, though *-face* clearly takes the cake as the most prolifically diverse suffix.
 
@@ -84,7 +84,7 @@ The dynamic duo of *shit* and *fuck* also put up a strong showing in their capac
 
 Below is our matrix of profanity again, but this time I've added a glyph to mark which compounds have a definition on English Wiktionary at the time of writing. (If you're not familiar, Wiktionary is a wiki dictionary, a sister project to Wikipedia. Despite getting a lot less attention than Wikipedia, and having orders of magnitude fewer active editors, I find the breadth of its coverage and quality of its definitions to be very high.)
 
-![png](/assets/compound_curses/wikt_matrix.png)
+![Heatmap matrix, with an "X" glyph added to compounds which have a definition on Wiktionary](/assets/compound_curses/wikt_matrix.png)
 
 The presence of a Wiktionary entry tracks pretty well with a term's popularity, with every term appearing in over 10,000 comments having an entry. But turning to the full list of compounds, a few apparent oversights emerge.
 
@@ -116,7 +116,7 @@ I included a few prefixes which are primarily used to insult based on political 
 
 <small>(If these epithets feel a little dated, keep in mind the dataset only extends up to 2020.)</small>
 
-![png](/assets/compound_curses/politics_matrix.png)
+![Heatmap showing attachment patterns for the prefixes "lib", "soy", "trump", and "right".](/assets/compound_curses/politics_matrix.png)
 
 The prefixes used against the left (*lib-* and *soy-*) have about 430,000 occurences between them, significantly exceeding *right-* and *trump-*, with 15,000 and 69,000, respectively. However, it's unclear to what degree this reflects the size of these political demographics on Reddit vs. their respective propensities to use vulgar language.
 
@@ -126,7 +126,7 @@ While *trump-* is only third in frequency among these prefixes, it is by far the
 
 The question of *why* certain terms combine more felicitously than others is fascinating to me. It's more than just a matter of semantics. Consider a family of synonyms like *ass*, *butt* and *bum*:
 
-![png](/assets/compound_curses/butt_matrix.png)
+![Heatmap showing attachment patterns for the prefixes "ass", "butt", and "bum".](/assets/compound_curses/butt_matrix.png)
 
 (For ease of comparison, I linearly scaled each row so they summed to the same amount. Thus the colour of a cell reflects the prefix's affinity for that suffix relative to all the suffixes shown here.)
 
