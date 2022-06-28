@@ -8,22 +8,6 @@ thumbnail: "/assets/compound_curses/wikt_matrix.png"
 excerpt: "What can Reddit comment data tell us about the rules governing the formation of insulting compound words like 'fartface', 'scumwad', or 'assgoblin'?"
 ---
 
-<!-- TODO
-Prose:
-- draft text for reddit/twitter posts
-- tighten up ending?
-    - link to James BP might be a good thing to wrap up with
-- test on mobile
-- latex?
-
-Matrix:
-- how grokkable is the matrix without context? Would it help to label the rows as prefixes? Add a dash after each to indicate that it's a prefix?
-    - or maybe just add another subtitle line like "Rows (prefixes) and columns (suffixes) sorted by total frequency"
-- generate a captioned version of matrix for twitter/reddit
-    - need to decide on title
-
--->
-
 Dirty words are, let's face it, a lot of fun. If you want to express your dislike for someone and a standard insult like "jerk" or "moron" won't cut it, you can get creative. There are a few reliable recipes for forming derogatory noun-noun compounds in English. For example:
 
 - Start with a word for a disgusting or worthless substance
@@ -75,8 +59,7 @@ One of the first things that sticks out from the above visualization is that som
 
 I experimented with a few metrics for quantifying this notion of an affix's "flexibility" (including measures of statistical diversity like [Shannon entropy](https://en.wikipedia.org/wiki/Shannon_entropy)). The one that I found best matched my intution was simply the sum of the logarithms of the counts. You can think of this as the total amount of "redness" of an affix's row or column in the above matrix visualization.
 
-
-To take a toy example:
+Let's look at a small toy example with nice round numbers:
 
 |           | fart | head | stick | breath |
 |:----------|:-----|:-----|:------|:-------|
@@ -85,7 +68,7 @@ To take a toy example:
 
 Here the total frequency of the prefix *dip* is far greater than that of *butt*, but its "log sum" is log(1) + log(10) + log(1,000,000) + log(1) = 0 + 1 + 6 + 0 = 7, which is less than *butt*'s, which is 2 + 5 + 1 + 3 = 11. The contribution to this score from any single high frequency compound is subject to greatly diminishing returns, so it pays to diversify.
 
-The scatter plot below shows total frequency vs. this log sum metric for most of the prefixes in the dataset (including many not included in the matrix above):
+The scatter plot below shows total frequency vs. this log sum metric for most of the prefixes in the dataset (including many not present in the matrix above):
 
 ![png](/assets/compound_curses/prefix_collisions.png)
 
@@ -121,7 +104,7 @@ It's worth noting that Green's Dictionary of Slang, another excellent free onlin
 
 ### Words Wiktionary maybe *shouldn't* have
 
-On the other hand, there are a few words in Wiktionary which are vanishingly rare on Reddit, including 8 which appear less than 10 times each:
+On the other hand, there are a few compounds in Wiktionary which are vanishingly rare on Reddit, including 8 which appear less than 10 times each:
 
 {% include compound_curses/rare_wikt_terms_table.md %}
 
@@ -129,9 +112,9 @@ Of course, just because they're rare on Reddit doesn't mean they weren't in comm
 
 ## The politics of pejoration
 
-I included a few prefixes which are primarily used to insult based on political orientation (presented here with a few of the suffixes with which they collectively appear most frequently):
+I included a few prefixes which are primarily used to insult based on political orientation. They're presented here with a few of the suffixes with which they collectively appear most frequently:
 
-<small>If these epithets feel a little dated, keep in mind the dataset only extends up to 2020.</small>
+<small>(If these epithets feel a little dated, keep in mind the dataset only extends up to 2020.)</small>
 
 ![png](/assets/compound_curses/politics_matrix.png)
 
@@ -153,11 +136,11 @@ The repetition of consonants in compounds like *bummonkey* or *assslut* is ortho
 
 But other lacunae are harder to account for. *Butthead* is common, so why are *asshead* and *bumhead* so rare? Why does *buttclown* fail where *assclown* succeeds?
 
-For that matter, why are some affixes so much more productive than other terms from the same semantic category? *-face*, *-head*, and *-brain* are extremely productive suffixes. Why not other body parts? Why do *poopheart*, *scumeyes*, *dickhand*, or *monkeyhair* just sound ridiculous rather than wounding? Perhaps head, face, and brains are uniquely suited to metonymically referring to a person as a whole.
+For that matter, why are some affixes so much more productive than other terms from the same semantic category? *-face*, *-head*, and *-brain* are extremely productive suffixes. Why not other body parts? Why do *poopheart*, *scumeyes*, *dickhand*, or *monkeyhair* just sound ridiculous rather than wounding? Perhaps head, face, and brains are uniquely suited to metonymically referring to a person as a whole (but why?).
 
 The full dataset of Reddit pejorative compounds is [available here on GitHub](https://github.com/colinmorris/pejorative-compounds). The repo also includes:
 - a very long README documenting some of the technical details of the data collection process, including notes on false positives (some of which we can automatically filter out, and some we can't)
-- the scripts used to create the dataset
+- the scripts used to scrape and process the dataset
 - the code used to generate the visualizations in this post
 
 Special thanks to my cousin Kate who opened my eyes to the joy of taboo compound formation many years ago with her Shakespearean coinage, "fuckmitten". Still not entirely sure what it means, but I think about it a lot.
