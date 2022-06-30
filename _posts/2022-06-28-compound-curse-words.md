@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Compound pejoratives on Reddit – from <i>buttface</i> to <i>wankpuffin</i>"
+headtitle: "Compound pejoratives on Reddit – from 'buttface' to 'wankpuffin'"
 custom_css: "compound_curses"
 tags: [linguistics]
 thumbnail: "/assets/compound_curses/wikt_matrix.png"
