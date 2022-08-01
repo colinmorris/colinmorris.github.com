@@ -2,6 +2,7 @@
 layout: post
 title: A brief history of "men who have sex with men"
 tags: [linguistics]
+thumbnail: "/assets/msm/nyt.png"
 ---
 
 With monkeypox in the news, some people are encountering the phrase "men who have sex with men" ("MSM" for short) for the first time. I've even seen some hot takes positing that it's a new invention being pushed by woke moralists.
