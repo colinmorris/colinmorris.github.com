@@ -163,4 +163,4 @@ Well, here's a chart showing the annual number of articles using this phrase in 
 
 ![Number of NYT articles containing "men who have sex with (other) men" per year from 1993-2022](/assets/msm/nyt.png)
 
-It's been there all along! Sure, 2022 is a record high, but that's pretty easily explained by the fact that a virus outbreak disproportionately affecting MSM is a major news story! (47 of the 50 results for this year also include the term "monkeypox".)
+The Times did use the term during the first two decades of the AIDS epidemic, but only rarely. Its usage picks up rapidly in the early 2000s. 2022 is a record year by a large margin, but this doesn't imply an increased push to use this term. It's more easily explained by the fact that a disease disproportionately affecting MSM is a major news story. If we excluded articles that include "monkeypox" from the above chart, the bar for 2022 would be at a mere 3 so far.
