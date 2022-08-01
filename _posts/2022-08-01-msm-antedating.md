@@ -8,8 +8,8 @@ thumbnail: "/assets/msm/nyt.png"
 With monkeypox in the news, some people are encountering the phrase "men who have sex with men" ("MSM" for short) for the first time. I've even seen some hot takes positing that it's a new invention being pushed by woke moralists.
 
 <div>
-    <img src="/assets/msm/tweets.png" height="600px"
-     style="display:block; margin: 1em auto;"
+    <img src="/assets/msm/tweets.png"
+     style="display:block; margin: 1em auto; max-height: 600px;"
      alt="Screenshots of some tweets describing 'men who have sex with men' as a new or unfamiliar phrase"
      />
 </div>
