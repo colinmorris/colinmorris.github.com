@@ -2,6 +2,7 @@
 title: "Does ChatGPT know about things Wikipedia doesn't?"
 tags: [wikipedia, machine-learning]
 excerpt: "Damaged Goods is a 1901 play about syphilis. It is so obscure it doesn't have a Wikipedia article. Does ChatGPT know anything about it?"
+thumbnail: "/assets/damaged_goods/cover.jpg"
 ---
 
 I've spent a lot of time editing Wikipedia. I do it for many reasons, but one of the sillier ones floating around the margins of my consciousness is that I like to think that, by expanding Wikipedia, I am in some small way helping the advance of AI and speeding along the arrival of the singularity. After all, Wikipedia has historically been an important training corpus for AI models.
